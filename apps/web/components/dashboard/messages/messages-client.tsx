@@ -631,6 +631,14 @@ function ComposeModal({
   const [receiver, setReceiver] = useState<RecipientUser | null>(null)
   const [subject, setSubject] = useState("")
   const [body, setBody] = useState("")
+  const [attachment, setAttachment] = useState<{
+    url: string
+    name: string
+    size: number
+    type: string
+  } | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   const recipients = useQuery<{ items: RecipientUser[]; roles: string[] }>({
     queryKey: ["messages-recipients", q, roleFilter],
@@ -644,6 +652,45 @@ function ComposeModal({
     enabled: open,
   })
 
+  async function pickFile(file: File) {
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Max 10 MB")
+      return
+    }
+    setUploading(true)
+    try {
+      const presignRes = await fetch("/api/upload/presign", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          filename: file.name,
+          contentType: file.type,
+          size: file.size,
+          scope: "messages",
+        }),
+      })
+      if (!presignRes.ok) {
+        const e = (await presignRes.json().catch(() => ({}))) as { error?: string }
+        throw new Error(e.error ?? "Presign failed")
+      }
+      const { uploadUrl, publicUrl } = (await presignRes.json()) as {
+        uploadUrl: string
+        publicUrl: string
+      }
+      const put = await fetch(uploadUrl, {
+        method: "PUT",
+        body: file,
+        headers: { "content-type": file.type },
+      })
+      if (!put.ok) throw new Error("Upload failed")
+      setAttachment({ url: publicUrl, name: file.name, size: file.size, type: file.type })
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Upload failed")
+    } finally {
+      setUploading(false)
+    }
+  }
+
   const send = useMutation({
     mutationFn: async () => {
       if (!receiver) throw new Error("Pick a recipient")
@@ -654,6 +701,7 @@ function ComposeModal({
           receiverId: receiver.id,
           subject: subject || undefined,
           body,
+          attachments: attachment ? [attachment] : undefined,
         }),
       })
       const r = await res.json().catch(() => ({}))
@@ -667,6 +715,7 @@ function ComposeModal({
       setReceiver(null)
       setSubject("")
       setBody("")
+      setAttachment(null)
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   })
@@ -742,13 +791,62 @@ function ComposeModal({
             <Label className="text-xs">Message</Label>
             <Textarea rows={5} value={body} onChange={(e) => setBody(e.target.value)} />
           </div>
+          <div>
+            <Label className="text-xs">Attachment (optional)</Label>
+            {attachment ? (
+              <div className="mt-1 flex items-center gap-2 rounded-md border bg-muted/40 px-2 py-1 text-xs">
+                <Paperclip className="h-3 w-3" />
+                <span className="truncate flex-1">{attachment.name}</span>
+                <button
+                  type="button"
+                  className="text-muted-foreground hover:text-foreground"
+                  onClick={() => setAttachment(null)}
+                  aria-label="Remove attachment"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            ) : (
+              <>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*,application/pdf"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0]
+                    if (f) void pickFile(f)
+                    e.target.value = ""
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="mt-1"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                >
+                  {uploading ? (
+                    <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Paperclip className="mr-1.5 h-3.5 w-3.5" />
+                  )}
+                  Add file
+                </Button>
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  PDF or image, max 10 MB.
+                </p>
+              </>
+            )}
+          </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
           <Button
-            disabled={!receiver || !body.trim() || send.isPending}
+            disabled={!receiver || !body.trim() || send.isPending || uploading}
             onClick={() => send.mutate()}
           >
             {send.isPending ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Send className="mr-1.5 h-4 w-4" />}

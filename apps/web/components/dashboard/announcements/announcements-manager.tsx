@@ -42,8 +42,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
 import { RichBody } from "@/components/dashboard/announcements/rich-body"
+import { RichEditor } from "@/components/dashboard/announcements/rich-editor"
 
 type Audience = "ALL" | "STUDENTS" | "PARENTS" | "STAFF" | "CLASS" | "SECTION"
 type Priority = "NORMAL" | "IMPORTANT" | "URGENT"
@@ -138,7 +138,7 @@ export function AnnouncementsManager({
           <h1 className="text-2xl font-bold tracking-tight">Announcements</h1>
           <p className="text-sm text-muted-foreground">
             Broadcast school updates to staff, parents, students, or a specific class.
-            Supports markdown — **bold**, *italic*, links, lists.
+            Rich text — bold, italic, lists, links.
           </p>
         </div>
         <Button onClick={() => setComposeOpen(true)} size="sm">
@@ -560,10 +560,9 @@ function ComposeDialog({
             {mode === "edit" ? "Edit announcement" : "New announcement"}
           </DialogTitle>
           <DialogDescription>
-            Markdown is supported.
             {mode === "edit"
-              ? " Editing won't re-send notifications unless you tick the box below."
-              : ""}
+              ? "Editing won't re-send notifications unless you tick the box below."
+              : "Compose your announcement and pick how it should fan out."}
           </DialogDescription>
         </DialogHeader>
 
@@ -577,18 +576,13 @@ function ComposeDialog({
             />
           </Field>
 
-          <Field label="Message (markdown)">
-            <Textarea
+          <Field label="Message">
+            <RichEditor
               value={form.body}
-              onChange={(e) => update("body", e.target.value)}
-              placeholder={"Details, dates, action items.\n\nUse **bold**, *italic*, [links](https://example.com), and lists."}
-              rows={7}
+              onChange={(md) => update("body", md.slice(0, 4000))}
               maxLength={4000}
-              className="font-mono text-sm"
+              placeholder="Use the toolbar for headings, lists, and links."
             />
-            <p className="text-[11px] text-muted-foreground">
-              {form.body.length}/4000 characters · supports **bold**, *italic*, links, lists.
-            </p>
           </Field>
 
           <Field label="Attachments">

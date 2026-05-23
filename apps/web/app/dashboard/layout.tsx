@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
+import { SyncManager } from "@/components/pwa/sync-manager"
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
@@ -25,6 +26,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       school={school}
     >
       {children}
+      <SyncManager />
     </DashboardShell>
   )
 }

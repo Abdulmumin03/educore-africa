@@ -74,7 +74,7 @@ export function TimetableClient({
   const [endTime, setEndTime] = useState("15:00")
   const [days, setDays] = useState<number[]>([1, 2, 3, 4, 5]) // Mon–Fri
   const [breakAfter, setBreakAfter] = useState(4)
-  const [breakDuration, setBreakDuration] = useState(20)
+  const [breakDuration] = useState(20)
   const [plans, setPlans] = useState<ClassPlan[]>([])
   const [result, setResult] = useState<GenerateResponse | null>(null)
 
@@ -151,10 +151,17 @@ export function TimetableClient({
         const e = (await res.json().catch(() => ({}))) as { error?: string }
         throw new Error(e.error ?? "Failed")
       }
-      return res.json() as Promise<{ saved: number }>
+      return res.json() as Promise<{ saved: number; conflictCount?: number }>
     },
     onSuccess: (d) => {
-      toast.success(`Saved ${d.saved} timetable slot${d.saved === 1 ? "" : "s"}`)
+      const base = `Saved ${d.saved} timetable slot${d.saved === 1 ? "" : "s"}`
+      if (d.conflictCount && d.conflictCount > 0) {
+        toast.warning(
+          `${base} — ${d.conflictCount} teacher double-booking${d.conflictCount === 1 ? "" : "s"} detected. Open /dashboard/timetable to resolve.`,
+        )
+      } else {
+        toast.success(base)
+      }
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   })

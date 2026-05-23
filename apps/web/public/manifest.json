@@ -1,0 +1,39 @@
+{
+  "name": "EduCore Africa",
+  "short_name": "EduCore",
+  "description": "Multi-tenant school management system for African K-12 schools.",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFFFFF",
+  "theme_color": "#0D2B5E",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Mark attendance",
+      "short_name": "Attendance",
+      "url": "/dashboard/attendance",
+      "icons": [{ "src": "/icons/icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "View results",
+      "short_name": "Results",
+      "url": "/dashboard/grades",
+      "icons": [{ "src": "/icons/icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Pay fees",
+      "short_name": "Fees",
+      "url": "/dashboard/finance",
+      "icons": [{ "src": "/icons/icon.svg", "sizes": "any" }]
+    }
+  ]
+}

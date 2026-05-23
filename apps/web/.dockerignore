@@ -1,0 +1,16 @@
+# Reduce build context and avoid copying secrets / heavy folders.
+node_modules
+.next
+.turbo
+.git
+.vscode
+.idea
+.env
+.env.*
+!.env.example
+*.log
+coverage
+e2e
+playwright-report
+__tests__
+docs

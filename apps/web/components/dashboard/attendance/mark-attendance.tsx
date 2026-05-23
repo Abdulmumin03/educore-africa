@@ -174,30 +174,54 @@ export function MarkAttendance() {
   const submit = useMutation({
     mutationFn: async () => {
       if (!roster) throw new Error("No roster loaded")
+      const body = {
+        classId,
+        sectionId,
+        date,
+        entries: roster.map((r) => ({
+          studentId: r.studentId,
+          status: r.status,
+          remark: r.remark,
+        })),
+      }
+
+      // Offline path — stash the write in IndexedDB and let SyncManager
+      // replay when the browser reconnects. Same (sectionId, date) key
+      // overwrites prior offline edits before sync, so the user can keep
+      // tweaking and only the latest version uploads.
+      const isOffline =
+        typeof navigator !== "undefined" && navigator.onLine === false
+      if (isOffline) {
+        const { enqueue } = await import("@/lib/offline-queue")
+        await enqueue({
+          key: `attendance:${sectionId}:${date}`,
+          url: "/api/attendance",
+          method: "POST",
+          body,
+          label: `Attendance · ${sectionId} · ${date}`,
+        })
+        return { saved: 0, queued: 0, counts, offline: true as const }
+      }
+
       const res = await fetch("/api/attendance", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          classId,
-          sectionId,
-          date,
-          entries: roster.map((r) => ({
-            studentId: r.studentId,
-            status: r.status,
-            remark: r.remark,
-          })),
-        }),
+        body: JSON.stringify(body),
       })
       if (!res.ok) {
         const e = (await res.json().catch(() => ({}))) as { error?: string }
         throw new Error(e.error ?? "Failed")
       }
-      return res.json() as Promise<{ saved: number; queued: number; counts: typeof counts }>
+      return res.json() as Promise<{ saved: number; queued: number; counts: typeof counts; offline?: false }>
     },
     onSuccess: (d) => {
-      toast.success(
-        `Saved ${d.saved} entries · ${d.counts.ABSENT} absentee SMS queued (${d.queued} new)`,
-      )
+      if ("offline" in d && d.offline) {
+        toast.success("Saved locally — will sync when you're back online.")
+      } else {
+        toast.success(
+          `Saved ${d.saved} entries · ${d.counts.ABSENT} absentee SMS queued (${d.queued} new)`,
+        )
+      }
       qc.invalidateQueries({ queryKey: ["attendance-roster", sectionId, date] })
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),

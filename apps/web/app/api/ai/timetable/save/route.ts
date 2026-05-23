@@ -79,5 +79,79 @@ export async function POST(req: Request) {
     }
   }
 
-  return NextResponse.json({ ok: true, saved, replaced: replace })
+  // After save, surface teacher double-bookings across the affected sections so
+  // the AI Timetable UI can warn the user. Algorithm mirrors GET /api/timetable.
+  const persisted = await prisma.timetable.findMany({
+    where: {
+      schoolId: session.user.schoolId,
+      academicYearId,
+      sectionId: { in: sectionIds },
+      deletedAt: null,
+    },
+    select: {
+      id: true,
+      teacherId: true,
+      sectionId: true,
+      classId: true,
+      subjectId: true,
+      dayOfWeek: true,
+      startTime: true,
+      endTime: true,
+    },
+  })
+  const teacherIds = Array.from(new Set(persisted.map((p) => p.teacherId)))
+  const peers = teacherIds.length
+    ? await prisma.timetable.findMany({
+        where: {
+          schoolId: session.user.schoolId,
+          academicYearId,
+          teacherId: { in: teacherIds },
+          deletedAt: null,
+        },
+        select: {
+          id: true,
+          teacherId: true,
+          sectionId: true,
+          classId: true,
+          subjectId: true,
+          dayOfWeek: true,
+          startTime: true,
+          endTime: true,
+        },
+      })
+    : []
+
+  type DoubleBook = {
+    type: "teacher-double-booked"
+    teacherId: string
+    dayOfWeek: number
+    startTime: string
+    slotIds: string[]
+  }
+  const groups = new Map<string, typeof peers>()
+  for (const p of peers) {
+    const key = `${p.teacherId}-${p.dayOfWeek}-${p.startTime}`
+    const list = groups.get(key) ?? []
+    list.push(p)
+    groups.set(key, list)
+  }
+  const conflicts: DoubleBook[] = []
+  groups.forEach((group) => {
+    if (group.length < 2) return
+    conflicts.push({
+      type: "teacher-double-booked",
+      teacherId: group[0].teacherId,
+      dayOfWeek: group[0].dayOfWeek,
+      startTime: group[0].startTime,
+      slotIds: group.map((g) => g.id),
+    })
+  })
+
+  return NextResponse.json({
+    ok: true,
+    saved,
+    replaced: replace,
+    conflicts,
+    conflictCount: conflicts.length,
+  })
 }

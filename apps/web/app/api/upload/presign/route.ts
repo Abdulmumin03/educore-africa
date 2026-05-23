@@ -7,8 +7,18 @@ export const runtime = "nodejs"
 
 const IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp", "image/svg+xml"]
 const MESSAGE_TYPES = [...IMAGE_TYPES, "application/pdf"]
+const MEDIA_TYPES = [
+  ...MESSAGE_TYPES,
+  "video/mp4",
+  "video/webm",
+  "audio/mpeg",
+  "audio/mp4",
+  "audio/wav",
+  "audio/webm",
+]
 const IMAGE_MAX = 2 * 1024 * 1024 // 2 MB for branding uploads
 const MESSAGE_MAX = 10 * 1024 * 1024 // 10 MB for chat attachments
+const RESOURCE_MAX = 25 * 1024 * 1024 // 25 MB for learning resources (video/audio)
 
 const SCOPE_RULES = {
   onboarding: { types: IMAGE_TYPES, max: IMAGE_MAX },
@@ -16,6 +26,11 @@ const SCOPE_RULES = {
   documents: { types: MESSAGE_TYPES, max: MESSAGE_MAX },
   messages: { types: MESSAGE_TYPES, max: MESSAGE_MAX },
   announcements: { types: MESSAGE_TYPES, max: MESSAGE_MAX },
+  assignments: { types: MESSAGE_TYPES, max: MESSAGE_MAX },
+  lessons: { types: MESSAGE_TYPES, max: MESSAGE_MAX },
+  resources: { types: MEDIA_TYPES, max: RESOURCE_MAX },
+  books: { types: IMAGE_TYPES, max: IMAGE_MAX }, // library book covers
+  visitors: { types: IMAGE_TYPES, max: IMAGE_MAX }, // visitor photos
 } as const
 
 const bodySchema = z.object({
@@ -23,7 +38,18 @@ const bodySchema = z.object({
   contentType: z.string(),
   size: z.number().int().positive(),
   scope: z
-    .enum(["onboarding", "school", "documents", "messages", "announcements"])
+    .enum([
+      "onboarding",
+      "school",
+      "documents",
+      "messages",
+      "announcements",
+      "assignments",
+      "lessons",
+      "resources",
+      "books",
+      "visitors",
+    ])
     .default("onboarding"),
 })
 

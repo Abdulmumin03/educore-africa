@@ -62,7 +62,10 @@
       "Bash(xargs -0 grep -l \"VAPID\\\\|webPush\\\\|web-push\\\\|sendPush\")",
       "Bash(mkdir -p \"C:/Users/abdul/Documents/React Apps/educore-africa/packages/database/prisma/migrations/20260518010000_p09_communication_hub\")",
       "Bash(cp \"C:/tmp/p09_comms.sql\" \"C:/Users/abdul/Documents/React Apps/educore-africa/packages/database/prisma/migrations/20260518010000_p09_communication_hub/migration.sql\")",
-      "Bash(xargs grep -l \"presign\\\\|/api/upload\")"
+      "Bash(xargs grep -l \"presign\\\\|/api/upload\")",
+      "Bash(findstr /i \"messag announce communic notification sms whatsapp emergency\")",
+      "PowerShell(pnpm *)",
+      "PowerShell(docker compose up *)"
     ]
   }
 }
