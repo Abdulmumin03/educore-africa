@@ -2,8 +2,8 @@ import { z } from "zod"
 import JSZip from "jszip"
 import { prisma } from "@/lib/db"
 import { resolveGradeAccess } from "@/lib/grade-access"
-import { buildReportCardData } from "@/lib/report-card"
-import { renderReportCardPdf } from "@/lib/report-card-pdf"
+import { buildMidtermReportData } from "@/lib/midterm-report"
+import { renderMidtermReportPdf } from "@/lib/midterm-report-pdf"
 import { resolveTemplate, type ReportTemplateConfig } from "@/lib/report-template"
 
 export const runtime = "nodejs"
@@ -18,9 +18,8 @@ const querySchema = z.object({
 })
 
 /**
- * Stream a zip of report-card PDFs for every active student in the chosen
- * class/section + term. Skips students without a generated ReportCard row
- * (they should be created via /api/grades/report-cards/generate first).
+ * Stream a ZIP of midterm-report PDFs for every active student in the chosen
+ * class/section + term. Mirrors the term-end report-card ZIP route.
  */
 export async function POST(req: Request) {
   const access = await resolveGradeAccess()
@@ -65,19 +64,17 @@ export async function POST(req: Request) {
     ? `${term.academicYear.name.replace("/", "-")}-${term.type}`
     : termId
   const folderName = sectionId
-    ? `${enrollments[0]?.section.class.name}-Arm${enrollments[0]?.section.name}-${termLabel}`
-    : `${enrollments[0]?.section.class.name}-${termLabel}`
+    ? `midterm-${enrollments[0]?.section.class.name}-Arm${enrollments[0]?.section.name}-${termLabel}`
+    : `midterm-${enrollments[0]?.section.class.name}-${termLabel}`
   const folder = zip.folder(folderName)!
 
   const skipped: string[] = []
-  // Resolve the template once per curriculum so a 30-student class is at most
-  // ~2 lookups (typical hybrid schools have 1–2 curricula).
   const templateCache = new Map<string | "null", ReportTemplateConfig>()
 
   // Sequential render to keep memory bounded — @react-pdf/renderer holds the
   // full doc in memory per render.
   for (const e of enrollments) {
-    const data = await buildReportCardData({
+    const data = await buildMidtermReportData({
       schoolId: access.session.schoolId,
       studentId: e.student.id,
       termId,
@@ -91,12 +88,12 @@ export async function POST(req: Request) {
     if (!template) {
       template = await resolveTemplate(
         access.session.schoolId,
-        "GRADE",
+        "MIDTERM",
         data.curriculum.id,
       )
       templateCache.set(cacheKey, template)
     }
-    const pdf = await renderReportCardPdf(data, template)
+    const pdf = await renderMidtermReportPdf(data, template)
     const safeName = `${e.student.user.lastName}_${e.student.user.firstName}`.replace(
       /[^a-z0-9_-]/gi,
       "",

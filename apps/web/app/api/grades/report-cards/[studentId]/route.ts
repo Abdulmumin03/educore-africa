@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { resolveStudentAccess } from "@/lib/student-access"
 import { buildReportCardData } from "@/lib/report-card"
 import { renderReportCardPdf } from "@/lib/report-card-pdf"
+import { resolveTemplate } from "@/lib/report-template"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -26,7 +27,12 @@ export async function GET(req: Request, { params }: { params: { studentId: strin
   if (!data) return NextResponse.json({ error: "Not found" }, { status: 404 })
 
   if (format === "pdf") {
-    const pdf = await renderReportCardPdf(data)
+    const template = await resolveTemplate(
+      access.session.schoolId,
+      "GRADE",
+      data.curriculum.id,
+    )
+    const pdf = await renderReportCardPdf(data, template)
     const filename = `report-card-${data.student.admissionNumber}-${data.term.sessionName.replace("/", "-")}-${data.term.type}.pdf`
     return new Response(new Uint8Array(pdf), {
       headers: {

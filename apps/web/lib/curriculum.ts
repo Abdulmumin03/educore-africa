@@ -15,11 +15,17 @@ export type ResolvedCurriculum = {
   isDefault: boolean
   gradingScale: GradingSettings
   aiPromptHint: string | null
+  midtermComponents: string[]
 }
 
 function parseGrading(raw: unknown): GradingSettings {
   const parsed = gradingSettingsSchema.safeParse(raw)
   return parsed.success ? parsed.data : DEFAULT_GRADING
+}
+
+function parseMidtermComponents(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return []
+  return raw.filter((v): v is string => typeof v === "string")
 }
 
 function normaliseExamBody(value: string): ExamBodyCode {
@@ -39,6 +45,7 @@ function toResolved(row: {
   isDefault: boolean
   gradingScale: unknown
   aiPromptHint: string | null
+  midtermComponents: unknown
 }): ResolvedCurriculum {
   return {
     id: row.id,
@@ -49,6 +56,7 @@ function toResolved(row: {
     isDefault: row.isDefault,
     gradingScale: parseGrading(row.gradingScale),
     aiPromptHint: row.aiPromptHint,
+    midtermComponents: parseMidtermComponents(row.midtermComponents),
   }
 }
 

@@ -15,31 +15,36 @@ export default async function SchoolSettingsPage() {
   const schoolId = session.user.schoolId
   if (!schoolId) redirect("/dashboard")
 
-  const [school, academicYears, holidays, classes, subjects, curricula] = await Promise.all([
-    prisma.school.findUnique({ where: { id: schoolId } }),
-    prisma.academicYear.findMany({
-      where: { schoolId, deletedAt: null },
-      orderBy: { startDate: "desc" },
-      include: { terms: { orderBy: { startDate: "asc" } } },
-    }),
-    prisma.holiday.findMany({
-      where: { schoolId, deletedAt: null },
-      orderBy: { startDate: "asc" },
-    }),
-    prisma.class.findMany({
-      where: { schoolId, deletedAt: null },
-      orderBy: { level: "asc" },
-      include: {
-        sections: { where: { deletedAt: null }, orderBy: { name: "asc" } },
-      },
-    }),
-    prisma.subject.findMany({
-      where: { schoolId, deletedAt: null },
-      orderBy: { name: "asc" },
-      include: { curricula: { select: { curriculumId: true } } },
-    }),
-    listCurricula(schoolId),
-  ])
+  const [school, academicYears, holidays, classes, subjects, curricula, templates] =
+    await Promise.all([
+      prisma.school.findUnique({ where: { id: schoolId } }),
+      prisma.academicYear.findMany({
+        where: { schoolId, deletedAt: null },
+        orderBy: { startDate: "desc" },
+        include: { terms: { orderBy: { startDate: "asc" } } },
+      }),
+      prisma.holiday.findMany({
+        where: { schoolId, deletedAt: null },
+        orderBy: { startDate: "asc" },
+      }),
+      prisma.class.findMany({
+        where: { schoolId, deletedAt: null },
+        orderBy: { level: "asc" },
+        include: {
+          sections: { where: { deletedAt: null }, orderBy: { name: "asc" } },
+        },
+      }),
+      prisma.subject.findMany({
+        where: { schoolId, deletedAt: null },
+        orderBy: { name: "asc" },
+        include: { curricula: { select: { curriculumId: true } } },
+      }),
+      listCurricula(schoolId),
+      prisma.reportTemplate.findMany({
+        where: { schoolId, deletedAt: null },
+        orderBy: [{ kind: "asc" }, { isDefault: "desc" }, { name: "asc" }],
+      }),
+    ])
 
   if (!school) redirect("/dashboard")
 
@@ -112,6 +117,15 @@ export default async function SchoolSettingsPage() {
         isDefault: c.isDefault,
         gradingScale: c.gradingScale,
         aiPromptHint: c.aiPromptHint,
+        midtermComponents: c.midtermComponents,
+      }))}
+      reportTemplates={templates.map((t) => ({
+        id: t.id,
+        kind: t.kind,
+        name: t.name,
+        curriculumId: t.curriculumId,
+        isDefault: t.isDefault,
+        config: t.config,
       }))}
       settings={resolveSettings(school.settings)}
     />

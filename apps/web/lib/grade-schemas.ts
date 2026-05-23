@@ -75,9 +75,37 @@ export const aiPrincipalSchema = z.object({
     .max(20),
 })
 
+export const generateMidtermReportSchema = z.object({
+  classId: z.string().cuid(),
+  sectionId: z.string().cuid().optional(),
+  termId: z.string().cuid(),
+})
+
+export const patchMidtermReportSchema = z
+  .object({
+    termId: z.string().cuid(),
+    classTeacherComment: z.string().trim().max(2000).nullable().optional(),
+    principalComment: z.string().trim().max(2000).nullable().optional(),
+  })
+  .refine(
+    (v) =>
+      v.classTeacherComment !== undefined || v.principalComment !== undefined,
+    { message: "Nothing to update" },
+  )
+
+export const shareMidtermReportSchema = z.object({
+  studentId: z.string().cuid(),
+  termId: z.string().cuid(),
+  expiresInDays: z.number().int().min(1).max(60).default(14),
+  sendSms: z.boolean().default(false),
+})
+
 export type PatchGradeInput = z.infer<typeof patchGradeSchema>
 export type BulkGradesInput = z.infer<typeof bulkGradesSchema>
 export type GenerateReportCardInput = z.infer<typeof generateReportCardSchema>
+export type GenerateMidtermReportInput = z.infer<typeof generateMidtermReportSchema>
+export type PatchMidtermReportInput = z.infer<typeof patchMidtermReportSchema>
+export type ShareMidtermReportInput = z.infer<typeof shareMidtermReportSchema>
 export type ShareReportCardInput = z.infer<typeof shareReportCardSchema>
 export type AiRemarkInput = z.infer<typeof aiRemarkSchema>
 export type AiPrincipalInput = z.infer<typeof aiPrincipalSchema>

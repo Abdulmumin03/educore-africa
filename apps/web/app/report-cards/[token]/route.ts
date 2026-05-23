@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db"
 import { buildReportCardData } from "@/lib/report-card"
 import { renderReportCardPdf } from "@/lib/report-card-pdf"
+import { resolveTemplate } from "@/lib/report-template"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -35,7 +36,12 @@ export async function GET(_req: Request, { params }: { params: { token: string }
     data: { accesses: { increment: 1 }, lastAccessAt: new Date() },
   })
 
-  const pdf = await renderReportCardPdf(data)
+  const template = await resolveTemplate(
+    share.reportCard.schoolId,
+    "GRADE",
+    data.curriculum.id,
+  )
+  const pdf = await renderReportCardPdf(data, template)
   const filename = `report-card-${data.student.admissionNumber}-${data.term.sessionName.replace("/", "-")}-${data.term.type}.pdf`
   return new Response(new Uint8Array(pdf), {
     headers: {

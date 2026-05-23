@@ -6,6 +6,7 @@ export type CurriculumPreset = {
   examBodyCode: "WAEC" | "CAMBRIDGE" | "IB" | "NECO" | "NONE"
   aiPromptHint: string
   gradingScale: GradingSettings
+  midtermComponents: string[]
 }
 
 const NIGERIAN_CA: GradingSettings["caComponents"] = ["CA1", "CA2", "Mid-Term", "Assignment"]
@@ -34,6 +35,7 @@ export const CURRICULUM_PRESETS: CurriculumPreset[] = [
       caComponents: NIGERIAN_CA,
       positionRanking: true,
     },
+    midtermComponents: ["CA1", "Mid-Term"],
   },
   {
     code: "IGCSE",
@@ -58,6 +60,7 @@ export const CURRICULUM_PRESETS: CurriculumPreset[] = [
       caComponents: ["Coursework 1", "Coursework 2", "Practical"],
       positionRanking: false,
     },
+    midtermComponents: ["Coursework 1", "Practical"],
   },
   {
     code: "CHECKPOINT",
@@ -79,6 +82,7 @@ export const CURRICULUM_PRESETS: CurriculumPreset[] = [
       caComponents: ["Unit 1", "Unit 2", "Mid-Term", "Assignment"],
       positionRanking: false,
     },
+    midtermComponents: ["Unit 1", "Mid-Term"],
   },
   {
     code: "ALEVEL",
@@ -101,6 +105,7 @@ export const CURRICULUM_PRESETS: CurriculumPreset[] = [
       caComponents: ["Practical", "Coursework"],
       positionRanking: false,
     },
+    midtermComponents: ["Practical"],
   },
   {
     code: "NECO",
@@ -122,6 +127,7 @@ export const CURRICULUM_PRESETS: CurriculumPreset[] = [
       caComponents: NIGERIAN_CA,
       positionRanking: true,
     },
+    midtermComponents: ["CA1", "Mid-Term"],
   },
 ]
 

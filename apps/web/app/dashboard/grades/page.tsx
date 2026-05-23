@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { BarChart3, ClipboardEdit, FileSpreadsheet, GraduationCap } from "lucide-react"
+import { BarChart3, ClipboardEdit, FileSpreadsheet, GraduationCap, Hourglass } from "lucide-react"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -44,6 +44,12 @@ export default async function GradesLandingPage() {
       icon: GraduationCap,
       title: "Report cards",
       description: "Generate, share, and print PDF report cards.",
+    },
+    {
+      href: "/dashboard/grades/midterm-reports",
+      icon: Hourglass,
+      title: "Midterm reports",
+      description: "Live midterm PDFs off CA1 + mid-term components.",
     },
     {
       href: "/dashboard/grades/analytics",

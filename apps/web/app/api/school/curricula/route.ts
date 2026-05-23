@@ -8,14 +8,25 @@ import { listCurricula } from "@/lib/curriculum"
 
 export const runtime = "nodejs"
 
-const createSchema = z.object({
-  code: z.string().trim().min(2).max(30).regex(/^[A-Za-z0-9_-]+$/, "Use letters, digits, _ or -"),
-  name: z.string().trim().min(2).max(80),
-  examBodyCode: z.enum(EXAM_BODY_CODES),
-  aiPromptHint: z.string().trim().max(2000).optional(),
-  gradingScale: gradingSettingsSchema,
-  isDefault: z.boolean().optional(),
-})
+const createSchema = z
+  .object({
+    code: z.string().trim().min(2).max(30).regex(/^[A-Za-z0-9_-]+$/, "Use letters, digits, _ or -"),
+    name: z.string().trim().min(2).max(80),
+    examBodyCode: z.enum(EXAM_BODY_CODES),
+    aiPromptHint: z.string().trim().max(2000).optional(),
+    gradingScale: gradingSettingsSchema,
+    midtermComponents: z.array(z.string().min(1).max(40)).max(10).optional(),
+    isDefault: z.boolean().optional(),
+  })
+  .refine(
+    (v) =>
+      !v.midtermComponents ||
+      v.midtermComponents.every((c) => v.gradingScale.caComponents.includes(c)),
+    {
+      message: "Midterm components must be a subset of caComponents",
+      path: ["midtermComponents"],
+    },
+  )
 
 export async function GET() {
   const g = await requireSchoolAdmin()
@@ -60,6 +71,7 @@ export async function POST(req: Request) {
         examBodyCode: parsed.data.examBodyCode,
         aiPromptHint: parsed.data.aiPromptHint ?? null,
         gradingScale: parsed.data.gradingScale,
+        midtermComponents: parsed.data.midtermComponents ?? [],
         isDefault: parsed.data.isDefault ?? !existingDefault,
       },
     })

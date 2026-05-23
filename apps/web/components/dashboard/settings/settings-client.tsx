@@ -6,6 +6,7 @@ import { CalendarTab, type AcademicYearDTO, type HolidayDTO } from "@/components
 import { ClassesTab, type ClassDTO } from "@/components/dashboard/settings/classes-tab"
 import { SubjectsTab, type SubjectDTO } from "@/components/dashboard/settings/subjects-tab"
 import { CurriculaTab, type CurriculumDTO } from "@/components/dashboard/settings/curricula-tab"
+import { TemplatesTab, type ReportTemplateDTO } from "@/components/dashboard/settings/templates-tab"
 import { NotificationsTab } from "@/components/dashboard/settings/notifications-tab"
 import type { NotificationSettings } from "@/lib/school-settings"
 
@@ -16,6 +17,7 @@ type Props = {
   classes: ClassDTO[]
   subjects: SubjectDTO[]
   curricula: CurriculumDTO[]
+  reportTemplates: ReportTemplateDTO[]
   settings: { notifications: NotificationSettings }
 }
 
@@ -25,7 +27,8 @@ export function SettingsClient(props: Props) {
       <div>
         <h1 className="text-2xl font-bold tracking-tight">School settings</h1>
         <p className="text-sm text-muted-foreground">
-          Manage your school&apos;s profile, calendar, curricula, classes, subjects and notifications.
+          Manage your school&apos;s profile, calendar, curricula, classes, subjects, report
+          templates, and notifications.
         </p>
       </div>
 
@@ -36,6 +39,7 @@ export function SettingsClient(props: Props) {
           <TabsTrigger value="curricula">Curricula</TabsTrigger>
           <TabsTrigger value="classes">Classes & Sections</TabsTrigger>
           <TabsTrigger value="subjects">Subjects</TabsTrigger>
+          <TabsTrigger value="report-templates">Report Templates</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
         </TabsList>
 
@@ -53,6 +57,9 @@ export function SettingsClient(props: Props) {
         </TabsContent>
         <TabsContent value="subjects">
           <SubjectsTab subjects={props.subjects} curricula={props.curricula} />
+        </TabsContent>
+        <TabsContent value="report-templates">
+          <TemplatesTab templates={props.reportTemplates} curricula={props.curricula} />
         </TabsContent>
         <TabsContent value="notifications">
           <NotificationsTab initial={props.settings.notifications} />

@@ -123,6 +123,11 @@ enum SubjectCategory {
   TRADE
 }
 
+enum ReportTemplateKind {
+  GRADE
+  MIDTERM
+}
+
 enum AdmissionType {
   NEW
   TRANSFER
@@ -366,6 +371,7 @@ model School {
   evaluations             Evaluation[]
   trainings               TrainingLog[]
   reportCards             ReportCard[]
+  midtermReports          MidtermReport[]
   gradeImports            GradeImport[]
   questionBank            QuestionBank[]
   askConversations        AskConversation[]
@@ -379,6 +385,7 @@ model School {
   maintenanceRequests     MaintenanceRequest[]
   studentRouteAssignments StudentRouteAssignment[]
   curricula               Curriculum[]
+  reportTemplates         ReportTemplate[]
 
   @@index([slug])
   @@index([deletedAt])
@@ -501,6 +508,7 @@ model Term {
   staffAttendance StaffAttendance[]
   evaluations     Evaluation[]
   reportCards     ReportCard[]
+  midtermReports  MidtermReport[]
 
   @@unique([academicYearId, type])
   @@index([academicYearId, isCurrent])
@@ -597,22 +605,24 @@ model Subject {
 }
 
 model Curriculum {
-  id            String  @id @default(cuid())
-  schoolId      String  @map("school_id")
-  code          String // free-form school-defined code, e.g. "WAEC", "IGCSE", "CHECKPOINT"
-  name          String
-  examBodyCode  String  @default("NONE") @map("exam_body_code") // WAEC | CAMBRIDGE | IB | NECO | NONE — drives report-card sheet selection
-  isDefault     Boolean @default(false) @map("is_default")
-  gradingScale  Json    @map("grading_scale") // shape: GradingSettings from lib/school-settings
-  aiPromptHint  String? @map("ai_prompt_hint") // pasted into lesson-plan + question-bank prompts
+  id                 String  @id @default(cuid())
+  schoolId           String  @map("school_id")
+  code               String // free-form school-defined code, e.g. "WAEC", "IGCSE", "CHECKPOINT"
+  name               String
+  examBodyCode       String  @default("NONE") @map("exam_body_code") // WAEC | CAMBRIDGE | IB | NECO | NONE — drives report-card sheet selection
+  isDefault          Boolean @default(false) @map("is_default")
+  gradingScale       Json    @map("grading_scale") // shape: GradingSettings from lib/school-settings
+  aiPromptHint       String? @map("ai_prompt_hint") // pasted into lesson-plan + question-bank prompts
+  midtermComponents  Json    @default("[]") @map("midterm_components") // subset of gradingScale.caComponents — names summed for the midterm report
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  school   School              @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  classes  Class[]
-  subjects SubjectCurriculum[]
+  school          School              @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  classes         Class[]
+  subjects        SubjectCurriculum[]
+  reportTemplates ReportTemplate[]
 
   @@unique([schoolId, code])
   @@index([schoolId])
@@ -766,6 +776,7 @@ model Student {
   behaviorLogs        BehaviorLog[]
   documents           StudentDocument[]
   reportCards         ReportCard[]
+  midtermReports      MidtermReport[]
   discounts           StudentDiscount[]
   exeats              Exeat[]
   hostelIncidents     HostelIncident[]
@@ -1933,6 +1944,73 @@ model ReportCardShare {
   @@index([reportCardId])
   @@index([expiresAt])
   @@map("report_card_shares")
+}
+
+model MidtermReport {
+  id                  String    @id @default(cuid())
+  schoolId            String    @map("school_id")
+  studentId           String    @map("student_id")
+  termId              String    @map("term_id")
+  classTeacherComment String?   @map("class_teacher_comment")
+  principalComment    String?   @map("principal_comment")
+  aiPrincipal         Boolean   @default(false) @map("ai_principal")
+  lockedAt            DateTime? @map("locked_at")
+  generatedById       String?   @map("generated_by_id")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  school  School               @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  student Student              @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  term    Term                 @relation(fields: [termId], references: [id], onDelete: Cascade)
+  shares  MidtermReportShare[]
+
+  @@unique([studentId, termId])
+  @@index([schoolId, termId])
+  @@index([deletedAt])
+  @@map("midterm_reports")
+}
+
+model MidtermReportShare {
+  id              String    @id @default(cuid())
+  midtermReportId String    @map("midterm_report_id")
+  token           String    @unique // public, URL-safe
+  expiresAt       DateTime  @map("expires_at")
+  accesses        Int       @default(0)
+  lastAccessAt    DateTime? @map("last_access_at")
+  smsSentAt       DateTime? @map("sms_sent_at")
+  createdById     String?   @map("created_by_id")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  midtermReport MidtermReport @relation(fields: [midtermReportId], references: [id], onDelete: Cascade)
+
+  @@index([midtermReportId])
+  @@index([expiresAt])
+  @@map("midterm_report_shares")
+}
+
+model ReportTemplate {
+  id           String             @id @default(cuid())
+  schoolId     String             @map("school_id")
+  curriculumId String?            @map("curriculum_id") // null = applies to all curricula of this kind
+  kind         ReportTemplateKind
+  name         String
+  isDefault    Boolean            @default(false) @map("is_default")
+  config       Json // shape: ReportTemplateConfig in lib/report-template.ts
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  school     School      @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  curriculum Curriculum? @relation(fields: [curriculumId], references: [id], onDelete: SetNull)
+
+  @@unique([schoolId, kind, name])
+  @@index([schoolId, kind])
+  @@index([curriculumId])
+  @@index([deletedAt])
+  @@map("report_templates")
 }
 
 model GradeImport {

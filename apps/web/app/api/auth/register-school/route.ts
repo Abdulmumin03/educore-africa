@@ -104,6 +104,7 @@ export async function POST(req: Request) {
         examBodyCode: waecPreset.examBodyCode,
         aiPromptHint: waecPreset.aiPromptHint,
         gradingScale: waecPreset.gradingScale,
+        midtermComponents: waecPreset.midtermComponents,
         isDefault: true,
       },
     })

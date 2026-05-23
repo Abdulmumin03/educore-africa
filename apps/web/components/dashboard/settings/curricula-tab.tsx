@@ -42,6 +42,7 @@ export type CurriculumDTO = {
   isDefault: boolean
   gradingScale: GradingSettings
   aiPromptHint: string | null
+  midtermComponents: string[]
 }
 
 type FormState = {
@@ -50,6 +51,7 @@ type FormState = {
   examBodyCode: CurriculumDTO["examBodyCode"]
   aiPromptHint: string
   gradingScale: GradingSettings
+  midtermComponents: string[]
   isDefault: boolean
 }
 
@@ -65,6 +67,7 @@ const BLANK_FORM: FormState = {
     caComponents: [],
     positionRanking: false,
   },
+  midtermComponents: [],
   isDefault: false,
 }
 
@@ -87,6 +90,7 @@ export function CurriculaTab({ curricula }: { curricula: CurriculumDTO[] }) {
       examBodyCode: c.examBodyCode,
       aiPromptHint: c.aiPromptHint ?? "",
       gradingScale: c.gradingScale,
+      midtermComponents: c.midtermComponents,
       isDefault: c.isDefault,
     })
     setEditing(c)
@@ -102,6 +106,16 @@ export function CurriculaTab({ curricula }: { curricula: CurriculumDTO[] }) {
       examBodyCode: preset.examBodyCode,
       aiPromptHint: f.aiPromptHint || preset.aiPromptHint,
       gradingScale: preset.gradingScale,
+      midtermComponents: preset.midtermComponents,
+    }))
+  }
+
+  function toggleMidtermComponent(component: string) {
+    setForm((f) => ({
+      ...f,
+      midtermComponents: f.midtermComponents.includes(component)
+        ? f.midtermComponents.filter((c) => c !== component)
+        : [...f.midtermComponents, component],
     }))
   }
 
@@ -147,7 +161,12 @@ export function CurriculaTab({ curricula }: { curricula: CurriculumDTO[] }) {
       .split(",")
       .map((s) => s.trim())
       .filter(Boolean)
-    setScale({ caComponents: list })
+    setForm((f) => ({
+      ...f,
+      gradingScale: { ...f.gradingScale, caComponents: list },
+      // Keep midterm picks valid by dropping any that no longer appear.
+      midtermComponents: f.midtermComponents.filter((c) => list.includes(c)),
+    }))
   }
 
   async function save() {
@@ -170,6 +189,7 @@ export function CurriculaTab({ curricula }: { curricula: CurriculumDTO[] }) {
       examBodyCode: form.examBodyCode,
       aiPromptHint: form.aiPromptHint.trim() || null,
       gradingScale: form.gradingScale,
+      midtermComponents: form.midtermComponents,
       isDefault: form.isDefault,
     }
     const res =
@@ -436,6 +456,38 @@ export function CurriculaTab({ curricula }: { curricula: CurriculumDTO[] }) {
               onChange={(e) => setComponents(e.target.value)}
               placeholder="CA1, CA2, Mid-Term, Assignment"
             />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-xs">Midterm components</Label>
+            <p className="text-[11px] text-muted-foreground">
+              Which of the components above feed the midterm report.
+            </p>
+            {form.gradingScale.caComponents.length === 0 ? (
+              <p className="text-xs text-muted-foreground italic">
+                Add CA components first.
+              </p>
+            ) : (
+              <div className="flex flex-wrap gap-1.5">
+                {form.gradingScale.caComponents.map((c) => {
+                  const on = form.midtermComponents.includes(c)
+                  return (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => toggleMidtermComponent(c)}
+                      className={`rounded-md border px-2.5 py-1 text-xs transition ${
+                        on
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-muted text-muted-foreground hover:border-foreground/30"
+                      }`}
+                    >
+                      {c}
+                    </button>
+                  )
+                })}
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">

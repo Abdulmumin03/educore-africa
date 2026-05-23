@@ -6,10 +6,10 @@ import {
   View,
   renderToBuffer,
 } from "@react-pdf/renderer"
-import type { ReportCardData } from "@/lib/report-card"
+import type { MidtermReportData } from "@/lib/midterm-report"
 import {
-  DEFAULT_GRADE_TEMPLATE,
-  type GradeSection,
+  DEFAULT_MIDTERM_TEMPLATE,
+  type MidtermSection,
   type ReportTemplateConfig,
 } from "@/lib/report-template"
 
@@ -45,8 +45,18 @@ function buildStyles(t: ReportTemplateConfig) {
       marginTop: 6,
       textTransform: "uppercase",
       letterSpacing: 1,
+      color: t.colors.primary,
     },
     termInfo: { fontSize: 9, color: t.colors.mutedText },
+    notice: {
+      marginVertical: 8,
+      padding: 6,
+      backgroundColor: "#fef3c7",
+      border: "0.5pt solid #fbbf24",
+      fontSize: 8.5,
+      color: "#78350f",
+      borderRadius: 3,
+    },
     studentRow: {
       flexDirection: "row",
       gap: 12,
@@ -57,7 +67,6 @@ function buildStyles(t: ReportTemplateConfig) {
     studentBlock: { flex: 1 },
     studentName: { fontSize: 13, fontWeight: 700 },
     studentMeta: { fontSize: 9, color: t.colors.mutedText, marginTop: 1 },
-    metaCol: { flex: 1 },
     table: {
       marginTop: 6,
       borderTop: "0.5pt solid #94a3b8",
@@ -70,16 +79,12 @@ function buildStyles(t: ReportTemplateConfig) {
       borderBottom: "0.5pt solid #94a3b8",
       fontWeight: 700,
     },
-    tr: {
-      flexDirection: "row",
-      paddingVertical: 3,
-      borderBottom: "0.25pt solid #e2e8f0",
-    },
-    c_subject: { flex: 2, paddingLeft: 4 },
-    c_num: { flex: 0.7, textAlign: "right", paddingRight: 4 },
-    c_grade: { flex: 0.7, textAlign: "center" },
-    c_remark: { flex: 2.5, fontSize: 8, color: t.colors.mutedText, paddingHorizontal: 4 },
-    c_pos: { flex: 0.6, textAlign: "center" },
+    tr: { flexDirection: "row", paddingVertical: 3, borderBottom: "0.25pt solid #e2e8f0" },
+    c_no: { width: 22, paddingLeft: 4 },
+    c_subject: { flex: 2.2, paddingLeft: 4 },
+    c_score: { flex: 0.8, textAlign: "right", paddingRight: 4 },
+    c_total: { flex: 0.8, textAlign: "right", paddingRight: 4, fontWeight: 700 },
+    c_remark: { flex: 2.2, fontSize: 8, color: t.colors.mutedText, paddingHorizontal: 4 },
     totalsRow: {
       marginTop: 8,
       flexDirection: "row",
@@ -121,30 +126,44 @@ function buildStyles(t: ReportTemplateConfig) {
       color: t.colors.mutedText,
       textAlign: "center",
     },
+    watermark: {
+      position: "absolute",
+      top: 340,
+      left: 80,
+      right: 80,
+      textAlign: "center",
+      fontSize: 56,
+      color: t.colors.watermark ?? "#fee2c2",
+      opacity: 0.55,
+      fontWeight: 700,
+      transform: "rotate(-22deg)",
+      letterSpacing: 6,
+    },
     footer: {
       position: "absolute",
-      bottom: 24,
+      bottom: 22,
       left: 32,
       right: 32,
+      fontSize: 7.5,
+      color: "#94a3b8",
+      borderTop: `0.5pt solid ${t.colors.headerBorder}`,
+      paddingTop: 6,
       flexDirection: "row",
       justifyContent: "space-between",
-      paddingTop: 6,
-      borderTop: `0.5pt solid ${t.colors.headerBorder}`,
-      fontSize: 8,
-      color: "#94a3b8",
     },
   })
 }
 
-function dateOnly(iso: string) {
-  return new Date(iso).toISOString().slice(0, 10)
+function termLabel(t: MidtermReportData["term"]) {
+  const type = t.type[0] + t.type.slice(1).toLowerCase()
+  return `${type} term · ${t.sessionName}`
 }
 
-export function ReportCardDocument({
+export function MidtermReportDocument({
   data,
-  template = DEFAULT_GRADE_TEMPLATE,
+  template = DEFAULT_MIDTERM_TEMPLATE,
 }: {
-  data: ReportCardData
+  data: MidtermReportData
   template?: ReportTemplateConfig
 }) {
   const t = template
@@ -152,10 +171,17 @@ export function ReportCardDocument({
   const fullName = [data.student.firstName, data.student.middleName, data.student.lastName]
     .filter(Boolean)
     .join(" ")
-  const title = t.header.titleOverride || "Student report card"
-  const sections = t.sections as GradeSection[]
 
-  const renderSection = (sec: GradeSection) => {
+  const hasComponents = data.midtermComponents.length > 0
+  // Adapt the per-component column flex so wide rosters still fit. 4+ components
+  // get the smallest cell; 1–3 keeps a comfortable 0.8.
+  const compFlex = data.midtermComponents.length >= 4 ? 0.6 : 0.8
+
+  const title = t.header.titleOverride || "Midterm report — not final"
+  const watermarkText = t.customText.watermark ?? "MIDTERM"
+  const sections = t.sections as MidtermSection[]
+
+  const renderSection = (sec: MidtermSection) => {
     switch (sec) {
       case "student-info":
         return (
@@ -164,20 +190,8 @@ export function ReportCardDocument({
               <Text style={styles.studentName}>{fullName}</Text>
               <Text style={styles.studentMeta}>
                 Admission no.: {data.student.admissionNumber}
-                {data.student.dateOfBirth ? ` · DOB: ${dateOnly(data.student.dateOfBirth)}` : ""}
-              </Text>
-              <Text style={styles.studentMeta}>
-                Class: {data.student.className} · Arm {data.student.sectionName}
-              </Text>
-            </View>
-            <View style={styles.metaCol}>
-              <Text style={styles.studentMeta}>School days: {data.attendance.schoolDays}</Text>
-              <Text style={styles.studentMeta}>
-                Present: {data.attendance.present + data.attendance.late}
-                {data.attendance.percent !== null ? `  (${data.attendance.percent}%)` : ""}
-              </Text>
-              <Text style={styles.studentMeta}>
-                Absent: {data.attendance.absent} · Excused: {data.attendance.excused}
+                {" · "}Class: {data.student.className} · Arm {data.student.sectionName}
+                {data.curriculum.code ? ` · ${data.curriculum.code}` : ""}
               </Text>
             </View>
           </View>
@@ -185,35 +199,53 @@ export function ReportCardDocument({
 
       case "subjects-table":
         return (
-          <View key="subjects-table" style={styles.table}>
-            <View style={styles.trHead}>
-              <Text style={styles.c_subject}>Subject</Text>
-              <Text style={styles.c_num}>CA</Text>
-              <Text style={styles.c_num}>Exam</Text>
-              <Text style={styles.c_num}>Total</Text>
-              <Text style={styles.c_grade}>Grade</Text>
-              <Text style={styles.c_pos}>Pos.</Text>
-              <Text style={styles.c_remark}>Remark</Text>
-            </View>
-            {data.subjects.map((s) => (
-              <View key={s.id} style={styles.tr}>
-                <Text style={styles.c_subject}>
-                  {s.name}
-                  {s.externalCode ? `  (${s.externalCode})` : ""}
+          <View key="subjects-table">
+            {!hasComponents ? (
+              <View style={styles.notice}>
+                <Text>
+                  This curriculum has no midterm components configured. Set them in
+                  Settings → Curricula to populate this report.
                 </Text>
-                <Text style={styles.c_num}>{s.ca.toFixed(1)}</Text>
-                <Text style={styles.c_num}>{s.exam.toFixed(1)}</Text>
-                <Text style={[styles.c_num, { fontWeight: 700 }]}>{s.total.toFixed(1)}</Text>
-                <Text style={styles.c_grade}>{s.letterGrade ?? "—"}</Text>
-                <Text style={styles.c_pos}>{s.position ?? "—"}</Text>
-                <Text style={styles.c_remark}>{s.teacherRemark ?? ""}</Text>
               </View>
-            ))}
-            {data.subjects.length === 0 && (
-              <View style={styles.tr}>
-                <Text style={[styles.c_subject, { color: "#94a3b8" }]}>
-                  No grades recorded for this term.
-                </Text>
+            ) : (
+              <View style={styles.table}>
+                <View style={styles.trHead}>
+                  <Text style={styles.c_no}>#</Text>
+                  <Text style={styles.c_subject}>Subject</Text>
+                  {data.midtermComponents.map((c) => (
+                    <Text key={c} style={[styles.c_score, { flex: compFlex }]}>
+                      {c}
+                    </Text>
+                  ))}
+                  <Text style={styles.c_total}>Total</Text>
+                  <Text style={styles.c_remark}>Remark</Text>
+                </View>
+                {data.subjects.length === 0 ? (
+                  <View style={styles.tr}>
+                    <Text style={[styles.c_subject, { color: "#94a3b8" }]}>
+                      No grades recorded for this term yet.
+                    </Text>
+                  </View>
+                ) : (
+                  data.subjects.map((s, i) => (
+                    <View key={s.id} style={styles.tr}>
+                      <Text style={styles.c_no}>{i + 1}</Text>
+                      <Text style={styles.c_subject}>
+                        {s.name}
+                        {s.externalCode ? `  (${s.externalCode})` : ""}
+                      </Text>
+                      {data.midtermComponents.map((c) => (
+                        <Text key={c} style={[styles.c_score, { flex: compFlex }]}>
+                          {s.components[c] === null
+                            ? "—"
+                            : (s.components[c] as number).toFixed(1)}
+                        </Text>
+                      ))}
+                      <Text style={styles.c_total}>{s.midtermTotal.toFixed(1)}</Text>
+                      <Text style={styles.c_remark}>{s.teacherRemark ?? ""}</Text>
+                    </View>
+                  ))
+                )}
               </View>
             )}
           </View>
@@ -223,18 +255,21 @@ export function ReportCardDocument({
         return (
           <View key="totals" style={styles.totalsRow}>
             <View style={styles.totalsCard}>
-              <Text style={styles.totalsLabel}>Overall total</Text>
+              <Text style={styles.totalsLabel}>Subjects</Text>
+              <Text style={styles.totalsValue}>{data.totals.subjectCount}</Text>
+            </View>
+            <View style={styles.totalsCard}>
+              <Text style={styles.totalsLabel}>Midterm total</Text>
               <Text style={styles.totalsValue}>{data.totals.total.toFixed(1)}</Text>
             </View>
             <View style={styles.totalsCard}>
-              <Text style={styles.totalsLabel}>Average %</Text>
-              <Text style={styles.totalsValue}>{data.totals.average.toFixed(1)}%</Text>
+              <Text style={styles.totalsLabel}>Average</Text>
+              <Text style={styles.totalsValue}>{data.totals.average.toFixed(1)}</Text>
             </View>
             <View style={styles.totalsCard}>
-              <Text style={styles.totalsLabel}>Class position</Text>
+              <Text style={styles.totalsLabel}>Attendance</Text>
               <Text style={styles.totalsValue}>
-                {data.totals.overallPosition ?? "—"}
-                {data.totals.positionOutOf > 0 ? ` / ${data.totals.positionOutOf}` : ""}
+                {data.attendance.percent === null ? "—" : `${data.attendance.percent}%`}
               </Text>
             </View>
           </View>
@@ -252,7 +287,7 @@ export function ReportCardDocument({
         return data.principalComment ? (
           <View key="principal-comment" style={styles.commentBox}>
             <Text style={styles.commentLabel}>
-              Principal{data.aiPrincipal ? " · AI-assisted draft" : ""}
+              Principal {data.aiPrincipal ? "· AI-assisted" : ""}
             </Text>
             <Text style={styles.commentText}>{data.principalComment}</Text>
           </View>
@@ -268,64 +303,55 @@ export function ReportCardDocument({
             ))}
           </View>
         )
-
-      case "next-term-banner":
-        // Rendered in the footer (the bottom-fixed strip), not in the body.
-        return null
     }
   }
-
-  const nextTermPrefix = t.customText.nextTermPrefix ?? "Next term begins"
-  const showNextTerm = sections.includes("next-term-banner")
 
   return (
     <Document>
       <Page size="A4" style={styles.page}>
+        <Text style={styles.watermark} fixed>
+          {watermarkText}
+        </Text>
+
         {t.header.layout === "centered" ? (
           <View style={styles.headerCentered}>
             <View style={styles.schoolBlockCentered}>
               <Text style={styles.schoolName}>{data.school.name}</Text>
-              {t.header.showMotto && data.school.motto && (
-                <Text style={[styles.schoolMeta, { fontStyle: "italic" }]}>
-                  {data.school.motto}
-                </Text>
-              )}
               <Text style={styles.schoolMeta}>
                 {[data.school.address, data.school.phone, data.school.email]
                   .filter(Boolean)
                   .join(" · ")}
               </Text>
-              <Text style={[styles.title, { color: t.colors.primary }]}>{title}</Text>
-              <Text style={styles.termInfo}>
-                {data.term.sessionName} · {data.term.type[0] + data.term.type.slice(1).toLowerCase()}{" "}
-                term
-              </Text>
+              {t.header.showMotto && data.school.motto && (
+                <Text style={[styles.schoolMeta, { fontStyle: "italic", marginTop: 2 }]}>
+                  {data.school.motto}
+                </Text>
+              )}
+              <Text style={styles.title}>{title}</Text>
+              <Text style={styles.termInfo}>{termLabel(data.term)}</Text>
             </View>
           </View>
         ) : (
           <View style={styles.header}>
             <View style={styles.schoolBlock}>
               <Text style={styles.schoolName}>{data.school.name}</Text>
-              {t.header.showMotto && data.school.motto && (
-                <Text style={[styles.schoolMeta, { fontStyle: "italic" }]}>
-                  {data.school.motto}
-                </Text>
-              )}
               <Text style={styles.schoolMeta}>
                 {[data.school.address, data.school.phone, data.school.email]
                   .filter(Boolean)
                   .join(" · ")}
               </Text>
-              <Text style={[styles.title, { color: t.colors.primary }]}>{title}</Text>
-              <Text style={styles.termInfo}>
-                {data.term.sessionName} · {data.term.type[0] + data.term.type.slice(1).toLowerCase()}{" "}
-                term
-              </Text>
+              {t.header.showMotto && data.school.motto && (
+                <Text style={[styles.schoolMeta, { fontStyle: "italic", marginTop: 2 }]}>
+                  {data.school.motto}
+                </Text>
+              )}
+              <Text style={styles.title}>{title}</Text>
+              <Text style={styles.termInfo}>{termLabel(data.term)}</Text>
             </View>
             <View>
               <Text style={[styles.schoolMeta, { textAlign: "right" }]}>Issued</Text>
-              <Text style={[styles.title, { fontSize: 10, textAlign: "right" }]}>
-                {dateOnly(new Date().toISOString())}
+              <Text style={[styles.studentMeta, { textAlign: "right", fontWeight: 700 }]}>
+                {new Date().toISOString().slice(0, 10)}
               </Text>
             </View>
           </View>
@@ -334,16 +360,7 @@ export function ReportCardDocument({
         {sections.map(renderSection)}
 
         <View style={styles.footer} fixed>
-          <Text>
-            {showNextTerm && data.nextTermBegins
-              ? `${nextTermPrefix} ${dateOnly(data.nextTermBegins)}`
-              : showNextTerm
-                ? "Next term TBC"
-                : ""}
-            {data.schoolFees !== null
-              ? `${showNextTerm ? " · " : ""}School fees: NGN ${data.schoolFees.toLocaleString()}`
-              : ""}
-          </Text>
+          <Text>Midterm report · {data.school.name}</Text>
           <Text>{t.customText.footer ?? "Generated by EduCore Africa"}</Text>
         </View>
       </Page>
@@ -351,9 +368,9 @@ export function ReportCardDocument({
   )
 }
 
-export async function renderReportCardPdf(
-  data: ReportCardData,
+export async function renderMidtermReportPdf(
+  data: MidtermReportData,
   template?: ReportTemplateConfig,
 ): Promise<Buffer> {
-  return await renderToBuffer(<ReportCardDocument data={data} template={template} />)
+  return await renderToBuffer(<MidtermReportDocument data={data} template={template} />)
 }

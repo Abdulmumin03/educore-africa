@@ -30,8 +30,9 @@ const ROLE_RULES: Array<{ prefix: string; roles: Role[] }> = [
 
 // Routes accessible without auth. Matches by prefix.
 // /api/cron is allowed through because the routes self-authenticate via CRON_SECRET.
-// /report-cards is allowed through because the routes self-authenticate via opaque
-// share tokens (see app/report-cards/[token]/route.ts).
+// /report-cards and /midterm-reports are allowed through because the routes
+// self-authenticate via opaque share tokens (see the corresponding
+// app/.../[token]/route.ts handlers).
 const PUBLIC_PREFIXES = [
   "/auth",
   "/onboard",
@@ -39,6 +40,7 @@ const PUBLIC_PREFIXES = [
   "/api/webhooks",
   "/api/cron",
   "/report-cards",
+  "/midterm-reports",
   "/_next",
   "/favicon",
 ]

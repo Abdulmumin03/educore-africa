@@ -20,6 +20,7 @@ const patchSchema = z
     examBodyCode: z.enum(EXAM_BODY_CODES).optional(),
     aiPromptHint: z.string().trim().max(2000).nullable().optional(),
     gradingScale: gradingSettingsSchema.optional(),
+    midtermComponents: z.array(z.string().min(1).max(40)).max(10).optional(),
     isDefault: z.boolean().optional(),
   })
   .refine((v) => Object.keys(v).length > 0, { message: "Nothing to update" })
@@ -67,6 +68,27 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
       { error: "Promote another curriculum to default first" },
       { status: 409 },
     )
+  }
+
+  // midtermComponents must be a subset of the effective caComponents
+  // (either the incoming gradingScale.caComponents, or the stored one).
+  if (parsed.data.midtermComponents) {
+    let effectiveCa: string[] = []
+    if (parsed.data.gradingScale) {
+      effectiveCa = parsed.data.gradingScale.caComponents
+    } else {
+      const stored = gradingSettingsSchema.safeParse(cur.gradingScale)
+      if (stored.success) effectiveCa = stored.data.caComponents
+    }
+    const invalid = parsed.data.midtermComponents.filter(
+      (c) => !effectiveCa.includes(c),
+    )
+    if (invalid.length > 0) {
+      return NextResponse.json(
+        { error: `Midterm components not in caComponents: ${invalid.join(", ")}` },
+        { status: 422 },
+      )
+    }
   }
 
   const { aiPromptHint, ...rest } = parsed.data
