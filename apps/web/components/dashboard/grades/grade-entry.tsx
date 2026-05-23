@@ -43,7 +43,7 @@ type Row = {
 
 type MatrixResponse = {
   section: { id: string; name: string; className: string; classId: string } | null
-  subject: { id: string; name: string; code: string; waecCode: string | null }
+  subject: { id: string; name: string; code: string }
   term: { id: string; type: string; sessionName: string }
   config: {
     components: string[]

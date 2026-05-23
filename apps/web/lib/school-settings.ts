@@ -1,7 +1,8 @@
 import { z } from "zod"
 
 // Everything that lives inside the School.settings JSON column.
-// Add new keys here so the shape stays a single source of truth.
+// Grading config has moved to the Curriculum model (P14); settings now only
+// covers notifications.
 
 export const gradeRowSchema = z.object({
   grade: z.string().min(1).max(4),
@@ -43,7 +44,6 @@ export const notificationSettingsSchema = z.object({
 
 export const schoolSettingsSchema = z
   .object({
-    grading: gradingSettingsSchema.optional(),
     notifications: notificationSettingsSchema.optional(),
   })
   .strict()
@@ -52,6 +52,9 @@ export type GradingSettings = z.infer<typeof gradingSettingsSchema>
 export type NotificationSettings = z.infer<typeof notificationSettingsSchema>
 export type SchoolSettings = z.infer<typeof schoolSettingsSchema>
 
+// Default WAEC scale — preserved as a constant for the curriculum-presets
+// module to seed from, and as a last-resort fallback inside grade-config when
+// a school has zero curricula configured.
 export const DEFAULT_GRADING: GradingSettings = {
   scale: [
     { grade: "A1", minScore: 75, maxScore: 100, points: 4.0, remark: "Excellent" },
@@ -82,13 +85,11 @@ export const DEFAULT_NOTIFICATIONS: NotificationSettings = {
 }
 
 export function resolveSettings(raw: unknown): {
-  grading: GradingSettings
   notifications: NotificationSettings
 } {
   const parsed = schoolSettingsSchema.safeParse(raw ?? {})
   const data = parsed.success ? parsed.data : {}
   return {
-    grading: data.grading ?? DEFAULT_GRADING,
     notifications: data.notifications ?? DEFAULT_NOTIFICATIONS,
   }
 }

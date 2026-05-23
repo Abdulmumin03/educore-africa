@@ -28,7 +28,7 @@ export async function GET(req: Request) {
     prisma.subject.findFirst({
       where: { id: subjectId, schoolId: access.session.schoolId, deletedAt: null },
     }),
-    getGradingConfig(access.session.schoolId),
+    getGradingConfig({ schoolId: access.session.schoolId, sectionId }),
     prisma.enrollment.findMany({
       where: {
         sectionId,

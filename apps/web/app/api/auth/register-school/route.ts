@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db"
 import { registerSchoolSchema } from "@/lib/auth-schemas"
 import { CLASSES_BY_TIER, armNames, slugify, termDatesFor } from "@/lib/academic-structure"
 import { sendEmail, welcomeEmailHtml } from "@/lib/email"
+import { findPreset } from "@/lib/curriculum-presets"
 
 export const runtime = "nodejs"
 
@@ -92,6 +93,21 @@ export async function POST(req: Request) {
       })),
     })
 
+    // Seed a default WAEC curriculum so classes can be tagged (non-null FK).
+    // Schools running other curricula add them later in Settings → Curricula.
+    const waecPreset = findPreset("WAEC")!
+    const defaultCurriculum = await tx.curriculum.create({
+      data: {
+        schoolId: createdSchool.id,
+        code: waecPreset.code,
+        name: waecPreset.name,
+        examBodyCode: waecPreset.examBodyCode,
+        aiPromptHint: waecPreset.aiPromptHint,
+        gradingScale: waecPreset.gradingScale,
+        isDefault: true,
+      },
+    })
+
     // Build Class + Section rows for every selected tier.
     const arms = armNames(academic.armsPerClass)
     for (const tier of academic.sections) {
@@ -101,6 +117,7 @@ export async function POST(req: Request) {
             schoolId: createdSchool.id,
             name: cls.name,
             level: cls.level,
+            curriculumId: defaultCurriculum.id,
           },
         })
         await tx.section.createMany({

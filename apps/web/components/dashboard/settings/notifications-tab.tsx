@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import type { GradingSettings, NotificationSettings } from "@/lib/school-settings"
+import type { NotificationSettings } from "@/lib/school-settings"
 
 const CHANNELS: { key: keyof NotificationSettings["channels"]; label: string; icon: typeof MessageSquare }[] = [
   { key: "sms", label: "SMS (Africa's Talking)", icon: MessageSquare },
@@ -28,10 +28,8 @@ const EVENTS: { key: keyof NotificationSettings["events"]; label: string; hint: 
 
 export function NotificationsTab({
   initial,
-  grading,
 }: {
   initial: NotificationSettings
-  grading: GradingSettings
 }) {
   const router = useRouter()
   const [state, setState] = useState<NotificationSettings>(initial)
@@ -51,7 +49,7 @@ export function NotificationsTab({
     const res = await fetch("/api/school/settings", {
       method: "PATCH",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ grading, notifications: state }),
+      body: JSON.stringify({ notifications: state }),
     })
     setSaving(false)
     const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string }

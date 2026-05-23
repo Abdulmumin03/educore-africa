@@ -6,9 +6,9 @@ export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
 /**
- * Mock WAEC/NECO summary sheet PDF for an SS3 student (or any class — the UI
- * gates by level, the API doesn't restrict). Uses the same data builder as
- * the regular report card and renders into the WAEC template.
+ * Mock WAEC / NECO summary sheet PDF. Refuses when the student's class
+ * runs a non-WAEC / non-NECO curriculum — Cambridge classes use the
+ * /cambridge route instead.
  */
 export async function GET(req: Request, { params }: { params: { studentId: string } }) {
   const access = await resolveStudentAccess()
@@ -27,6 +27,17 @@ export async function GET(req: Request, { params }: { params: { studentId: strin
     termId,
   })
   if (!data) return new Response("Not found", { status: 404 })
+
+  if (
+    data.curriculum.examBodyCode !== "WAEC" &&
+    data.curriculum.examBodyCode !== "NECO" &&
+    data.curriculum.examBodyCode !== "NONE"
+  ) {
+    return new Response(
+      `This class runs the ${data.curriculum.examBodyCode} curriculum, not WAEC/NECO.`,
+      { status: 422 },
+    )
+  }
 
   const pdf = await renderWaecSheetPdf(data)
   const filename = `waec-mock-${data.student.admissionNumber}-${data.term.sessionName.replace("/", "-")}-${data.term.type}.pdf`

@@ -8,6 +8,7 @@ export const runtime = "nodejs"
 const schema = z.object({
   name: z.string().trim().min(1).max(40),
   level: z.number().int().min(1).max(99),
+  curriculumId: z.string().trim().min(1).optional(),
 })
 
 export async function POST(req: Request) {
@@ -16,14 +17,40 @@ export async function POST(req: Request) {
 
   const parsed = schema.safeParse(await req.json().catch(() => null))
   if (!parsed.success) return NextResponse.json({ error: "Invalid" }, { status: 422 })
+  const schoolId = g.session.user.schoolId
 
   const existing = await prisma.class.findFirst({
-    where: { schoolId: g.session.user.schoolId, name: parsed.data.name, deletedAt: null },
+    where: { schoolId, name: parsed.data.name, deletedAt: null },
   })
   if (existing) return NextResponse.json({ error: "Class name already exists" }, { status: 409 })
 
+  let curriculumId = parsed.data.curriculumId
+  if (curriculumId) {
+    const cur = await prisma.curriculum.findFirst({
+      where: { id: curriculumId, schoolId, deletedAt: null },
+    })
+    if (!cur) return NextResponse.json({ error: "Curriculum not found" }, { status: 422 })
+  } else {
+    const def = await prisma.curriculum.findFirst({
+      where: { schoolId, isDefault: true, deletedAt: null },
+      select: { id: true },
+    })
+    if (!def) {
+      return NextResponse.json(
+        { error: "No default curriculum — create one in Settings → Curricula first" },
+        { status: 422 },
+      )
+    }
+    curriculumId = def.id
+  }
+
   const klass = await prisma.class.create({
-    data: { schoolId: g.session.user.schoolId, ...parsed.data },
+    data: {
+      schoolId,
+      name: parsed.data.name,
+      level: parsed.data.level,
+      curriculumId,
+    },
   })
   return NextResponse.json({ ok: true, id: klass.id })
 }

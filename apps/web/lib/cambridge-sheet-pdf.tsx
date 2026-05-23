@@ -7,6 +7,14 @@ import {
   renderToBuffer,
 } from "@react-pdf/renderer"
 import type { ReportCardData } from "@/lib/report-card"
+import type { ResolvedCurriculum } from "@/lib/curriculum"
+import { letterGradeFor } from "@/lib/grade-config"
+
+export type CambridgeSheetInput = {
+  data: ReportCardData
+  curriculum: ResolvedCurriculum
+  externalCodeBySubjectId: Record<string, string | null>
+}
 
 const styles = StyleSheet.create({
   page: { padding: 36, fontSize: 10, color: "#0f172a", fontFamily: "Helvetica" },
@@ -20,15 +28,15 @@ const styles = StyleSheet.create({
   },
   schoolName: { fontSize: 16, fontWeight: 700, color: "#0D2B5E" },
   schoolMeta: { fontSize: 9, color: "#475569", marginTop: 1 },
-  title: { fontSize: 14, fontWeight: 700, marginTop: 6, color: "#7c2d12" },
+  title: { fontSize: 14, fontWeight: 700, marginTop: 6, color: "#1e3a8a" },
   subtitle: { fontSize: 9, color: "#475569" },
   notice: {
     marginVertical: 10,
     padding: 8,
-    backgroundColor: "#fef3c7",
-    border: "0.5pt solid #fbbf24",
+    backgroundColor: "#dbeafe",
+    border: "0.5pt solid #60a5fa",
     fontSize: 9,
-    color: "#78350f",
+    color: "#1e3a8a",
   },
   studentBlock: {
     marginBottom: 12,
@@ -45,14 +53,14 @@ const styles = StyleSheet.create({
   trHead: {
     flexDirection: "row",
     paddingVertical: 4,
-    backgroundColor: "#f1f5f9",
+    backgroundColor: "#e0e7ff",
     borderBottom: "0.5pt solid #94a3b8",
     fontWeight: 700,
   },
   tr: { flexDirection: "row", paddingVertical: 3, borderBottom: "0.25pt solid #e2e8f0" },
   c_no: { width: 24, paddingLeft: 4 },
   c_subject: { flex: 2.5, paddingLeft: 4 },
-  c_waec: { flex: 1, fontFamily: "Helvetica", color: "#475569" },
+  c_code: { flex: 1, color: "#475569" },
   c_score: { flex: 0.8, textAlign: "right", paddingRight: 4 },
   c_grade: { flex: 0.7, textAlign: "center", fontWeight: 700 },
   c_interp: { flex: 1.8, fontSize: 8.5, color: "#475569", paddingHorizontal: 4 },
@@ -69,6 +77,13 @@ const styles = StyleSheet.create({
   },
   summaryLabel: { color: "#475569" },
   summaryValue: { fontWeight: 700 },
+  candidateBlock: {
+    marginTop: 4,
+    flexDirection: "row",
+    gap: 12,
+  },
+  candidateLabel: { color: "#475569", fontSize: 9 },
+  candidateValue: { fontWeight: 700, fontSize: 9 },
   footer: {
     position: "absolute",
     bottom: 24,
@@ -83,34 +98,48 @@ const styles = StyleSheet.create({
   },
 })
 
-// WAEC interpretation map — derived from the WAEC SSCE grading scheme.
-const WAEC_INTERP: Record<string, { label: string; pass: boolean }> = {
-  A1: { label: "Excellent", pass: true },
-  B2: { label: "Very Good", pass: true },
-  B3: { label: "Good", pass: true },
-  C4: { label: "Credit", pass: true },
-  C5: { label: "Credit", pass: true },
-  C6: { label: "Credit", pass: true },
-  D7: { label: "Pass", pass: false }, // Not a Credit at WAEC level
-  E8: { label: "Pass", pass: false },
-  F9: { label: "Fail", pass: false },
-}
-
 function dateOnly(iso: string) {
   return new Date(iso).toISOString().slice(0, 10)
 }
 
-export function WaecSheetDocument({ data }: { data: ReportCardData }) {
+// A Cambridge "pass" at IGCSE is C or above; A-Level is E or above. We use
+// a generic threshold of >= 5 scale points which captures both for the
+// preset scales we ship.
+function isPass(grade: string | null | undefined, scale: ReturnType<typeof letterGradeFor> | null): boolean {
+  if (!grade) return false
+  if (grade === "U" || grade === "F" || grade === "G") return false
+  return true
+}
+
+export function CambridgeSheetDocument({
+  data,
+  curriculum,
+  externalCodeBySubjectId,
+}: CambridgeSheetInput) {
   const fullName = [data.student.firstName, data.student.middleName, data.student.lastName]
     .filter(Boolean)
     .join(" ")
 
-  // Count credits (A1–C6 = 1–6 on WAEC's points scale).
-  const credits = data.subjects.filter((s) => {
-    if (!s.examBodyGrade) return false
-    const meta = WAEC_INTERP[s.examBodyGrade]
-    return meta?.pass ?? false
-  }).length
+  const scale = curriculum.gradingScale.scale
+
+  const rows = data.subjects.map((s) => {
+    const lg = letterGradeFor(s.total, scale)
+    return {
+      ...s,
+      cambridgeGrade: lg?.grade ?? null,
+      remark: lg?.remark ?? null,
+      cambridgeCode: externalCodeBySubjectId[s.id] ?? null,
+    }
+  })
+
+  const passing = rows.filter((r) => isPass(r.cambridgeGrade, null)).length
+
+  const sheetTitle =
+    curriculum.examBodyCode === "CAMBRIDGE"
+      ? curriculum.code === "ALEVEL"
+        ? "Mock Cambridge A-Level sheet"
+        : "Mock Cambridge IGCSE / Checkpoint sheet"
+      : `Mock ${curriculum.name} sheet`
 
   return (
     <Document>
@@ -121,9 +150,9 @@ export function WaecSheetDocument({ data }: { data: ReportCardData }) {
             <Text style={styles.schoolMeta}>
               {[data.school.address, data.school.phone, data.school.email].filter(Boolean).join(" · ")}
             </Text>
-            <Text style={styles.title}>Mock WAEC / NECO summary sheet</Text>
+            <Text style={styles.title}>{sheetTitle}</Text>
             <Text style={styles.subtitle}>
-              {data.term.sessionName} · {data.term.type[0] + data.term.type.slice(1).toLowerCase()} term
+              {data.term.sessionName} · {data.term.type[0] + data.term.type.slice(1).toLowerCase()} term · {curriculum.name}
             </Text>
           </View>
           <View>
@@ -136,8 +165,8 @@ export function WaecSheetDocument({ data }: { data: ReportCardData }) {
 
         <View style={styles.notice}>
           <Text>
-            This is a MOCK summary projecting performance under the WAEC SSCE grading scheme. It is
-            not an official WAEC result and may not be used for university admissions.
+            This is a MOCK summary projecting performance under the {curriculum.name} grading scheme.
+            It is not an official Cambridge result and may not be used for university admissions.
           </Text>
         </View>
 
@@ -147,63 +176,69 @@ export function WaecSheetDocument({ data }: { data: ReportCardData }) {
             Admission no.: {data.student.admissionNumber}
             {" · "}Class: {data.student.className} · Arm {data.student.sectionName}
           </Text>
+          <View style={styles.candidateBlock}>
+            <Text style={styles.candidateLabel}>Candidate number</Text>
+            <Text style={styles.candidateValue}>—</Text>
+          </View>
         </View>
 
         <View style={styles.table}>
           <View style={styles.trHead}>
             <Text style={styles.c_no}>#</Text>
             <Text style={styles.c_subject}>Subject</Text>
-            <Text style={styles.c_waec}>WAEC code</Text>
+            <Text style={styles.c_code}>Syllabus</Text>
             <Text style={styles.c_score}>Score</Text>
             <Text style={styles.c_grade}>Grade</Text>
             <Text style={styles.c_interp}>Interpretation</Text>
           </View>
-          {data.subjects.length === 0 ? (
+          {rows.length === 0 ? (
             <View style={styles.tr}>
               <Text style={[styles.c_subject, { color: "#94a3b8" }]}>
                 No grades recorded for this term.
               </Text>
             </View>
           ) : (
-            data.subjects.map((s, i) => {
-              const meta = s.examBodyGrade ? WAEC_INTERP[s.examBodyGrade] : null
-              return (
-                <View key={s.id} style={styles.tr}>
-                  <Text style={styles.c_no}>{i + 1}</Text>
-                  <Text style={styles.c_subject}>{s.name}</Text>
-                  <Text style={styles.c_waec}>{s.externalCode ?? "—"}</Text>
-                  <Text style={styles.c_score}>{s.total.toFixed(1)}</Text>
-                  <Text
-                    style={[
-                      styles.c_grade,
-                      {
-                        color:
-                          s.examBodyGrade === "F9"
-                            ? "#b91c1c"
-                            : meta?.pass
-                              ? "#0f766e"
-                              : "#a16207",
-                      },
-                    ]}
-                  >
-                    {s.examBodyGrade ?? "—"}
-                  </Text>
-                  <Text style={styles.c_interp}>{meta?.label ?? "—"}</Text>
-                </View>
-              )
-            })
+            rows.map((s, i) => (
+              <View key={s.id} style={styles.tr}>
+                <Text style={styles.c_no}>{i + 1}</Text>
+                <Text style={styles.c_subject}>{s.name}</Text>
+                <Text style={styles.c_code}>{s.cambridgeCode ?? "—"}</Text>
+                <Text style={styles.c_score}>{s.total.toFixed(1)}</Text>
+                <Text
+                  style={[
+                    styles.c_grade,
+                    {
+                      color:
+                        s.cambridgeGrade === "U"
+                          ? "#b91c1c"
+                          : isPass(s.cambridgeGrade, null)
+                            ? "#0f766e"
+                            : "#a16207",
+                    },
+                  ]}
+                >
+                  {s.cambridgeGrade ?? "—"}
+                </Text>
+                <Text style={styles.c_interp}>{s.remark ?? "—"}</Text>
+              </View>
+            ))
           )}
         </View>
 
         <View style={styles.summary}>
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Subjects sat</Text>
-            <Text style={styles.summaryValue}>{data.subjects.length}</Text>
+            <Text style={styles.summaryValue}>{rows.length}</Text>
           </View>
           <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Credits (A1–C6)</Text>
-            <Text style={[styles.summaryValue, { color: credits >= 5 ? "#0f766e" : "#a16207" }]}>
-              {credits} {credits >= 5 ? "✓ minimum met" : "· below 5"}
+            <Text style={styles.summaryLabel}>Passing grades</Text>
+            <Text
+              style={[
+                styles.summaryValue,
+                { color: passing >= 5 ? "#0f766e" : "#a16207" },
+              ]}
+            >
+              {passing} {passing >= 5 ? "✓ minimum met" : "· below 5"}
             </Text>
           </View>
           <View style={styles.summaryRow}>
@@ -220,7 +255,7 @@ export function WaecSheetDocument({ data }: { data: ReportCardData }) {
         </View>
 
         <View style={styles.footer} fixed>
-          <Text>Mock WAEC/NECO projection · {data.school.name}</Text>
+          <Text>Mock Cambridge projection · {data.school.name}</Text>
           <Text>Generated by EduCore Africa</Text>
         </View>
       </Page>
@@ -228,6 +263,6 @@ export function WaecSheetDocument({ data }: { data: ReportCardData }) {
   )
 }
 
-export async function renderWaecSheetPdf(data: ReportCardData): Promise<Buffer> {
-  return await renderToBuffer(<WaecSheetDocument data={data} />)
+export async function renderCambridgeSheetPdf(input: CambridgeSheetInput): Promise<Buffer> {
+  return await renderToBuffer(<CambridgeSheetDocument {...input} />)
 }

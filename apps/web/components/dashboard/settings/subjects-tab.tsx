@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { Plus, Trash2, Download, Upload, Loader2 } from "lucide-react"
+import { Plus, Trash2, Download, Upload, Loader2, Tag } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -27,6 +27,15 @@ import {
 } from "@/components/ui/table"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import type { CurriculumDTO } from "@/components/dashboard/settings/curricula-tab"
 
 const CATEGORIES = ["CORE", "ELECTIVE", "TRADE"] as const
 
@@ -48,12 +57,67 @@ export type SubjectDTO = {
   creditUnits: number
   isCore: boolean
   isActive: boolean
+  curriculumIds: string[]
 }
 
-export function SubjectsTab({ subjects }: { subjects: SubjectDTO[] }) {
+export function SubjectsTab({
+  subjects,
+  curricula,
+}: {
+  subjects: SubjectDTO[]
+  curricula: CurriculumDTO[]
+}) {
   const router = useRouter()
+  const defaultCurriculumId = curricula.find((c) => c.isDefault)?.id ?? curricula[0]?.id ?? ""
+  const curriculaById = new Map(curricula.map((c) => [c.id, c]))
   const [busy, setBusy] = useState<string | null>(null)
   const [importing, setImporting] = useState(false)
+  const [newCurriculumIds, setNewCurriculumIds] = useState<string[]>(
+    defaultCurriculumId ? [defaultCurriculumId] : [],
+  )
+  const [curEditing, setCurEditing] = useState<SubjectDTO | null>(null)
+  const [curEditSelection, setCurEditSelection] = useState<string[]>([])
+  const [curEditSaving, setCurEditSaving] = useState(false)
+
+  function toggleNewCurriculum(id: string) {
+    setNewCurriculumIds((arr) =>
+      arr.includes(id) ? arr.filter((x) => x !== id) : [...arr, id],
+    )
+  }
+
+  function openCurriculaEdit(s: SubjectDTO) {
+    setCurEditing(s)
+    setCurEditSelection([...s.curriculumIds])
+  }
+
+  function toggleCurEdit(id: string) {
+    setCurEditSelection((arr) =>
+      arr.includes(id) ? arr.filter((x) => x !== id) : [...arr, id],
+    )
+  }
+
+  async function saveCurriculaEdit() {
+    if (!curEditing) return
+    if (curEditSelection.length === 0) {
+      toast.error("Select at least one curriculum")
+      return
+    }
+    setCurEditSaving(true)
+    const res = await fetch(`/api/school/subjects/${curEditing.id}`, {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ curriculumIds: curEditSelection }),
+    })
+    setCurEditSaving(false)
+    const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string }
+    if (!res.ok || !data.ok) {
+      toast.error(data.error ?? "Couldn't update")
+      return
+    }
+    toast.success("Curricula updated")
+    setCurEditing(null)
+    router.refresh()
+  }
 
   const {
     register,
@@ -70,10 +134,19 @@ export function SubjectsTab({ subjects }: { subjects: SubjectDTO[] }) {
   const isActive = watch("isActive")
 
   async function onAdd(values: NewSubjectInput) {
+    const payload = {
+      ...values,
+      curriculumIds:
+        newCurriculumIds.length > 0
+          ? newCurriculumIds
+          : defaultCurriculumId
+            ? [defaultCurriculumId]
+            : [],
+    }
     const res = await fetch("/api/school/subjects", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify(values),
+      body: JSON.stringify(payload),
     })
     const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string }
     if (!res.ok || !data.ok) {
@@ -82,6 +155,7 @@ export function SubjectsTab({ subjects }: { subjects: SubjectDTO[] }) {
     }
     toast.success("Subject added")
     reset({ category: "CORE", creditUnits: 1, isActive: true })
+    setNewCurriculumIds(defaultCurriculumId ? [defaultCurriculumId] : [])
     router.refresh()
   }
 
@@ -185,53 +259,79 @@ export function SubjectsTab({ subjects }: { subjects: SubjectDTO[] }) {
       <CardContent className="space-y-4">
         <form
           onSubmit={handleSubmit(onAdd)}
-          className="grid gap-2 rounded-md border bg-muted/30 p-3 sm:grid-cols-[1.5fr_1fr_1fr_0.7fr_auto_auto]"
+          className="space-y-3 rounded-md border bg-muted/30 p-3"
         >
-          <div className="space-y-1">
-            <Label className="text-xs">Name</Label>
-            <Input {...register("name")} placeholder="Mathematics" />
-            {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
+          <div className="grid gap-2 sm:grid-cols-[1.5fr_1fr_1fr_0.7fr_auto_auto]">
+            <div className="space-y-1">
+              <Label className="text-xs">Name</Label>
+              <Input {...register("name")} placeholder="Mathematics" />
+              {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Code</Label>
+              <Input {...register("code")} placeholder="MTH" />
+              {errors.code && <p className="text-xs text-destructive">{errors.code.message}</p>}
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Category</Label>
+              <Select value={category} onValueChange={(v) => setValue("category", v as typeof category)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {CATEGORIES.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Credits</Label>
+              <Input type="number" min={1} max={10} {...register("creditUnits", { valueAsNumber: true })} />
+            </div>
+            <div className="flex items-end">
+              <label className="flex items-center gap-1 text-xs">
+                <input
+                  type="checkbox"
+                  checked={isActive}
+                  onChange={(e) => setValue("isActive", e.target.checked)}
+                />
+                Active
+              </label>
+            </div>
+            <div className="flex items-end">
+              <Button type="submit" size="sm" disabled={isSubmitting}>
+                <Plus className="mr-1 h-4 w-4" />
+                Add
+              </Button>
+            </div>
           </div>
-          <div className="space-y-1">
-            <Label className="text-xs">Code</Label>
-            <Input {...register("code")} placeholder="MTH" />
-            {errors.code && <p className="text-xs text-destructive">{errors.code.message}</p>}
-          </div>
-          <div className="space-y-1">
-            <Label className="text-xs">Category</Label>
-            <Select value={category} onValueChange={(v) => setValue("category", v as typeof category)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {CATEGORIES.map((c) => (
-                  <SelectItem key={c} value={c}>
-                    {c}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-1">
-            <Label className="text-xs">Credits</Label>
-            <Input type="number" min={1} max={10} {...register("creditUnits", { valueAsNumber: true })} />
-          </div>
-          <div className="flex items-end">
-            <label className="flex items-center gap-1 text-xs">
-              <input
-                type="checkbox"
-                checked={isActive}
-                onChange={(e) => setValue("isActive", e.target.checked)}
-              />
-              Active
-            </label>
-          </div>
-          <div className="flex items-end">
-            <Button type="submit" size="sm" disabled={isSubmitting}>
-              <Plus className="mr-1 h-4 w-4" />
-              Add
-            </Button>
-          </div>
+          {curricula.length > 0 && (
+            <div className="space-y-1.5">
+              <Label className="text-xs">Curricula (subject is offered under)</Label>
+              <div className="flex flex-wrap gap-1.5">
+                {curricula.map((cu) => {
+                  const on = newCurriculumIds.includes(cu.id)
+                  return (
+                    <button
+                      key={cu.id}
+                      type="button"
+                      onClick={() => toggleNewCurriculum(cu.id)}
+                      className={`rounded-md border px-2.5 py-1 text-xs transition ${
+                        on
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-muted text-muted-foreground hover:border-foreground/30"
+                      }`}
+                    >
+                      {cu.code}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
         </form>
 
         {subjects.length === 0 ? (
@@ -250,6 +350,7 @@ export function SubjectsTab({ subjects }: { subjects: SubjectDTO[] }) {
                   <TableHead>Name</TableHead>
                   <TableHead>Category</TableHead>
                   <TableHead>Credits</TableHead>
+                  <TableHead>Curricula</TableHead>
                   <TableHead>Active</TableHead>
                   <TableHead className="w-10" />
                 </TableRow>
@@ -265,6 +366,31 @@ export function SubjectsTab({ subjects }: { subjects: SubjectDTO[] }) {
                       </Badge>
                     </TableCell>
                     <TableCell>{s.creditUnits}</TableCell>
+                    <TableCell>
+                      <button
+                        type="button"
+                        onClick={() => openCurriculaEdit(s)}
+                        className="flex flex-wrap items-center gap-1 hover:underline"
+                        aria-label="Edit curricula"
+                        disabled={curricula.length === 0}
+                      >
+                        {s.curriculumIds.length === 0 ? (
+                          <span className="text-xs text-muted-foreground">— none —</span>
+                        ) : (
+                          s.curriculumIds.map((cid) => {
+                            const cu = curriculaById.get(cid)
+                            return (
+                              <Badge key={cid} variant="outline" className="text-xs">
+                                {cu?.code ?? "?"}
+                              </Badge>
+                            )
+                          })
+                        )}
+                        {curricula.length > 0 && (
+                          <Tag className="ml-1 h-3 w-3 text-muted-foreground" />
+                        )}
+                      </button>
+                    </TableCell>
                     <TableCell>
                       <input
                         type="checkbox"
@@ -291,6 +417,48 @@ export function SubjectsTab({ subjects }: { subjects: SubjectDTO[] }) {
           </div>
         )}
       </CardContent>
+
+      <Dialog open={curEditing !== null} onOpenChange={(open) => !open && setCurEditing(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Curricula for {curEditing?.name}</DialogTitle>
+            <DialogDescription>
+              Choose every curriculum this subject is offered under.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            {curricula.map((cu) => {
+              const on = curEditSelection.includes(cu.id)
+              return (
+                <label
+                  key={cu.id}
+                  className="flex cursor-pointer items-center gap-2 rounded-md border p-2 text-sm hover:bg-muted/40"
+                >
+                  <input
+                    type="checkbox"
+                    checked={on}
+                    onChange={() => toggleCurEdit(cu.id)}
+                  />
+                  <span className="font-medium">{cu.name}</span>
+                  <Badge variant="outline" className="text-xs">{cu.code}</Badge>
+                  {cu.isDefault && (
+                    <Badge className="bg-amber-500/15 text-amber-700 text-xs">Default</Badge>
+                  )}
+                </label>
+              )
+            })}
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setCurEditing(null)}>
+              Cancel
+            </Button>
+            <Button type="button" onClick={saveCurriculaEdit} disabled={curEditSaving}>
+              {curEditSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   )
 }

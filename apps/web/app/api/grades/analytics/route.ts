@@ -29,7 +29,11 @@ export async function GET(req: Request) {
     )
   }
 
-  const config = await getGradingConfig(access.session.schoolId)
+  const config = await getGradingConfig({
+    schoolId: access.session.schoolId,
+    classId,
+    sectionId,
+  })
 
   const sectionFilter = sectionId
     ? sectionId

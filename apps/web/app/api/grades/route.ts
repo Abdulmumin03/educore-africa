@@ -47,7 +47,11 @@ export async function GET(req: Request) {
       where: { id: termId, academicYear: { schoolId: access.session.schoolId } },
       include: { academicYear: { select: { name: true } } },
     }),
-    getGradingConfig(access.session.schoolId),
+    getGradingConfig({
+      schoolId: access.session.schoolId,
+      classId,
+      sectionId,
+    }),
   ])
   if (!subject || !term) return NextResponse.json({ error: "Not found" }, { status: 404 })
 
@@ -109,7 +113,7 @@ export async function GET(req: Request) {
     section: section
       ? { id: section.id, name: section.name, className: section.class.name, classId: section.classId }
       : null,
-    subject: { id: subject.id, name: subject.name, code: subject.code, waecCode: subject.waecCode },
+    subject: { id: subject.id, name: subject.name, code: subject.code },
     term: { id: term.id, type: term.type, sessionName: term.academicYear.name },
     config: {
       components: config.caComponents,
@@ -161,7 +165,11 @@ export async function POST(req: Request) {
   })
   if (!allowed) return NextResponse.json({ error: "Not assigned to this subject" }, { status: 403 })
 
-  const config = await getGradingConfig(access.session.schoolId)
+  const config = await getGradingConfig({
+    schoolId: access.session.schoolId,
+    classId,
+    sectionId: sectionId ?? null,
+  })
 
   // Validate every student is enrolled in the target section(s).
   const studentIds = entries.map((e) => e.studentId)

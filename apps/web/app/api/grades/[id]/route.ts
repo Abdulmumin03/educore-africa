@@ -50,7 +50,10 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   const parsed = patchGradeSchema.safeParse(await req.json().catch(() => null))
   if (!parsed.success) return NextResponse.json({ error: "Validation failed" }, { status: 422 })
 
-  const config = await getGradingConfig(access.session.schoolId)
+  const config = await getGradingConfig({
+    schoolId: access.session.schoolId,
+    sectionId,
+  })
 
   // Merge incoming component patch with whatever's already stored.
   const currentComponents =

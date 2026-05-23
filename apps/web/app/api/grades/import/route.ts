@@ -86,7 +86,11 @@ export async function POST(req: Request) {
   })
   if (!allowed) return NextResponse.json({ error: "Not assigned to this subject" }, { status: 403 })
 
-  const config = await getGradingConfig(access.session.schoolId)
+  const config = await getGradingConfig({
+    schoolId: access.session.schoolId,
+    classId,
+    sectionId,
+  })
   const { header, rows } = parseCsv(csv)
 
   const admIdx = header.findIndex((h) => h.toLowerCase() === "admission_no")

@@ -9,6 +9,7 @@ import {
   dayOnly,
   submitRollCallSchema,
 } from "@/lib/attendance-schemas"
+import { findTermForDate } from "@/lib/term"
 import { enqueueAttendanceJob } from "@/lib/queues/attendance.queue"
 
 export const runtime = "nodejs"
@@ -46,13 +47,14 @@ export async function POST(req: Request) {
   })
   if (!section) return NextResponse.json({ error: "Invalid section" }, { status: 422 })
 
-  const term = await prisma.term.findFirst({
-    where: { isCurrent: true, academicYear: { schoolId: access.session.schoolId } },
-    select: { id: true },
-  })
-  if (!term) return NextResponse.json({ error: "No active term" }, { status: 400 })
-
   const day = dayOnly(date)
+  const term = await findTermForDate(access.session.schoolId, day)
+  if (!term) {
+    return NextResponse.json(
+      { error: "No term configured for this date" },
+      { status: 400 },
+    )
+  }
 
   // Validate every student is actively enrolled in this section.
   const studentIds = entries.map((e) => e.studentId)

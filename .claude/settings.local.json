@@ -65,7 +65,12 @@
       "Bash(xargs grep -l \"presign\\\\|/api/upload\")",
       "Bash(findstr /i \"messag announce communic notification sms whatsapp emergency\")",
       "PowerShell(pnpm *)",
-      "PowerShell(docker compose up *)"
+      "PowerShell(docker compose up *)",
+      "Bash(echo \"EXIT=$?\")",
+      "Bash(npx vitest *)",
+      "Bash(netstat -ano)",
+      "Bash(grep -E \":3[0-9]{3,4}\\\\b\")",
+      "PowerShell(Get-NetTCPConnection *)"
     ]
   }
 }

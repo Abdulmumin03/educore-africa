@@ -176,7 +176,7 @@ export function ReportCardDocument({ data }: { data: ReportCardData }) {
             <View key={s.id} style={styles.tr}>
               <Text style={styles.c_subject}>
                 {s.name}
-                {s.waecCode ? `  (${s.waecCode})` : ""}
+                {s.externalCode ? `  (${s.externalCode})` : ""}
               </Text>
               <Text style={styles.c_num}>{s.ca.toFixed(1)}</Text>
               <Text style={styles.c_num}>{s.exam.toFixed(1)}</Text>

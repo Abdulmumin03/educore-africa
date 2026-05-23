@@ -153,6 +153,7 @@ export function LessonDialog({
           classLevel: classMeta.name,
           topic: form.topic.trim(),
           durationMin: form.durationMin,
+          classId: form.classId,
         }),
       })
       const b = (await res.json().catch(() => ({}))) as {

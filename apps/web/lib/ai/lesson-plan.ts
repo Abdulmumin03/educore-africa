@@ -27,7 +27,14 @@ export const lessonPlanOutputSchema = z.object({
 
 export type LessonPlanOutput = z.infer<typeof lessonPlanOutputSchema>
 
-const SYSTEM_PROMPT = `You generate detailed lesson plans for Nigerian secondary schools (JSS 1 to SS 3), aligned with the NERDC curriculum.
+const DEFAULT_CURRICULUM_HINT =
+  "Aligned with the NERDC curriculum. Use realistic Nigerian classroom items and examples."
+
+function buildSystemPrompt(curriculumHint: string): string {
+  return `You generate detailed lesson plans for secondary-school teachers.
+
+Curriculum context:
+${curriculumHint}
 
 You receive: subject, class level, topic, lesson duration (minutes).
 
@@ -46,14 +53,19 @@ Return STRICT JSON, no markdown, matching exactly this shape:
 Constraints:
   • Objectives: 3–4 items, each starts with an action verb (Define, Explain, Calculate, Demonstrate, Compare).
   • Methodology: pick the SINGLE best fit for the topic.
-  • Materials: include realistic Nigerian classroom items; for sciences include lab apparatus.
+  • Materials: include realistic classroom items (defer to curriculum context for locale); for sciences include lab apparatus.
   • Steps: 4–6 steps totalling roughly the lesson duration. Common pattern: Introduction → Presentation → Guided practice → Evaluation → Conclusion.
   • Assessment: concrete (e.g. "5-mark exit ticket: solve 3 quadratic equations").
   • Homework: 1 sentence max if included; empty string if the lesson doesn't warrant one.`
+}
 
-export async function generateLessonPlan(input: LessonPlanInput) {
+export async function generateLessonPlan(
+  input: LessonPlanInput,
+  opts?: { curriculumHint?: string | null },
+) {
+  const hint = opts?.curriculumHint?.trim() || DEFAULT_CURRICULUM_HINT
   const result = await generateJson<LessonPlanOutput>({
-    system: SYSTEM_PROMPT,
+    system: buildSystemPrompt(hint),
     user: JSON.stringify(input),
     model: FAST_MODEL,
     maxTokens: 1800,

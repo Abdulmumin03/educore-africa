@@ -1,29 +1,95 @@
 import { prisma } from "@/lib/db"
-import { resolveSettings, type GradingSettings } from "@/lib/school-settings"
+import { gradingSettingsSchema, DEFAULT_GRADING, type GradingSettings } from "@/lib/school-settings"
+
+type GradingConfigInput =
+  | string
+  | {
+      schoolId: string
+      classId?: string | null
+      sectionId?: string | null
+      curriculumId?: string | null
+    }
 
 /**
- * Returns the resolved grading config for a school. Falls back to DEFAULT_GRADING
- * when nothing is set. Computes derived values (caMax + examMax) so callers
- * don't have to.
+ * Returns the resolved grading config for a school + class context.
+ *
+ * Resolution order:
+ *   1. explicit curriculumId (if provided)
+ *   2. class.curriculumId (resolved from classId or sectionId)
+ *   3. school's default Curriculum
+ *   4. DEFAULT_GRADING (WAEC scale) — last-resort if a school has no curricula
+ *
+ * Legacy callers passing just a schoolId still work — they get the school's
+ * default curriculum (which the P14 migration backfilled for every school).
  */
-export async function getGradingConfig(schoolId: string): Promise<
+export async function getGradingConfig(input: GradingConfigInput): Promise<
   GradingSettings & {
     caMax: number
     examMax: number
     perComponentMax: number
+    curriculumId: string | null
   }
 > {
-  const school = await prisma.school.findUnique({
-    where: { id: schoolId },
-    select: { settings: true },
-  })
-  const { grading } = resolveSettings(school?.settings ?? null)
+  const opts: Exclude<GradingConfigInput, string> =
+    typeof input === "string" ? { schoolId: input } : input
+
+  let curriculumId = opts.curriculumId ?? null
+
+  if (!curriculumId && opts.classId) {
+    const klass = await prisma.class.findUnique({
+      where: { id: opts.classId },
+      select: { curriculumId: true },
+    })
+    curriculumId = klass?.curriculumId ?? null
+  }
+
+  if (!curriculumId && opts.sectionId) {
+    const section = await prisma.section.findUnique({
+      where: { id: opts.sectionId },
+      select: { class: { select: { curriculumId: true } } },
+    })
+    curriculumId = section?.class.curriculumId ?? null
+  }
+
+  let grading: GradingSettings | null = null
+
+  if (curriculumId) {
+    const cur = await prisma.curriculum.findFirst({
+      where: { id: curriculumId, schoolId: opts.schoolId, deletedAt: null },
+      select: { gradingScale: true },
+    })
+    if (cur) {
+      const parsed = gradingSettingsSchema.safeParse(cur.gradingScale)
+      if (parsed.success) grading = parsed.data
+    }
+  }
+
+  if (!grading) {
+    // Fall back to the school's default curriculum.
+    const def = await prisma.curriculum.findFirst({
+      where: { schoolId: opts.schoolId, isDefault: true, deletedAt: null },
+      select: { id: true, gradingScale: true },
+    })
+    if (def) {
+      const parsed = gradingSettingsSchema.safeParse(def.gradingScale)
+      if (parsed.success) {
+        grading = parsed.data
+        curriculumId = curriculumId ?? def.id
+      }
+    }
+  }
+
+  if (!grading) {
+    // Last-resort default — only hit when a school somehow has no curricula.
+    grading = DEFAULT_GRADING
+  }
+
   const caMax = grading.caWeight
   const examMax = grading.examWeight
   const perComponentMax = grading.caComponents.length
     ? Math.round((caMax / grading.caComponents.length) * 10) / 10
     : caMax
-  return { ...grading, caMax, examMax, perComponentMax }
+  return { ...grading, caMax, examMax, perComponentMax, curriculumId }
 }
 
 export type ResolvedGradingConfig = Awaited<ReturnType<typeof getGradingConfig>>

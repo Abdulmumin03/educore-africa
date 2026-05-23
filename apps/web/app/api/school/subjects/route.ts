@@ -11,6 +11,7 @@ const schema = z.object({
   category: z.enum(["CORE", "ELECTIVE", "TRADE"]),
   creditUnits: z.number().int().min(1).max(10),
   isActive: z.boolean(),
+  curriculumIds: z.array(z.string().trim().min(1)).optional(),
 })
 
 export async function POST(req: Request) {
@@ -19,14 +20,49 @@ export async function POST(req: Request) {
 
   const parsed = schema.safeParse(await req.json().catch(() => null))
   if (!parsed.success) return NextResponse.json({ error: "Invalid" }, { status: 422 })
+  const schoolId = g.session.user.schoolId
+
+  // Resolve curricula. Empty / unspecified => fall back to the school's default.
+  let curriculumIds = parsed.data.curriculumIds ?? []
+  if (curriculumIds.length === 0) {
+    const def = await prisma.curriculum.findFirst({
+      where: { schoolId, isDefault: true, deletedAt: null },
+      select: { id: true },
+    })
+    if (def) curriculumIds = [def.id]
+  } else {
+    const found = await prisma.curriculum.findMany({
+      where: { schoolId, deletedAt: null, id: { in: curriculumIds } },
+      select: { id: true },
+    })
+    if (found.length !== curriculumIds.length) {
+      return NextResponse.json({ error: "Unknown curriculum in selection" }, { status: 422 })
+    }
+  }
 
   try {
-    const subj = await prisma.subject.create({
-      data: {
-        schoolId: g.session.user.schoolId,
-        ...parsed.data,
-        isCore: parsed.data.category === "CORE",
-      },
+    const subj = await prisma.$transaction(async (tx) => {
+      const created = await tx.subject.create({
+        data: {
+          schoolId,
+          name: parsed.data.name,
+          code: parsed.data.code,
+          category: parsed.data.category,
+          creditUnits: parsed.data.creditUnits,
+          isActive: parsed.data.isActive,
+          isCore: parsed.data.category === "CORE",
+        },
+      })
+      if (curriculumIds.length > 0) {
+        await tx.subjectCurriculum.createMany({
+          data: curriculumIds.map((curriculumId) => ({
+            subjectId: created.id,
+            curriculumId,
+          })),
+          skipDuplicates: true,
+        })
+      }
+      return created
     })
     return NextResponse.json({ ok: true, id: subj.id })
   } catch {

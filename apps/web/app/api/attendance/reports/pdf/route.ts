@@ -40,18 +40,22 @@ export async function GET(req: Request) {
     })
     if (!section) return new Response("Not found", { status: 404 })
 
+    // No user-supplied range → fall back to current term by termId only.
+    // displayFrom/displayTo are for the PDF header; the actual query trusts
+    // Attendance.termId (canonical) rather than the term's calendar dates,
+    // which could mismatch when isCurrent hasn't been rotated.
     let termId: string | null = null
-    let effectiveFrom = from
-    let effectiveTo = to
-    if (!effectiveFrom && !effectiveTo) {
+    let displayFrom = from
+    let displayTo = to
+    if (!from && !to) {
       const term = await prisma.term.findFirst({
         where: { isCurrent: true, academicYear: { schoolId: access.session.schoolId } },
         select: { id: true, startDate: true, endDate: true },
       })
       if (term) {
         termId = term.id
-        effectiveFrom = term.startDate
-        effectiveTo = term.endDate
+        displayFrom = term.startDate
+        displayTo = term.endDate
       }
     }
 
@@ -74,11 +78,11 @@ export async function GET(req: Request) {
               studentId: { in: studentIds },
               deletedAt: null,
               ...(termId ? { termId } : {}),
-              ...(effectiveFrom || effectiveTo
+              ...(from || to
                 ? {
                     date: {
-                      ...(effectiveFrom ? { gte: effectiveFrom } : {}),
-                      ...(effectiveTo ? { lte: effectiveTo } : {}),
+                      ...(from ? { gte: from } : {}),
+                      ...(to ? { lte: to } : {}),
                     },
                   }
                 : {}),
@@ -118,8 +122,8 @@ export async function GET(req: Request) {
     const pdf = await renderClassReportPdf({
       school,
       section: { name: section.name, className: section.class.name },
-      from: effectiveFrom?.toISOString() ?? null,
-      to: effectiveTo?.toISOString() ?? null,
+      from: displayFrom?.toISOString() ?? null,
+      to: displayTo?.toISOString() ?? null,
       rows,
       generatedAt: new Date().toISOString(),
     })

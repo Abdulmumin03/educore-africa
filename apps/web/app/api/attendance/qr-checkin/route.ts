@@ -5,6 +5,7 @@ import {
   staffCanMarkSection,
 } from "@/lib/attendance-access"
 import { dayOnly, qrCheckinSchema } from "@/lib/attendance-schemas"
+import { findTermForDate } from "@/lib/term"
 
 export const runtime = "nodejs"
 
@@ -54,13 +55,14 @@ export async function POST(req: Request) {
   })
   if (!ok) return NextResponse.json({ error: "Not assigned to this section" }, { status: 403 })
 
-  const term = await prisma.term.findFirst({
-    where: { isCurrent: true, academicYear: { schoolId: access.session.schoolId } },
-    select: { id: true },
-  })
-  if (!term) return NextResponse.json({ error: "No active term" }, { status: 400 })
-
   const day = parsed.data.date ? dayOnly(parsed.data.date) : dayOnly(new Date())
+  const term = await findTermForDate(access.session.schoolId, day)
+  if (!term) {
+    return NextResponse.json(
+      { error: "No term configured for this date" },
+      { status: 400 },
+    )
+  }
   const now = new Date()
 
   // LATE if scanned after 09:00 local.

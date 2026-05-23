@@ -26,19 +26,19 @@ export async function GET(req: Request) {
   })
   if (!section) return NextResponse.json({ error: "Not found" }, { status: 404 })
 
-  let from: Date | null = fromStr ? dayOnly(fromStr) : null
-  let to: Date | null = toStr ? dayOnly(toStr) : null
+  const from: Date | null = fromStr ? dayOnly(fromStr) : null
+  const to: Date | null = toStr ? dayOnly(toStr) : null
   let termId: string | null = null
+  // No user-supplied range → fall back to current term by termId only.
+  // We don't also apply the term's date range as a filter — Attendance.termId
+  // is canonical, and a stale isCurrent flag could otherwise exclude rows the
+  // user just marked.
   if (!from && !to) {
     const term = await prisma.term.findFirst({
       where: { isCurrent: true, academicYear: { schoolId: access.session.schoolId } },
-      select: { id: true, startDate: true, endDate: true },
+      select: { id: true },
     })
-    if (term) {
-      termId = term.id
-      from = term.startDate
-      to = term.endDate
-    }
+    termId = term?.id ?? null
   }
 
   const enrollments = await prisma.enrollment.findMany({

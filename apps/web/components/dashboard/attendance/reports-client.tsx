@@ -1,12 +1,10 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import dayjs from "dayjs"
-import { Download, FileDown, Loader2, Search } from "lucide-react"
+import { AlertCircle, Download, FileDown, Loader2 } from "lucide-react"
 import { toast } from "sonner"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -114,7 +112,7 @@ export function ReportsClient({ classes }: { classes: ClassOpt[] }) {
           <ClassReportTab classes={classes} useRange={false} />
         </TabsContent>
         <TabsContent value="student">
-          <StudentReportTab />
+          <StudentReportTab classes={classes} />
         </TabsContent>
         <TabsContent value="range">
           <ClassReportTab classes={classes} useRange />
@@ -148,7 +146,10 @@ function ClassReportTab({ classes, useRange }: { classes: ClassOpt[]; useRange: 
     queryKey: ["class-report", queryString],
     queryFn: async () => {
       const res = await fetch(`/api/attendance/class-report?${queryString}`)
-      if (!res.ok) throw new Error("Failed")
+      if (!res.ok) {
+        const body = (await res.json().catch(() => ({}))) as { error?: string }
+        throw new Error(body.error ?? `Request failed (${res.status})`)
+      }
       return res.json()
     },
     enabled: !!sectionId,
@@ -261,11 +262,27 @@ function ClassReportTab({ classes, useRange }: { classes: ClassOpt[]; useRange: 
           </div>
         </div>
 
-        {report.isLoading || !report.data ? (
+        {!sectionId ? (
+          <p className="rounded-md border border-dashed bg-muted/30 p-6 text-center text-sm text-muted-foreground">
+            Pick a class and arm to load the report.
+          </p>
+        ) : report.isLoading ? (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" /> Loading…
           </div>
-        ) : (
+        ) : report.isError ? (
+          <div className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+            <span>
+              Couldn&apos;t load report:{" "}
+              {report.error instanceof Error ? report.error.message : "Unknown error"}
+            </span>
+          </div>
+        ) : report.data && report.data.rows.length === 0 ? (
+          <p className="rounded-md border border-dashed bg-muted/30 p-6 text-center text-sm text-muted-foreground">
+            No students enrolled in this arm for the selected period.
+          </p>
+        ) : report.data ? (
           <Table>
             <TableHeader>
               <TableRow>
@@ -298,27 +315,44 @@ function ClassReportTab({ classes, useRange }: { classes: ClassOpt[]; useRange: 
               ))}
             </TableBody>
           </Table>
-        )}
+        ) : null}
       </CardContent>
     </Card>
   )
 }
 
-function StudentReportTab() {
-  const [search, setSearch] = useState("")
+function StudentReportTab({ classes }: { classes: ClassOpt[] }) {
+  const [classId, setClassId] = useState<string>(classes[0]?.id ?? "")
+  const arms = useMemo(
+    () => classes.find((c) => c.id === classId)?.sections ?? [],
+    [classes, classId],
+  )
+  const [sectionId, setSectionId] = useState<string>(arms[0]?.id ?? "")
   const [studentId, setStudentId] = useState<string>("")
   const [from, setFrom] = useState("")
   const [to, setTo] = useState("")
 
-  const results = useQuery<{ items: StudentResult[]; total: number }>({
-    queryKey: ["report-student-search", search],
+  const students = useQuery<{ items: StudentResult[]; total: number }>({
+    queryKey: ["report-students-by-section", sectionId],
     queryFn: async () => {
-      const res = await fetch(`/api/students?search=${encodeURIComponent(search)}&limit=10`)
-      if (!res.ok) throw new Error("Failed")
+      const res = await fetch(
+        `/api/students?sectionId=${encodeURIComponent(sectionId)}&status=ACTIVE&limit=200`,
+      )
+      if (!res.ok) {
+        const body = (await res.json().catch(() => ({}))) as { error?: string }
+        throw new Error(body.error ?? `Request failed (${res.status})`)
+      }
       return res.json()
     },
-    enabled: search.trim().length >= 2,
+    enabled: !!sectionId,
   })
+
+  // Clear studentId if the roster comes back without that student (e.g. arm
+  // switched and the previously picked student isn't in the new section).
+  useEffect(() => {
+    if (!students.data || !studentId) return
+    if (!students.data.items.some((s) => s.id === studentId)) setStudentId("")
+  }, [students.data, studentId])
 
   const report = useQuery<StudentReport>({
     queryKey: ["student-report", studentId, from, to],
@@ -327,13 +361,16 @@ function StudentReportTab() {
       if (from) p.set("from", from)
       if (to) p.set("to", to)
       const res = await fetch(`/api/attendance/summary?${p.toString()}`)
-      if (!res.ok) throw new Error("Failed")
+      if (!res.ok) {
+        const body = (await res.json().catch(() => ({}))) as { error?: string }
+        throw new Error(body.error ?? `Request failed (${res.status})`)
+      }
       return res.json()
     },
     enabled: !!studentId,
   })
 
-  const selected = results.data?.items.find((s) => s.id === studentId)
+  const selected = students.data?.items.find((s) => s.id === studentId)
 
   function exportPdf() {
     if (!studentId) {
@@ -361,20 +398,80 @@ function StudentReportTab() {
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-base">Student report</CardTitle>
-        <CardDescription>Defaults to the current term unless you set a range.</CardDescription>
+        <CardDescription>
+          Pick the class, arm, then the student. Defaults to the current term unless you set a range.
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid gap-3 sm:grid-cols-3">
-          <Field label="Search student">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Name or admission no."
-                className="pl-8"
-              />
-            </div>
+        <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          <Field label="Class">
+            <Select
+              value={classId}
+              onValueChange={(v) => {
+                setClassId(v)
+                const firstArm = classes.find((c) => c.id === v)?.sections[0]?.id ?? ""
+                setSectionId(firstArm)
+                setStudentId("")
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {classes.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+          <Field label="Arm">
+            <Select
+              value={sectionId}
+              onValueChange={(v) => {
+                setSectionId(v)
+                setStudentId("")
+              }}
+              disabled={arms.length === 0}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Pick an arm" />
+              </SelectTrigger>
+              <SelectContent>
+                {arms.map((s) => (
+                  <SelectItem key={s.id} value={s.id}>
+                    Arm {s.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+          <Field label="Student">
+            <Select
+              value={studentId}
+              onValueChange={setStudentId}
+              disabled={!sectionId || students.isLoading || (students.data?.items.length ?? 0) === 0}
+            >
+              <SelectTrigger>
+                <SelectValue
+                  placeholder={
+                    students.isLoading
+                      ? "Loading…"
+                      : (students.data?.items.length ?? 0) === 0
+                        ? "No students in arm"
+                        : "Pick a student"
+                  }
+                />
+              </SelectTrigger>
+              <SelectContent>
+                {students.data?.items.map((s) => (
+                  <SelectItem key={s.id} value={s.id}>
+                    {s.lastName}, {s.firstName} · {s.admissionNumber}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </Field>
           <Field label="From">
             <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
@@ -384,35 +481,15 @@ function StudentReportTab() {
           </Field>
         </div>
 
-        {results.data && results.data.items.length > 0 && (
-          <div className="rounded-md border">
-            <ul className="divide-y">
-              {results.data.items.map((s) => (
-                <li key={s.id}>
-                  <button
-                    type="button"
-                    onClick={() => setStudentId(s.id)}
-                    className={cn(
-                      "flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-muted",
-                      studentId === s.id && "bg-primary/5",
-                    )}
-                  >
-                    <Avatar className="h-7 w-7">
-                      <AvatarFallback className="text-[10px]">
-                        {s.firstName[0]}{s.lastName[0]}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="flex-1">
-                      {s.firstName} {s.lastName}{" "}
-                      <span className="text-xs text-muted-foreground">· {s.admissionNumber}</span>
-                    </span>
-                    {studentId === s.id && <Badge variant="default">Selected</Badge>}
-                  </button>
-                </li>
-              ))}
-            </ul>
+        {students.isError ? (
+          <div className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+            <span>
+              Couldn&apos;t load students:{" "}
+              {students.error instanceof Error ? students.error.message : "Unknown error"}
+            </span>
           </div>
-        )}
+        ) : null}
 
         {studentId && (
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -434,9 +511,19 @@ function StudentReportTab() {
           </div>
         )}
 
-        {studentId && (report.isLoading || !report.data) ? (
+        {studentId && report.isLoading ? (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" /> Loading…
+          </div>
+        ) : null}
+
+        {studentId && report.isError ? (
+          <div className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+            <span>
+              Couldn&apos;t load report:{" "}
+              {report.error instanceof Error ? report.error.message : "Unknown error"}
+            </span>
           </div>
         ) : null}
 

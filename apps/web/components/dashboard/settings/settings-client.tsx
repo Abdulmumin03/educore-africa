@@ -5,9 +5,9 @@ import { ProfileTab, type SchoolProfile } from "@/components/dashboard/settings/
 import { CalendarTab, type AcademicYearDTO, type HolidayDTO } from "@/components/dashboard/settings/calendar-tab"
 import { ClassesTab, type ClassDTO } from "@/components/dashboard/settings/classes-tab"
 import { SubjectsTab, type SubjectDTO } from "@/components/dashboard/settings/subjects-tab"
-import { GradingTab } from "@/components/dashboard/settings/grading-tab"
+import { CurriculaTab, type CurriculumDTO } from "@/components/dashboard/settings/curricula-tab"
 import { NotificationsTab } from "@/components/dashboard/settings/notifications-tab"
-import type { GradingSettings, NotificationSettings } from "@/lib/school-settings"
+import type { NotificationSettings } from "@/lib/school-settings"
 
 type Props = {
   school: SchoolProfile
@@ -15,7 +15,8 @@ type Props = {
   holidays: HolidayDTO[]
   classes: ClassDTO[]
   subjects: SubjectDTO[]
-  settings: { grading: GradingSettings; notifications: NotificationSettings }
+  curricula: CurriculumDTO[]
+  settings: { notifications: NotificationSettings }
 }
 
 export function SettingsClient(props: Props) {
@@ -24,7 +25,7 @@ export function SettingsClient(props: Props) {
       <div>
         <h1 className="text-2xl font-bold tracking-tight">School settings</h1>
         <p className="text-sm text-muted-foreground">
-          Manage your school&apos;s profile, calendar, classes, subjects and grading.
+          Manage your school&apos;s profile, calendar, curricula, classes, subjects and notifications.
         </p>
       </div>
 
@@ -32,9 +33,9 @@ export function SettingsClient(props: Props) {
         <TabsList className="h-auto flex-wrap justify-start">
           <TabsTrigger value="profile">School Profile</TabsTrigger>
           <TabsTrigger value="calendar">Academic Calendar</TabsTrigger>
+          <TabsTrigger value="curricula">Curricula</TabsTrigger>
           <TabsTrigger value="classes">Classes & Sections</TabsTrigger>
           <TabsTrigger value="subjects">Subjects</TabsTrigger>
-          <TabsTrigger value="grading">Grading System</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
         </TabsList>
 
@@ -44,20 +45,17 @@ export function SettingsClient(props: Props) {
         <TabsContent value="calendar">
           <CalendarTab academicYears={props.academicYears} holidays={props.holidays} />
         </TabsContent>
+        <TabsContent value="curricula">
+          <CurriculaTab curricula={props.curricula} />
+        </TabsContent>
         <TabsContent value="classes">
-          <ClassesTab classes={props.classes} />
+          <ClassesTab classes={props.classes} curricula={props.curricula} />
         </TabsContent>
         <TabsContent value="subjects">
-          <SubjectsTab subjects={props.subjects} />
-        </TabsContent>
-        <TabsContent value="grading">
-          <GradingTab initial={props.settings.grading} notifications={props.settings.notifications} />
+          <SubjectsTab subjects={props.subjects} curricula={props.curricula} />
         </TabsContent>
         <TabsContent value="notifications">
-          <NotificationsTab
-            initial={props.settings.notifications}
-            grading={props.settings.grading}
-          />
+          <NotificationsTab initial={props.settings.notifications} />
         </TabsContent>
       </Tabs>
     </div>

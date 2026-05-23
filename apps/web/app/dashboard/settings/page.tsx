@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/db"
 import { resolveSettings } from "@/lib/school-settings"
+import { listCurricula } from "@/lib/curriculum"
 import { SettingsClient } from "@/components/dashboard/settings/settings-client"
 
 export const metadata = { title: "School settings · EduCore Africa" }
@@ -14,7 +15,7 @@ export default async function SchoolSettingsPage() {
   const schoolId = session.user.schoolId
   if (!schoolId) redirect("/dashboard")
 
-  const [school, academicYears, holidays, classes, subjects] = await Promise.all([
+  const [school, academicYears, holidays, classes, subjects, curricula] = await Promise.all([
     prisma.school.findUnique({ where: { id: schoolId } }),
     prisma.academicYear.findMany({
       where: { schoolId, deletedAt: null },
@@ -35,7 +36,9 @@ export default async function SchoolSettingsPage() {
     prisma.subject.findMany({
       where: { schoolId, deletedAt: null },
       orderBy: { name: "asc" },
+      include: { curricula: { select: { curriculumId: true } } },
     }),
+    listCurricula(schoolId),
   ])
 
   if (!school) redirect("/dashboard")
@@ -84,6 +87,7 @@ export default async function SchoolSettingsPage() {
         id: c.id,
         name: c.name,
         level: c.level,
+        curriculumId: c.curriculumId,
         sections: c.sections.map((s) => ({
           id: s.id,
           name: s.name,
@@ -98,6 +102,16 @@ export default async function SchoolSettingsPage() {
         creditUnits: s.creditUnits,
         isCore: s.isCore,
         isActive: s.isActive,
+        curriculumIds: s.curricula.map((c) => c.curriculumId),
+      }))}
+      curricula={curricula.map((c) => ({
+        id: c.id,
+        code: c.code,
+        name: c.name,
+        examBodyCode: c.examBodyCode,
+        isDefault: c.isDefault,
+        gradingScale: c.gradingScale,
+        aiPromptHint: c.aiPromptHint,
       }))}
       settings={resolveSettings(school.settings)}
     />

@@ -75,7 +75,15 @@ export function QuestionBankClient({ subjects }: { subjects: SubjectOpt[] }) {
       const res = await fetch("/api/ai/questions/generate", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ subject, classLevel, topic, difficulty, type, count }),
+        body: JSON.stringify({
+          subject,
+          subjectId,
+          classLevel,
+          topic,
+          difficulty,
+          type,
+          count,
+        }),
       })
       if (!res.ok) {
         const e = (await res.json().catch(() => ({}))) as { error?: string }

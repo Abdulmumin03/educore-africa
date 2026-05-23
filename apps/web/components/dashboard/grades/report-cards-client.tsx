@@ -44,7 +44,13 @@ import {
 } from "@/components/ui/table"
 import { Textarea } from "@/components/ui/textarea"
 
-type ClassOpt = { id: string; name: string; sections: { id: string; name: string }[] }
+type ExamBody = "WAEC" | "CAMBRIDGE" | "IB" | "NECO" | "NONE"
+type ClassOpt = {
+  id: string
+  name: string
+  examBodyCode: ExamBody
+  sections: { id: string; name: string }[]
+}
 type TermOpt = { id: string; type: string; sessionName: string; isCurrent: boolean; sessionIsCurrent: boolean }
 
 type RankItem = {
@@ -86,6 +92,14 @@ export function ReportCardsClient({
   const currentClass = classes.find((c) => c.id === classId)
   const arms = currentClass?.sections ?? []
   const isSeniorClass = !!currentClass?.name.toLowerCase().startsWith("ss")
+  // Gate per the class's curriculum exam body. SS classes with "NONE" still
+  // get WAEC (legacy schools whose curriculum was backfilled without an exam
+  // body tag).
+  const showWaec =
+    currentClass?.examBodyCode === "WAEC" ||
+    currentClass?.examBodyCode === "NECO" ||
+    (currentClass?.examBodyCode === "NONE" && isSeniorClass)
+  const showCambridge = currentClass?.examBodyCode === "CAMBRIDGE"
 
   useEffect(() => {
     if (arms.length > 0 && !arms.find((a) => a.id === sectionId)) setSectionId(arms[0].id)
@@ -261,7 +275,8 @@ export function ReportCardsClient({
           <CardTitle className="text-base">Students</CardTitle>
           <CardDescription>
             Per-row: edit comments, lock, download PDF, share, SMS parent
-            {isSeniorClass && ", download mock WAEC sheet"}.
+            {showWaec && ", download mock WAEC sheet"}
+            {showCambridge && ", download mock Cambridge sheet"}.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -289,7 +304,8 @@ export function ReportCardsClient({
                     row={r}
                     termId={termId}
                     canWrite={canWrite}
-                    showWaec={isSeniorClass}
+                    showWaec={showWaec}
+                    showCambridge={showCambridge}
                     onChanged={() =>
                       qc.invalidateQueries({
                         queryKey: ["report-card-ranking", classId, sectionId, termId],
@@ -311,12 +327,14 @@ function RankRow({
   termId,
   canWrite,
   showWaec,
+  showCambridge,
   onChanged,
 }: {
   row: RankItem
   termId: string
   canWrite: boolean
   showWaec: boolean
+  showCambridge: boolean
   onChanged: () => void
 }) {
   const [editing, setEditing] = useState(false)
@@ -351,6 +369,12 @@ function RankRow({
   }
   function downloadWaec() {
     window.open(`/api/grades/report-cards/${row.studentId}/waec?termId=${termId}`, "_blank")
+  }
+  function downloadCambridge() {
+    window.open(
+      `/api/grades/report-cards/${row.studentId}/cambridge?termId=${termId}`,
+      "_blank",
+    )
   }
 
   const share = useMutation({
@@ -426,6 +450,16 @@ function RankRow({
             {showWaec && (
               <Button size="sm" variant="ghost" onClick={downloadWaec} title="Mock WAEC summary">
                 <FileText className="mr-1 h-3 w-3" /> WAEC
+              </Button>
+            )}
+            {showCambridge && (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={downloadCambridge}
+                title="Mock Cambridge summary"
+              >
+                <FileText className="mr-1 h-3 w-3" /> Cambridge
               </Button>
             )}
             {canWrite && (

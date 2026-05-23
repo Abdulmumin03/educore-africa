@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db"
 import { getGradingConfig, letterGradeFor, computePositions } from "@/lib/grade-config"
+import { resolveCurriculumForClass } from "@/lib/curriculum"
 
 export type ReportCardData = {
   student: {
@@ -26,15 +27,21 @@ export type ReportCardData = {
     id: string
     name: string
     code: string
-    waecCode: string | null
+    externalCode: string | null
     ca: number
     exam: number
     total: number
     letterGrade: string | null
-    waecGrade: string | null
+    examBodyGrade: string | null
     teacherRemark: string | null
     position: number | null
   }>
+  curriculum: {
+    id: string | null
+    code: string | null
+    name: string | null
+    examBodyCode: string
+  }
   totals: {
     total: number
     average: number
@@ -122,7 +129,24 @@ export async function buildReportCardData(opts: {
   if (!school || !student || !term || student.enrollments.length === 0) return null
   const enrollment = student.enrollments[0]
 
-  const config = await getGradingConfig(opts.schoolId)
+  const curriculum = await resolveCurriculumForClass(enrollment.section.classId)
+  const config = await getGradingConfig({
+    schoolId: opts.schoolId,
+    classId: enrollment.section.classId,
+    curriculumId: curriculum?.id ?? null,
+  })
+
+  // Per-subject external code under the resolved curriculum (e.g. WAEC "0540",
+  // IGCSE "0580"). Null when this subject isn't joined to the curriculum.
+  const subjectIds = grades.map((g) => g.subjectId)
+  const externalCodeBySubjectId: Record<string, string | null> = {}
+  if (curriculum && subjectIds.length > 0) {
+    const rows = await prisma.subjectCurriculum.findMany({
+      where: { curriculumId: curriculum.id, subjectId: { in: subjectIds } },
+      select: { subjectId: true, externalCode: true },
+    })
+    for (const r of rows) externalCodeBySubjectId[r.subjectId] = r.externalCode
+  }
 
   // Per-student summary.
   const totals = grades.reduce(
@@ -200,21 +224,31 @@ export async function buildReportCardData(opts: {
       .slice()
       .sort((a, b) => a.subject.name.localeCompare(b.subject.name))
       .map((g) => {
-        const lg = g.letterGrade ?? letterGradeFor(g.totalScore, config.scale)?.grade ?? null
+        // Always recompute against the class's active curriculum scale, so a
+        // mid-term curriculum change reflects on subsequent renders. Falls
+        // back to stored letterGrade only if the scale fails to match.
+        const fresh = letterGradeFor(g.totalScore, config.scale)?.grade ?? null
+        const lg = fresh ?? g.letterGrade ?? null
         return {
           id: g.subjectId,
           name: g.subject.name,
           code: g.subject.code,
-          waecCode: g.subject.waecCode ?? null,
+          externalCode: externalCodeBySubjectId[g.subjectId] ?? null,
           ca: g.caScore,
           exam: g.examScore,
           total: g.totalScore,
           letterGrade: lg,
-          waecGrade: lg, // 1:1 since the scale uses WAEC letters already
+          examBodyGrade: lg,
           teacherRemark: g.teacherRemark,
           position: g.position,
         }
       }),
+    curriculum: {
+      id: curriculum?.id ?? null,
+      code: curriculum?.code ?? null,
+      name: curriculum?.name ?? null,
+      examBodyCode: curriculum?.examBodyCode ?? "NONE",
+    },
     totals: {
       total: Math.round(totals.total * 10) / 10,
       average,

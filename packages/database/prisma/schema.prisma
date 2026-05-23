@@ -378,6 +378,7 @@ model School {
   hostelIncidents         HostelIncident[]
   maintenanceRequests     MaintenanceRequest[]
   studentRouteAssignments StudentRouteAssignment[]
+  curricula               Curriculum[]
 
   @@index([slug])
   @@index([deletedAt])
@@ -508,16 +509,18 @@ model Term {
 }
 
 model Class {
-  id       String @id @default(cuid())
-  schoolId String @map("school_id")
-  name     String // e.g. "JSS 1", "SS 3"
-  level    Int // numeric ordering for promotion logic
+  id           String @id @default(cuid())
+  schoolId     String @map("school_id")
+  name         String // e.g. "JSS 1", "SS 3"
+  level        Int // numeric ordering for promotion logic
+  curriculumId String @map("curriculum_id")
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
   school        School         @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  curriculum    Curriculum     @relation(fields: [curriculumId], references: [id], onDelete: Restrict)
   sections      Section[]
   enrollments   Enrollment[]
   feeStructures FeeStructure[]
@@ -527,6 +530,7 @@ model Class {
 
   @@unique([schoolId, name])
   @@index([schoolId, level])
+  @@index([curriculumId])
   @@index([deletedAt])
   @@map("classes")
 }
@@ -569,7 +573,6 @@ model Subject {
   category    SubjectCategory @default(CORE)
   creditUnits Int             @default(1) @map("credit_units")
   isActive    Boolean         @default(true) @map("is_active")
-  waecCode    String?         @map("waec_code")
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
@@ -585,11 +588,51 @@ model Subject {
   lessonPlans      LessonPlan[]
   resources        Resource[]
   libraryBooks     LibraryBook[]
+  curricula        SubjectCurriculum[]
 
   @@unique([schoolId, code])
   @@index([schoolId])
   @@index([deletedAt])
   @@map("subjects")
+}
+
+model Curriculum {
+  id            String  @id @default(cuid())
+  schoolId      String  @map("school_id")
+  code          String // free-form school-defined code, e.g. "WAEC", "IGCSE", "CHECKPOINT"
+  name          String
+  examBodyCode  String  @default("NONE") @map("exam_body_code") // WAEC | CAMBRIDGE | IB | NECO | NONE — drives report-card sheet selection
+  isDefault     Boolean @default(false) @map("is_default")
+  gradingScale  Json    @map("grading_scale") // shape: GradingSettings from lib/school-settings
+  aiPromptHint  String? @map("ai_prompt_hint") // pasted into lesson-plan + question-bank prompts
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  school   School              @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  classes  Class[]
+  subjects SubjectCurriculum[]
+
+  @@unique([schoolId, code])
+  @@index([schoolId])
+  @@index([deletedAt])
+  @@map("curricula")
+}
+
+model SubjectCurriculum {
+  subjectId    String  @map("subject_id")
+  curriculumId String  @map("curriculum_id")
+  externalCode String? @map("external_code") // exam-body-specific code, e.g. WAEC "0540", IGCSE "0580"
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  subject    Subject    @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  curriculum Curriculum @relation(fields: [curriculumId], references: [id], onDelete: Cascade)
+
+  @@id([subjectId, curriculumId])
+  @@index([curriculumId])
+  @@map("subject_curricula")
 }
 
 // ═══════════════════════════════════════════════════════════════════

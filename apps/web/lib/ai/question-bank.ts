@@ -29,7 +29,14 @@ export const questionSchema = z.object({
 
 export type GeneratedQuestion = z.infer<typeof questionSchema>
 
-const SYSTEM_PROMPT = `You generate exam questions for Nigerian K-12 schools in the style of WAEC / NECO papers.
+const DEFAULT_CURRICULUM_HINT =
+  "Aligned with the NERDC curriculum. Match the style of WAEC / NECO papers. Use NGN and culturally Nigerian examples. Hard questions should use WAEC trap-style distractors."
+
+function buildSystemPrompt(curriculumHint: string): string {
+  return `You generate exam questions for K-12 schools.
+
+Curriculum context:
+${curriculumHint}
 
 Match the format exactly:
   • MCQ — 4 options labelled A-D, exactly one correct. \`answer\` is the option label ("C").
@@ -42,19 +49,22 @@ Each question MUST include a 1-2 sentence \`explanation\` that justifies the cor
 Difficulty:
   EASY — recall, single-step.
   MEDIUM — applies a concept; 2-3 steps.
-  HARD — synthesises multiple concepts; common WAEC trap-style distractors.
+  HARD — synthesises multiple concepts; use distractor style appropriate to the curriculum context above.
 
 Return STRICT JSON only, no markdown:
 {"questions":[{"question":"...","options":[{"label":"A","text":"..."}, ...], "answer":"...", "explanation":"..."}]}
 
-Be culturally appropriate for Nigeria (use NGN, local examples). Don't repeat the same question twice.`
+Don't repeat the same question twice.`
+}
 
 export async function generateQuestions(
   input: GenerateInput,
+  opts?: { curriculumHint?: string | null },
 ): Promise<
   | { ok: true; questions: GeneratedQuestion[]; model: string }
   | { ok: false; error: string }
 > {
+  const hint = opts?.curriculumHint?.trim() || DEFAULT_CURRICULUM_HINT
   const prompt = [
     `Subject: ${input.subject}`,
     `Class level: ${input.classLevel}`,
@@ -64,7 +74,7 @@ export async function generateQuestions(
     `Count: ${input.count}`,
   ].join("\n")
   const res = await generateJson<{ questions: GeneratedQuestion[] }>({
-    system: SYSTEM_PROMPT,
+    system: buildSystemPrompt(hint),
     user: prompt,
     model: FAST_MODEL,
     maxTokens: Math.min(4000, 200 + input.count * 250),
