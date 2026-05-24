@@ -66,7 +66,7 @@ export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
             <Label htmlFor="password">Password</Label>
             <Link
               href="/auth/forgot-password"
-              className="text-xs text-muted-foreground hover:text-foreground"
+              className="text-xs font-medium text-amber-700 hover:text-amber-800"
             >
               Forgot password?
             </Link>
@@ -87,7 +87,11 @@ export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
             {error}
           </p>
         )}
-        <Button type="submit" className="w-full" disabled={submitting}>
+        <Button
+          type="submit"
+          className="h-11 w-full bg-navy text-white shadow-sm transition-colors hover:bg-[#0a2350]"
+          disabled={submitting}
+        >
           {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Sign in
         </Button>
@@ -95,17 +99,19 @@ export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
 
       <div className="relative py-1">
         <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t" />
+          <span className="w-full border-t border-navy/10" />
         </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-card px-2 text-muted-foreground">or</span>
+        <div className="relative flex justify-center">
+          <span className="bg-white px-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-navy/45">
+            or
+          </span>
         </div>
       </div>
 
       <Button
         type="button"
         variant="outline"
-        className="w-full"
+        className="h-11 w-full border-navy/15 text-navy hover:bg-cream-soft"
         onClick={onGoogle}
         disabled={googleLoading}
       >
@@ -117,9 +123,9 @@ export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
         Sign in with Google
       </Button>
 
-      <p className="text-center text-sm text-muted-foreground">
+      <p className="text-center text-sm text-navy/65">
         New to EduCore?{" "}
-        <Link href="/onboard" className="font-medium text-foreground hover:underline">
+        <Link href="/onboard" className="font-semibold text-amber-700 hover:text-amber-800">
           Register your school
         </Link>
       </p>

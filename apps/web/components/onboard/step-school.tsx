@@ -4,7 +4,7 @@ import { useState, useRef } from "react"
 import Image from "next/image"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2, Upload } from "lucide-react"
+import { Loader2, Upload, Building2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { ScrollReveal } from "@/components/shared/scroll-reveal"
 import { stepSchoolSchema, type StepSchoolInput, SCHOOL_TYPES } from "@/lib/auth-schemas"
 
 type Props = {
@@ -44,7 +45,6 @@ export function StepSchool({ defaults, onSubmit }: Props) {
 
   async function onFile(file: File) {
     setUploadError(null)
-    // Local preview always works.
     const reader = new FileReader()
     reader.onload = () => setLocalPreview(String(reader.result))
     reader.readAsDataURL(file)
@@ -89,117 +89,202 @@ export function StepSchool({ defaults, onSubmit }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
-      <div>
-        <h2 className="text-xl font-semibold">School details</h2>
-        <p className="text-sm text-muted-foreground">
-          Public details about your school. You can update these later.
-        </p>
-      </div>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-7" noValidate>
+      <ScrollReveal>
+        <div>
+          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">
+            Step 1 of 5
+          </span>
+          <h2 className="mt-2 text-2xl font-bold tracking-tight text-navy md:text-3xl">
+            School details
+          </h2>
+          <p className="mt-1.5 text-sm text-navy/65">
+            Public details about your school. You can update these later.
+          </p>
+        </div>
+      </ScrollReveal>
 
-      <div className="space-y-2">
-        <Label>School logo</Label>
-        <div className="flex items-center gap-4">
-          <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-lg border bg-muted">
-            {localPreview ? (
-              <Image src={localPreview} alt="Logo" width={80} height={80} className="h-full w-full object-cover" />
-            ) : (
-              <Upload className="h-6 w-6 text-muted-foreground" />
-            )}
+      <ScrollReveal delay={80}>
+        <div className="rounded-xl border border-navy/10 bg-cream-soft p-5">
+          <Label className="text-navy">School logo</Label>
+          <div className="mt-3 flex items-center gap-4">
+            <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-xl border border-navy/10 bg-white">
+              {localPreview ? (
+                <Image
+                  src={localPreview}
+                  alt="Logo"
+                  width={80}
+                  height={80}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <Building2 className="h-7 w-7 text-navy/40" />
+              )}
+            </div>
+            <div className="space-y-1.5">
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (file) void onFile(file)
+                }}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                className="border-navy/15 text-navy hover:bg-white"
+                onClick={() => fileRef.current?.click()}
+                disabled={uploading}
+              >
+                {uploading ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Upload className="mr-2 h-4 w-4" />
+                )}
+                {logoUrl ? "Replace logo" : "Upload logo"}
+              </Button>
+              {uploadError ? (
+                <p className="text-xs text-destructive">{uploadError}</p>
+              ) : (
+                <p className="text-xs text-navy/55">
+                  PNG, JPEG, WebP or SVG · max 2 MB · optional
+                </p>
+              )}
+            </div>
           </div>
-          <div className="space-y-1">
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/png,image/jpeg,image/webp,image/svg+xml"
-              className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0]
-                if (file) void onFile(file)
-              }}
+        </div>
+      </ScrollReveal>
+
+      <ScrollReveal delay={160}>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2 sm:col-span-2">
+            <Label htmlFor="schoolName" className="text-navy">School name</Label>
+            <Input
+              id="schoolName"
+              {...register("schoolName")}
+              aria-invalid={!!errors.schoolName}
             />
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => fileRef.current?.click()}
-              disabled={uploading}
+            {errors.schoolName && (
+              <p className="text-sm text-destructive">{errors.schoolName.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="schoolType" className="text-navy">School type</Label>
+            <Select
+              value={schoolType}
+              onValueChange={(v) => setValue("schoolType", v as typeof schoolType)}
             >
-              {uploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {logoUrl ? "Replace logo" : "Upload logo"}
-            </Button>
-            {uploadError ? (
-              <p className="text-xs text-destructive">{uploadError}</p>
-            ) : (
-              <p className="text-xs text-muted-foreground">PNG, JPEG, WebP or SVG · max 2 MB · optional</p>
+              <SelectTrigger id="schoolType">
+                <SelectValue placeholder="Select" />
+              </SelectTrigger>
+              <SelectContent>
+                {SCHOOL_TYPES.map((t) => (
+                  <SelectItem key={t} value={t}>
+                    {t.charAt(0) + t.slice(1).toLowerCase()}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.schoolType && (
+              <p className="text-sm text-destructive">{errors.schoolType.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="phone" className="text-navy">Phone</Label>
+            <Input
+              id="phone"
+              type="tel"
+              placeholder="+2348012345678"
+              {...register("phone")}
+              aria-invalid={!!errors.phone}
+            />
+            {errors.phone && (
+              <p className="text-sm text-destructive">{errors.phone.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-navy">School email</Label>
+            <Input
+              id="email"
+              type="email"
+              {...register("email")}
+              aria-invalid={!!errors.email}
+            />
+            {errors.email && (
+              <p className="text-sm text-destructive">{errors.email.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="website" className="text-navy">Website (optional)</Label>
+            <Input
+              id="website"
+              type="url"
+              placeholder="https://"
+              {...register("website")}
+              aria-invalid={!!errors.website}
+            />
+            {errors.website && (
+              <p className="text-sm text-destructive">{errors.website.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2 sm:col-span-2">
+            <Label htmlFor="address" className="text-navy">Address</Label>
+            <Input
+              id="address"
+              {...register("address")}
+              aria-invalid={!!errors.address}
+            />
+            {errors.address && (
+              <p className="text-sm text-destructive">{errors.address.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="state" className="text-navy">State</Label>
+            <Input
+              id="state"
+              placeholder="Lagos"
+              {...register("state")}
+              aria-invalid={!!errors.state}
+            />
+            {errors.state && (
+              <p className="text-sm text-destructive">{errors.state.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="lga" className="text-navy">LGA</Label>
+            <Input
+              id="lga"
+              placeholder="Ikeja"
+              {...register("lga")}
+              aria-invalid={!!errors.lga}
+            />
+            {errors.lga && (
+              <p className="text-sm text-destructive">{errors.lga.message}</p>
             )}
           </div>
         </div>
-      </div>
+      </ScrollReveal>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-2 sm:col-span-2">
-          <Label htmlFor="schoolName">School name</Label>
-          <Input id="schoolName" {...register("schoolName")} aria-invalid={!!errors.schoolName} />
-          {errors.schoolName && <p className="text-sm text-destructive">{errors.schoolName.message}</p>}
+      <ScrollReveal delay={240}>
+        <div className="flex justify-end">
+          <Button
+            type="submit"
+            className="h-11 bg-navy px-6 text-white hover:bg-[#0a2350]"
+          >
+            Continue →
+          </Button>
         </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="schoolType">School type</Label>
-          <Select value={schoolType} onValueChange={(v) => setValue("schoolType", v as typeof schoolType)}>
-            <SelectTrigger id="schoolType">
-              <SelectValue placeholder="Select" />
-            </SelectTrigger>
-            <SelectContent>
-              {SCHOOL_TYPES.map((t) => (
-                <SelectItem key={t} value={t}>
-                  {t.charAt(0) + t.slice(1).toLowerCase()}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.schoolType && <p className="text-sm text-destructive">{errors.schoolType.message}</p>}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="phone">Phone</Label>
-          <Input id="phone" type="tel" placeholder="+2348012345678" {...register("phone")} aria-invalid={!!errors.phone} />
-          {errors.phone && <p className="text-sm text-destructive">{errors.phone.message}</p>}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="email">School email</Label>
-          <Input id="email" type="email" {...register("email")} aria-invalid={!!errors.email} />
-          {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="website">Website (optional)</Label>
-          <Input id="website" type="url" placeholder="https://" {...register("website")} aria-invalid={!!errors.website} />
-          {errors.website && <p className="text-sm text-destructive">{errors.website.message}</p>}
-        </div>
-
-        <div className="space-y-2 sm:col-span-2">
-          <Label htmlFor="address">Address</Label>
-          <Input id="address" {...register("address")} aria-invalid={!!errors.address} />
-          {errors.address && <p className="text-sm text-destructive">{errors.address.message}</p>}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="state">State</Label>
-          <Input id="state" placeholder="Lagos" {...register("state")} aria-invalid={!!errors.state} />
-          {errors.state && <p className="text-sm text-destructive">{errors.state.message}</p>}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="lga">LGA</Label>
-          <Input id="lga" placeholder="Ikeja" {...register("lga")} aria-invalid={!!errors.lga} />
-          {errors.lga && <p className="text-sm text-destructive">{errors.lga.message}</p>}
-        </div>
-      </div>
-
-      <div className="flex justify-end">
-        <Button type="submit">Continue</Button>
-      </div>
+      </ScrollReveal>
     </form>
   )
 }

@@ -71,8 +71,8 @@ export function VerifyMfaForm() {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       <input type="hidden" {...register("email")} />
       {emailParam ? (
-        <div className="rounded-md bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
-          Code sent to <strong className="text-foreground">{emailParam}</strong>
+        <div className="rounded-lg border border-amber-200 bg-amber-50/60 px-3 py-2.5 text-sm text-navy/75">
+          Code sent to <strong className="text-navy">{emailParam}</strong>
         </div>
       ) : null}
       <div className="space-y-2">
@@ -93,7 +93,11 @@ export function VerifyMfaForm() {
           {error}
         </p>
       )}
-      <Button type="submit" className="w-full" disabled={submitting}>
+      <Button
+        type="submit"
+        className="h-11 w-full bg-navy text-white hover:bg-[#0a2350]"
+        disabled={submitting}
+      >
         {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         Verify
       </Button>
@@ -101,7 +105,7 @@ export function VerifyMfaForm() {
         type="button"
         onClick={onResend}
         disabled={cooldown > 0}
-        className="block w-full text-center text-sm text-muted-foreground hover:text-foreground disabled:cursor-not-allowed"
+        className="block w-full text-center text-sm font-medium text-amber-700 hover:text-amber-800 disabled:cursor-not-allowed disabled:text-navy/40"
       >
         {cooldown > 0 ? `Resend code in ${cooldown}s` : "Resend code"}
       </button>

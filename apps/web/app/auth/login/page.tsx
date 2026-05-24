@@ -1,7 +1,7 @@
 import Image from "next/image"
 import { Suspense } from "react"
 import { LoginForm } from "@/components/auth/login-form"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { AuthCard } from "@/components/auth/auth-card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { prisma } from "@/lib/db"
 
@@ -19,27 +19,29 @@ export default async function LoginPage({ searchParams }: Props) {
     : null
 
   return (
-    <Card>
-      <CardHeader className="space-y-3">
-        {school?.logoUrl ? (
+    <AuthCard
+      eyebrow="Welcome back"
+      title={school ? `Sign in to ${school.name}` : "Sign in to your school"}
+      description="Enter your credentials to access your EduCore Africa dashboard."
+    >
+      {school?.logoUrl ? (
+        <div className="-mt-4 mb-6 flex items-center gap-3 rounded-xl border border-navy/10 bg-cream-soft px-3 py-2.5">
           <Image
             src={school.logoUrl}
             alt={school.name}
-            width={72}
-            height={72}
-            className="rounded-lg"
+            width={36}
+            height={36}
+            className="rounded-md"
           />
-        ) : null}
-        <CardTitle className="text-2xl">
-          {school ? `Welcome back to ${school.name}` : "Welcome back"}
-        </CardTitle>
-        <CardDescription>Sign in to your EduCore Africa account.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Suspense fallback={<Skeleton className="h-72 w-full" />}>
-          <LoginForm callbackUrl={searchParams.callbackUrl} />
-        </Suspense>
-      </CardContent>
-    </Card>
+          <div className="text-sm">
+            <div className="font-semibold text-navy">{school.name}</div>
+            <div className="text-xs text-navy/55">Signing in to this school</div>
+          </div>
+        </div>
+      ) : null}
+      <Suspense fallback={<Skeleton className="h-72 w-full" />}>
+        <LoginForm callbackUrl={searchParams.callbackUrl} />
+      </Suspense>
+    </AuthCard>
   )
 }

@@ -13,9 +13,9 @@ export function Stepper({
   const pct = ((currentIndex + 1) / steps.length) * 100
   return (
     <div className="w-full">
-      <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+      <div className="h-2 w-full overflow-hidden rounded-full bg-navy/10">
         <div
-          className="h-full bg-primary transition-[width] duration-300 ease-out"
+          className="h-full bg-gradient-to-r from-navy via-navy to-amber-500 transition-[width] duration-500 ease-out"
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -27,25 +27,34 @@ export function Stepper({
             <li
               key={step.key}
               className={cn(
-                "flex items-start gap-2 rounded-md border p-3 text-sm",
-                active && "border-primary bg-primary/5",
-                done && "border-emerald-500/40 bg-emerald-500/5 text-emerald-700",
-                !active && !done && "border-muted text-muted-foreground",
+                "flex items-start gap-2 rounded-lg border bg-white p-3 text-sm shadow-sm transition-colors",
+                active && "border-amber-400 bg-amber-50/60",
+                done && "border-emerald-300 bg-emerald-50/40",
+                !active && !done && "border-navy/10 text-navy/55",
               )}
             >
               <span
                 className={cn(
-                  "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px] font-medium",
-                  active && "border-primary bg-primary text-primary-foreground",
+                  "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px] font-semibold",
+                  active && "border-amber-500 bg-amber-400 text-navy",
                   done && "border-emerald-500 bg-emerald-500 text-white",
-                  !active && !done && "border-muted-foreground/40",
+                  !active && !done && "border-navy/20 text-navy/55",
                 )}
               >
                 {done ? <Check className="h-3 w-3" /> : i + 1}
               </span>
               <div className="leading-tight">
-                <div className="font-medium text-foreground">{step.title}</div>
-                <div className="text-xs text-muted-foreground">Step {i + 1}</div>
+                <div
+                  className={cn(
+                    "font-semibold",
+                    done ? "text-emerald-800" : "text-navy",
+                  )}
+                >
+                  {step.title}
+                </div>
+                <div className="text-[11px] uppercase tracking-wider text-navy/45">
+                  Step {i + 1}
+                </div>
               </div>
             </li>
           )

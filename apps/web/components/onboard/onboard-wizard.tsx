@@ -68,22 +68,49 @@ export function OnboardWizard() {
   }
 
   return (
-    <div className="min-h-screen bg-muted/30">
-      <header className="border-b bg-background/80 backdrop-blur">
+    <div className="relative min-h-screen bg-cream text-navy">
+      {/* Kente top stripe */}
+      <div className="flex h-1.5 w-full overflow-hidden">
+        {[
+          "#F59E0B", "#0D2B5E", "#C2410C", "#F59E0B", "#0D2B5E",
+          "#B45309", "#F59E0B", "#0D2B5E", "#C2410C", "#F59E0B",
+        ].map((c, i) => (
+          <div key={i} className="flex-1" style={{ background: c }} />
+        ))}
+      </div>
+
+      {/* Subtle pattern */}
+      <div className="pointer-events-none absolute inset-0 pattern-dots opacity-60" />
+
+      <header className="relative border-b border-navy/10 bg-cream/80 backdrop-blur">
         <div className="container mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
-          <Link href="/" className="text-lg font-bold tracking-tight">
-            EduCore Africa
+          <Link href="/" className="flex items-center gap-2.5">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-navy text-base font-extrabold text-white">
+              E
+            </span>
+            <span className="text-base font-semibold tracking-tight text-navy">
+              EduCore <span className="text-amber-600">Africa</span>
+            </span>
           </Link>
-          <Link href="/auth/login" className="text-sm text-muted-foreground hover:text-foreground">
-            Already have an account? Sign in
+          <Link
+            href="/auth/login"
+            className="text-sm font-medium text-navy/65 hover:text-navy"
+          >
+            Already have an account?{" "}
+            <span className="text-amber-700 hover:text-amber-800">Sign in</span>
           </Link>
         </div>
       </header>
 
-      <div className="container mx-auto max-w-3xl px-4 py-8">
+      <div className="container relative mx-auto max-w-3xl px-4 py-10 md:py-14">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Register your school</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">
+            Get started
+          </span>
+          <h1 className="mt-3 text-3xl font-bold tracking-tight text-navy md:text-4xl">
+            Register your school
+          </h1>
+          <p className="mt-2 text-base text-navy/65">
             Five short steps and you&apos;re live. Takes about 5 minutes.
           </p>
         </div>
@@ -92,7 +119,9 @@ export function OnboardWizard() {
           <Stepper steps={STEPS} currentIndex={index} />
         </div>
 
-        <div className="rounded-lg border bg-card p-6 shadow-sm">
+        <div className="relative overflow-hidden rounded-2xl border border-navy/10 bg-white p-6 shadow-xl shadow-navy/[0.04] md:p-8">
+          <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-amber-100/60 blur-3xl" />
+          <div className="relative">
           {index === 0 && (
             <StepSchool
               defaults={data.school}
@@ -141,6 +170,7 @@ export function OnboardWizard() {
               serverError={serverError}
             />
           )}
+          </div>
         </div>
       </div>
     </div>

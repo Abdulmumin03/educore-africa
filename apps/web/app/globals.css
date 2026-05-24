@@ -68,6 +68,74 @@
   }
 }
 
+@layer utilities {
+  .bg-cream {
+    background-color: #FBF7EC;
+  }
+  .bg-cream-soft {
+    background-color: #FDFAF2;
+  }
+  .text-navy {
+    color: #0D2B5E;
+  }
+  .bg-navy {
+    background-color: #0D2B5E;
+  }
+  .border-navy {
+    border-color: #0D2B5E;
+  }
+  .ring-navy {
+    --tw-ring-color: #0D2B5E;
+  }
+  /* Subtle kente-inspired diagonal stripe pattern */
+  .pattern-kente {
+    background-image: repeating-linear-gradient(
+      45deg,
+      rgba(245, 158, 11, 0.06) 0,
+      rgba(245, 158, 11, 0.06) 1px,
+      transparent 1px,
+      transparent 14px
+    );
+  }
+  /* Adinkra-inspired dot grid */
+  .pattern-dots {
+    background-image: radial-gradient(
+      circle at 1px 1px,
+      rgba(13, 43, 94, 0.08) 1px,
+      transparent 0
+    );
+    background-size: 18px 18px;
+  }
+  /* Warm grid pattern for hero */
+  .pattern-grid-warm {
+    background-image:
+      linear-gradient(rgba(245, 158, 11, 0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(245, 158, 11, 0.07) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+  /* Soft radial glow for hero */
+  .glow-amber {
+    background: radial-gradient(
+      circle at 30% 20%,
+      rgba(245, 158, 11, 0.22) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      circle at 80% 70%,
+      rgba(194, 65, 12, 0.18) 0%,
+      transparent 50%
+    );
+  }
+  /* Fade-in animation utility (uses tailwindcss-animate keyframes already loaded) */
+  .animate-fade-up {
+    animation: fade-up 0.7s ease-out both;
+  }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
 @layer components {
   .rich-text {
     @apply text-sm leading-6;

@@ -31,7 +31,10 @@ export function ForgotPasswordFlow() {
         <p className="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-700">
           Password updated. You can now sign in with your new password.
         </p>
-        <Button className="w-full" onClick={() => router.push("/auth/login")}>
+        <Button
+          className="h-11 w-full bg-navy text-white hover:bg-[#0a2350]"
+          onClick={() => router.push("/auth/login")}
+        >
           Go to sign in
         </Button>
       </div>
@@ -118,12 +121,16 @@ function RequestOtpForm({
           {externalError}
         </p>
       )}
-      <Button type="submit" className="w-full" disabled={submitting}>
+      <Button
+        type="submit"
+        className="h-11 w-full bg-navy text-white hover:bg-[#0a2350]"
+        disabled={submitting}
+      >
         {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         Send reset code
       </Button>
-      <p className="text-center text-sm text-muted-foreground">
-        <Link href="/auth/login" className="hover:underline">
+      <p className="text-center text-sm text-navy/65">
+        <Link href="/auth/login" className="font-medium text-amber-700 hover:text-amber-800">
           Back to sign in
         </Link>
       </p>
@@ -197,9 +204,11 @@ function ResetForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       <input type="hidden" {...register("email")} value={email} />
-      <div className="rounded-md bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
-        Code sent to <strong className="text-foreground">{email}</strong>
-        {hintedOtp ? <span className="ml-2 font-mono text-xs">(dev: {hintedOtp})</span> : null}
+      <div className="rounded-lg border border-amber-200 bg-amber-50/60 px-3 py-2.5 text-sm text-navy/75">
+        Code sent to <strong className="text-navy">{email}</strong>
+        {hintedOtp ? (
+          <span className="ml-2 font-mono text-xs text-amber-800">(dev: {hintedOtp})</span>
+        ) : null}
       </div>
       <div className="space-y-2">
         <Label htmlFor="otp">Verification code</Label>
@@ -236,19 +245,27 @@ function ResetForm({
           {error}
         </p>
       )}
-      <Button type="submit" className="w-full" disabled={submitting}>
+      <Button
+        type="submit"
+        className="h-11 w-full bg-navy text-white hover:bg-[#0a2350]"
+        disabled={submitting}
+      >
         {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         Update password
       </Button>
       <div className="flex items-center justify-between text-sm">
-        <button type="button" onClick={onBack} className="text-muted-foreground hover:text-foreground">
+        <button
+          type="button"
+          onClick={onBack}
+          className="text-navy/60 hover:text-navy"
+        >
           ← Use a different email
         </button>
         <button
           type="button"
           onClick={onResend}
           disabled={cooldown > 0}
-          className="text-foreground hover:underline disabled:cursor-not-allowed disabled:text-muted-foreground"
+          className="font-medium text-amber-700 hover:text-amber-800 disabled:cursor-not-allowed disabled:text-navy/40"
         >
           {cooldown > 0 ? `Resend in ${cooldown}s` : "Resend code"}
         </button>
