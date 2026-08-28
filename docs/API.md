@@ -1,9 +1,14 @@
 # API reference
 
-EduCore exposes ~90 HTTP routes under `apps/web/app/api/**`. This file is a
-**navigational index** — for the actual request/response shape of any endpoint,
-open the route file in `app/api/<surface>/route.ts`; the Zod schema and
-response payload are right at the top.
+The **school platform** exposes ~90 HTTP routes under `apps/web/app/api/**`.
+This file is a **navigational index** — for the actual request/response shape
+of any endpoint, open the route file in `app/api/<surface>/route.ts`; the Zod
+schema and response payload are right at the top.
+
+> The Super Admin Console is a separate application with its own 114 routes,
+> its own auth conventions and its own rate limits. Its inventory is in
+> [`SUPERADMIN.md § 8`](./SUPERADMIN.md#8-api-inventory) — nothing on this page
+> applies to it.
 
 ## Conventions
 
@@ -35,6 +40,11 @@ Standard responses:
 
 Webhooks (no session): `/api/finance/webhook/paystack`, `/api/ussd`,
 `/api/cron/*`. These have their own verification (HMAC, secret header, etc.).
+
+Two routes are public by design: `GET /api/health` (probes and the container
+HEALTHCHECK) and `POST /api/promo` (validates a promo code during school
+signup, before any account exists). Both are listed in `PUBLIC_PREFIXES` in
+`apps/web/middleware.ts`.
 
 ## Endpoint inventory
 
@@ -144,7 +154,10 @@ Grouped by surface. Methods listed per route; `[id]` is a route param.
 
 - `POST /api/ussd` — Africa's Talking webhook (form-encoded)
 - `GET /api/ussd` — verification stub
-- `GET /api/health` — Postgres + Redis ping
+- `GET /api/health` — Postgres + Redis ping (public)
+- `POST /api/promo` — validate a promo code at signup (public)
+- `POST /api/impersonation/accept`, `POST /api/impersonation/exit` — read-only
+  console grant; see [ARCHITECTURE.md](./ARCHITECTURE.md#read-only-impersonation-visit-school)
 - `POST /api/upload/presign` — S3 presigned PUT URL
 - `GET POST /api/school/notifications/test`
 
@@ -159,5 +172,5 @@ Grouped by surface. Methods listed per route; `[id]` is a route param.
 ## Tool surfaces
 
 The Ask EduCore AI uses Anthropic tool use rather than text-to-SQL. Tool
-definitions live at `apps/web/lib/ai/ask-tools.ts` — see [P08 memory](../memory/project_p08_ai_intelligence.md)
-for the design rationale.
+definitions live at `apps/web/lib/ai/ask-tools.ts`; the header comment there
+explains why tool use beats text-to-SQL for this workload.

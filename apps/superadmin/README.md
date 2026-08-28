@@ -8,6 +8,11 @@ imported by `apps/web`, and nothing in `apps/web` should ever query the
 - Dev URL: <http://localhost:3001/console> (the school app owns :3000)
 - Prisma models live in the shared `@educore/database` package
 
+**This file is the implementation reference** — why each surface is built the
+way it is, and what was deliberately left out. For getting in, the role
+matrix, the endpoint inventory and the operational runbook, start with
+[`docs/SUPERADMIN.md`](../../docs/SUPERADMIN.md).
+
 ## Running it
 
 ```bash

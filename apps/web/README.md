@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# EduCore Africa — School Platform
 
-## Getting Started
+The school-facing application: one installation, many tenants. Admins,
+teachers, bursars, form masters and parents all live here, and everything they
+see is scoped by `schoolId`.
 
-First, run the development server:
+The internal staff console is a **separate** app — [`apps/superadmin`](../superadmin)
+on port 3001. Nothing in this app may import from it, or query the
+`super_admin_*` tables.
+
+- Dev URL: <http://localhost:3000>
+- Prisma models come from the shared `@educore/database` package
+
+## Running it
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm --filter web dev      # or `pnpm dev:web` from the repo root
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`pnpm dev` at the repo root starts this app **and** the console.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Queued work needs a second process. Without it, jobs are written to Redis and
+never dispatched:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+pnpm --filter web worker
+```
 
-## Learn More
+That covers attendance SMS, scheduled announcements, exeat OTPs — everything
+with a producer under `lib/queues/`.
 
-To learn more about Next.js, take a look at the following resources:
+## Surfaces
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Area | Route |
+| --- | --- |
+| Public site, signup, onboarding | `/`, `/auth/*`, `/onboard` |
+| Dashboard shell | `/dashboard` |
+| Students, staff, attendance, payroll | `/dashboard/students`, `/staff`, `/attendance` |
+| Grades, report cards, midterms | `/dashboard/grades`, public `/report-cards/[token]` |
+| Finance and fee collection | `/dashboard/finance`, public `/pay/[invoiceId]` |
+| AI suite — Ask EduCore, risk, insights | `/dashboard/ai` |
+| Communications, announcements | `/dashboard/messages`, public `/notice-board` |
+| Timetable, assignments, lessons, resources | `/dashboard/timetable`, `/assignments`, `/lessons`, `/resources` |
+| Library, hostel, transport, visitors | `/dashboard/library`, `/hostel`, `/transport`, `/visitors` |
+| Analytics, audit log, multi-school network | `/dashboard/analytics`, `/settings/audit-log`, `/network-dashboard` |
+| Feature-phone access | `POST /api/ussd` |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Checks
 
-## Deploy on Vercel
+```bash
+pnpm --filter web lint
+pnpm --filter web exec tsc --noEmit
+pnpm --filter web test           # vitest
+pnpm --filter web build
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Documentation
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Doc | What it covers |
+| --- | --- |
+| [`docs/README.md`](../../docs/README.md) | Setup, environment variables, commands |
+| [`docs/ARCHITECTURE.md`](../../docs/ARCHITECTURE.md) | Tenancy, data flow, caching, audit logging |
+| [`docs/API.md`](../../docs/API.md) | Endpoint inventory for this app |
+| [`docs/DEPLOYMENT.md`](../../docs/DEPLOYMENT.md) | Production runbook |

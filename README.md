@@ -1,159 +1,131 @@
-# Turborepo starter
+# EduCore Africa
 
-This Turborepo starter is maintained by the Turborepo core team.
+Multi-tenant school-management software for African K-12 schools, and the
+internal console the EduCore Africa team runs it from.
 
-## Using this example
+Two Next.js applications, one Postgres database, one Prisma schema:
 
-Run the following command:
+| App | Port | Who uses it | Package |
+| --- | --- | --- | --- |
+| **School platform** | 3000 | school admins, teachers, bursars, parents | `apps/web` |
+| **Super Admin Console** | 3001 | EduCore Africa staff only | `apps/superadmin` |
 
-```sh
-npx create-turbo@latest
+They share `packages/database` and nothing else. The console reads across
+every tenant; the school app never sees another school's data and never
+touches the `super_admin_*` tables. Keeping that boundary is the single most
+important rule in this repo.
+
+---
+
+## Quick start
+
+```bash
+corepack enable && corepack prepare pnpm@9 --activate
+
+git clone <repo> && cd educore-africa
+cp .env.example .env                              # fill in the required vars
+cp apps/superadmin/.env.local.example apps/superadmin/.env.local
+
+pnpm docker:up            # local Postgres + Redis
+pnpm install
+pnpm db:migrate           # apply migrations
+pnpm db:generate          # generate the Prisma client
+pnpm db:seed              # demo school + console accounts (optional)
+
+pnpm dev                  # starts BOTH apps via turbo
 ```
 
-## What's inside?
+- School platform → <http://localhost:3000>
+- Super Admin Console → <http://localhost:3001/console>
 
-This Turborepo includes the following packages/apps:
+Queued work (attendance SMS, scheduled announcements) needs a **separate
+worker process** — without it, jobs sit in Redis and nothing dispatches:
 
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
+```bash
+pnpm --filter web worker
 ```
 
-Without global `turbo`, use your package manager:
+To create your first console account:
 
-```sh
-cd my-turborepo
-npx turbo build
-pnpm dlx turbo build
-pnpm exec turbo build
+```bash
+pnpm --filter superadmin admin:create -- \
+  --email you@educoreafrica.com --name "Your Name" \
+  --password "…" --role SUPER_ADMIN
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+An account with no TOTP cannot reach the console — the first sign-in walks
+through enrolment and issues backup codes.
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+## Documentation
 
-```sh
-turbo build --filter=docs
+| Doc | What it covers |
+| --- | --- |
+| [`docs/README.md`](./docs/README.md) | Setup, environment variables, day-to-day commands |
+| [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) | System map, tenancy, data flow, caching |
+| [`docs/API.md`](./docs/API.md) | Endpoint inventory for the school platform |
+| [`docs/SUPERADMIN.md`](./docs/SUPERADMIN.md) | The console: access, roles, surfaces, API, runbook |
+| [`docs/DEPLOYMENT.md`](./docs/DEPLOYMENT.md) | Production runbook for both apps |
+| [`apps/superadmin/README.md`](./apps/superadmin/README.md) | Console implementation reference — why each surface is built the way it is |
+
+## Layout
+
+```
+educore-africa/
+├── apps/
+│   ├── web/                 # School platform (:3000)
+│   └── superadmin/          # Super Admin Console (:3001)
+├── packages/
+│   └── database/            # Prisma schema, migrations, seeds, shared promo rules
+├── design/                  # Claude Design canvases (.dc.html artboards)
+├── docs/                    # The guides above
+└── .github/workflows/       # ci.yml · deploy.yml (web) · deploy-superadmin.yml
 ```
 
-Without global `turbo`:
+## Commands
 
-```sh
-npx turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+Run from the repo root. Turbo fans them out across both apps.
+
+| Command | Purpose |
+| --- | --- |
+| `pnpm dev` | Start both apps |
+| `pnpm dev:web` / `pnpm dev:superadmin` | Start one |
+| `pnpm build` | Production build of everything |
+| `pnpm lint` / `pnpm check-types` | ESLint / `tsc --noEmit` across the workspace |
+| `pnpm db:migrate` | Apply pending migrations locally |
+| `pnpm db:generate` | Regenerate the Prisma client |
+| `pnpm db:seed` | Demo school, then the console seed |
+| `pnpm db:studio` | Prisma Studio |
+| `pnpm docker:up` / `:down` | Local Postgres + Redis |
+
+Per-app tests:
+
+```bash
+pnpm --filter web test               # vitest
+pnpm --filter superadmin test        # vitest
+pnpm --filter superadmin test:sa10   # end-to-end; needs a running server
 ```
 
-### Develop
+The console's end-to-end suites are listed in
+[`docs/SUPERADMIN.md`](./docs/SUPERADMIN.md#checks).
 
-To develop all apps and packages, run the following command:
+## Stack
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+Next.js 14 (app router) · React 18 · TypeScript · Tailwind + shadcn/ui ·
+Prisma 5 + Postgres 15 · Redis 7 · BullMQ · TanStack Query · Auth.js v5 ·
+Recharts · Anthropic Claude · Paystack + Flutterwave · Africa's Talking (SMS +
+USSD) · Meta WhatsApp Cloud API · Resend · AWS S3 · Leaflet · Sentry · Vitest.
 
-```sh
-cd my-turborepo
-turbo dev
-```
+## Conventions
 
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo dev
-pnpm exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo dev --filter=web
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-pnpm exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-pnpm exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+- **kebab-case filenames** throughout.
+- **British spelling** in user-facing copy; Nigerian naira (`₦`) formatting via
+  `formatCurrency`.
+- **Never fabricate a figure.** An unconfigured integration reads "Not
+  checked", not green; an unimplemented queue says so; an AI score is
+  arithmetic and the model only writes the prose around it. Every surface
+  labels which of the two it is showing.
+- **Audit logging is explicit**, never middleware — the recorded verb should
+  reflect intent.
+- One migration history in `packages/database/prisma/migrations`, shared by
+  both apps. Write migrations by hand and apply with `migrate deploy`;
+  `prisma migrate dev` misbehaves under `pnpm exec` in this workspace.
