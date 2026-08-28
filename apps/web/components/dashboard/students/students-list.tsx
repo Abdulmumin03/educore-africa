@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useEffect, useMemo, useState } from "react"
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query"
+import { useQuery, useMutation } from "@tanstack/react-query"
 import {
   Download,
   Loader2,
@@ -91,7 +91,6 @@ export function StudentsList({
   classes: ClassOpt[]
   currentSession: string | null
 }) {
-  const qc = useQueryClient()
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState("")
   const [classId, setClassId] = useState<string>("all")

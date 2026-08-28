@@ -454,8 +454,8 @@ function TemplateEditor({
               : `Edit ${initial.name}`}
           </DialogTitle>
           <DialogDescription>
-            Adjust colours and which sections render. The "Generate preview" button
-            renders a sample PDF using the first active student + current term.
+            Adjust colours and which sections render. The &ldquo;Generate preview&rdquo;
+            button renders a sample PDF using the first active student + current term.
           </DialogDescription>
         </DialogHeader>
 

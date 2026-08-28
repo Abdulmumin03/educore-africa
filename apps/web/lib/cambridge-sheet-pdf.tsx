@@ -105,7 +105,7 @@ function dateOnly(iso: string) {
 // A Cambridge "pass" at IGCSE is C or above; A-Level is E or above. We use
 // a generic threshold of >= 5 scale points which captures both for the
 // preset scales we ship.
-function isPass(grade: string | null | undefined, scale: ReturnType<typeof letterGradeFor> | null): boolean {
+function isPass(grade: string | null | undefined): boolean {
   if (!grade) return false
   if (grade === "U" || grade === "F" || grade === "G") return false
   return true
@@ -132,7 +132,7 @@ export function CambridgeSheetDocument({
     }
   })
 
-  const passing = rows.filter((r) => isPass(r.cambridgeGrade, null)).length
+  const passing = rows.filter((r) => isPass(r.cambridgeGrade)).length
 
   const sheetTitle =
     curriculum.examBodyCode === "CAMBRIDGE"
@@ -211,7 +211,7 @@ export function CambridgeSheetDocument({
                       color:
                         s.cambridgeGrade === "U"
                           ? "#b91c1c"
-                          : isPass(s.cambridgeGrade, null)
+                          : isPass(s.cambridgeGrade)
                             ? "#0f766e"
                             : "#a16207",
                     },

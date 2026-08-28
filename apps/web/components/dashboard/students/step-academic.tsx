@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useMemo } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
@@ -55,7 +55,12 @@ export function StepAcademic({
   const sectionId = watch("sectionId")
   const academicYearId = watch("academicYearId")
   const admissionType = watch("admissionType")
-  const arms = classes.find((c) => c.id === classId)?.sections ?? []
+  // Memoised so the effect below depends on the class changing, not on a new
+  // array being allocated every render.
+  const arms = useMemo(
+    () => classes.find((c) => c.id === classId)?.sections ?? [],
+    [classes, classId],
+  )
 
   useEffect(() => {
     if (sectionId && !arms.find((a) => a.id === sectionId)) {

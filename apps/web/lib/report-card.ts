@@ -190,7 +190,6 @@ export async function buildReportCardData(opts: {
   const attTotals = { PRESENT: 0, ABSENT: 0, LATE: 0, EXCUSED: 0 }
   for (const a of attendance) attTotals[a.status] = a._count._all
   const schoolDays = attTotals.PRESENT + attTotals.ABSENT + attTotals.LATE + attTotals.EXCUSED
-  const present = attTotals.PRESENT + attTotals.LATE
   const attendancePct = schoolDays === 0 ? null : Math.round(((attTotals.PRESENT + attTotals.LATE * 0.5) / schoolDays) * 100)
 
   return {

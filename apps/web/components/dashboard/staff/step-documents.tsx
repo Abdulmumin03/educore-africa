@@ -94,6 +94,9 @@ export function StepDocuments({
   function submit() {
     const docs = rows
       .filter((r) => r.url)
+      // _localId and _uploading are client-side bookkeeping; destructuring them
+      // out is how they are kept off the wire.
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       .map(({ _localId, _uploading, ...d }) => d)
     onSubmit(docs)
   }

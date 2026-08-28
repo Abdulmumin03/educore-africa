@@ -1,7 +1,7 @@
 "use client"
 
 import dayjs from "dayjs"
-import { AlertTriangle, ShieldCheck, TrendingUp } from "lucide-react"
+import { AlertTriangle, ShieldCheck } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import type { StudentDTO } from "@/components/dashboard/students/profile/types"

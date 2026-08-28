@@ -48,7 +48,12 @@ export function AttendanceHeatmap({
     enabled: visible.length > 0,
   })
 
-  const series = data?.series ?? data?.sections ?? {}
+  // `?? {}` allocates a new object on every render, which would re-run the
+  // memo below each time and defeat the point of it.
+  const series = useMemo(
+    () => data?.series ?? data?.sections ?? {},
+    [data],
+  )
   const days = useMemo(() => {
     const first = visible[0]?.id
     return first ? series[first]?.map((d) => d.date) ?? [] : []

@@ -251,6 +251,9 @@ export function InvoiceDocument({ data, qrDataUrl }: { data: InvoicePdfInput; qr
         <View style={styles.payCard}>
           <View style={styles.qrBlock}>
             {qrDataUrl ? (
+              // @react-pdf/renderer's Image, not the DOM's — it renders into a
+              // PDF and takes no alt prop. jsx-a11y matches on the name alone.
+              // eslint-disable-next-line jsx-a11y/alt-text
               <Image src={qrDataUrl} style={{ width: 100, height: 100 }} />
             ) : (
               <View style={{ width: 100, height: 100, backgroundColor: "#f1f5f9" }} />

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   AlertCircle,
@@ -99,7 +99,9 @@ export function MidtermReportsClient({
   const [termId, setTermId] = useState<string>(defaultTerm?.id ?? "")
 
   const currentClass = classes.find((c) => c.id === classId)
-  const arms = currentClass?.sections ?? []
+  // `?? []` is a fresh array each render; without the memo the effect below
+  // fires on every one.
+  const arms = useMemo(() => currentClass?.sections ?? [], [currentClass])
 
   useEffect(() => {
     if (arms.length > 0 && !arms.find((a) => a.id === sectionId)) setSectionId(arms[0].id)

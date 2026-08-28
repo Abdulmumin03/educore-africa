@@ -158,7 +158,7 @@ export async function GET(req: Request) {
       const inner = termSubj.get(t.id)
       const points: Record<string, number | null> = {}
       if (inner) {
-        inner.forEach((v, sId) => {
+        inner.forEach((v) => {
           points[v.subjectName] = Math.round((v.sum / v.count) * 10) / 10
         })
       }

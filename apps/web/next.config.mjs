@@ -79,7 +79,16 @@ const withPWA = require("next-pwa")({
 })
 
 /** @type {import('next').NextConfig} */
-const nextConfig = {}
+const nextConfig = {
+  experimental: {
+    // isomorphic-dompurify pulls in jsdom, which reads its own
+    // browser/default-stylesheet.css off disk relative to __dirname. Bundled,
+    // that path resolves to apps/web/browser/... and `next build` dies while
+    // collecting page data — not only for the routes that sanitise HTML, but
+    // for the whole build. require()'d at runtime instead, it finds its file.
+    serverComponentsExternalPackages: ["isomorphic-dompurify", "jsdom"],
+  },
+}
 
 const { withSentryConfig } = require("@sentry/nextjs")
 
