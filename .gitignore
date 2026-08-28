@@ -36,3 +36,7 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+
+# Claude Design: the seeded canvas is a 3 MB copy of the editor payload,
+# regenerated from the .dc.html artboards + canvas.json on every publish.
+design/**/educore-superadmin-console.html

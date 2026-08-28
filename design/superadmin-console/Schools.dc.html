@@ -1,0 +1,599 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  <style>
+    html, body { height: 100%; }
+    body { margin: 0; background: #0A1628; color: #F8FAFC;
+           font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+           font-size: 13px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+    a { color: #3B82F6; text-decoration: none; } a:hover { color: #60A5FA; }
+    .mono { font-family: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+            font-variant-numeric: tabular-nums; }
+    .navsec { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+              color: #475569; padding: 0 12px; }
+    .nav { display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 12px;
+           border-radius: 6px; color: #94A3B8; }
+    .nav-active { background: rgba(59,130,246,0.14); color: #F8FAFC; font-weight: 500;
+                  box-shadow: inset 2px 0 0 #3B82F6; }
+    .panel { background: #1E293B; border: 1px solid #1E3A5F; border-radius: 8px; }
+    .th { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+          color: #64748B; }
+    .row { display: grid; grid-template-columns: 30px minmax(0,2.4fr) 1fr 1.2fr 1.05fr .8fr 1fr .9fr 1.3fr 34px;
+           align-items: center; gap: 10px; padding: 0 14px; height: 36px;
+           border-bottom: 1px solid #1E3A5F; }
+    .name { display: flex; align-items: center; gap: 8px; min-width: 0;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cb { width: 14px; height: 14px; border: 1px solid #3B6090; border-radius: 3px; }
+    .badge { display: inline-flex; align-items: center; gap: 5px; height: 20px; padding: 0 8px;
+             border-radius: 4px; font-size: 11px; font-weight: 500; white-space: nowrap; }
+    .plan { display: inline-flex; align-items: center; gap: 6px; height: 20px; padding: 0 8px;
+            border-radius: 4px; background: #293548; border: 1px solid #2D4A6E; color: #CBD5E1;
+            font-size: 11px; font-weight: 500; white-space: nowrap; }
+    .dot { width: 6px; height: 6px; border-radius: 2px; flex-shrink: 0; }
+    .hs { display: flex; align-items: center; gap: 8px; }
+    .hs-t { flex-grow: 1; height: 5px; border-radius: 3px; background: #16233A; overflow: hidden; }
+    .kebab { color: #475569; display: flex; justify-content: flex-end; }
+    .num { text-align: right; }
+  </style>
+</helmet>
+
+<div style="display: flex; width: 1440px; min-height: 100%; background: #0A1628">
+
+  <!-- ══ SIDEBAR ══ -->
+  <div style="width: 220px; flex-shrink: 0; background: #0A1628; border-right: 1px solid #1E3A5F; display: flex; flex-direction: column">
+    <div style="height: 56px; flex-shrink: 0; display: flex; align-items: center; gap: 10px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+      <div style="width: 28px; height: 28px; border-radius: 7px; background: #3B82F6; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0A1628" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c0 1 2.7 3 6 3s6-2 6-3v-5"/></svg>
+      </div>
+      <div style="display: flex; flex-direction: column; line-height: 1.25">
+        <span style="font-size: 13px; font-weight: 600">EduCore Africa</span>
+        <span style="font-size: 11px; color: #64748B">Super Admin</span>
+      </div>
+    </div>
+
+    <div style="flex-grow: 1; padding: 12px 8px; display: flex; flex-direction: column; gap: 4px">
+      <div class="navsec" style="margin-bottom: 2px">Overview</div>
+      <span class="nav">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+        Command Centre
+      </span>
+      <div class="navsec" style="margin: 10px 0 2px">Business</div>
+      <span class="nav nav-active">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/></svg>
+        Schools
+      </span>
+      <span class="nav">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Revenue
+      </span>
+      <span class="nav">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        User Accounts
+      </span>
+      <span class="nav">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+        Analytics
+      </span>
+      <div class="navsec" style="margin: 10px 0 2px">Operations</div>
+      <span class="nav">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg>
+        Support
+        <span class="mono" style="margin-left: auto; display: inline-flex; align-items: center; height: 17px; padding: 0 6px; border-radius: 4px; background: rgba(239,68,68,0.16); color: #F87171; font-size: 11px; font-weight: 600">7</span>
+      </span>
+      <span class="nav">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+        Growth
+      </span>
+      <div class="navsec" style="margin: 10px 0 2px">Platform</div>
+      <span class="nav">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        System Health
+        <span style="margin-left: auto; width: 6px; height: 6px; border-radius: 50%; background: #22C55E"></span>
+      </span>
+      <span class="nav">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>
+        Configuration
+      </span>
+      <span class="nav">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+        Audit Log
+      </span>
+    </div>
+
+    <div style="flex-shrink: 0; padding: 12px; border-top: 1px solid #1E3A5F; display: flex; align-items: center; gap: 10px">
+      <div style="position: relative; flex-shrink: 0">
+        <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(139,92,246,0.16); border: 1px solid rgba(139,92,246,0.45); color: #C4B5FD; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600">AO</div>
+        <span style="position: absolute; right: -2px; bottom: -2px; width: 10px; height: 10px; border-radius: 50%; background: #22C55E; border: 2px solid #0A1628"></span>
+      </div>
+      <div style="display: flex; flex-direction: column; line-height: 1.3; flex-grow: 1; min-width: 0">
+        <span style="font-size: 13px; font-weight: 500">Abdulmumin O.</span>
+        <span style="font-size: 11px; color: #64748B">Super Admin</span>
+      </div>
+      <span style="color: #64748B; flex-shrink: 0">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><path d="M21 12H9"/></svg>
+      </span>
+    </div>
+  </div>
+
+  <!-- ══ RIGHT COLUMN ══ -->
+  <div style="flex-grow: 1; display: flex; flex-direction: column; min-width: 0">
+
+    <div style="height: 56px; flex-shrink: 0; background: #1E293B; border-bottom: 1px solid #1E3A5F; display: flex; align-items: center; gap: 16px; padding: 0 20px">
+      <div style="display: flex; align-items: center; gap: 6px; width: 260px; flex-shrink: 0">
+        <span style="color: #64748B">Console</span>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        <span style="font-weight: 500">Schools</span>
+      </div>
+      <div style="flex-grow: 1; display: flex; justify-content: center">
+        <div style="display: flex; align-items: center; gap: 8px; width: 420px; height: 32px; padding: 0 10px; border-radius: 6px; background: #16233A; border: 1px solid #2D4A6E">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <span style="flex-grow: 1; color: #64748B">Search schools, users, invoices…</span>
+          <span class="mono" style="display: inline-flex; align-items: center; height: 18px; padding: 0 5px; border-radius: 4px; background: #293548; border: 1px solid #2D4A6E; color: #94A3B8; font-size: 11px">⌘K</span>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 6px; width: 260px; flex-shrink: 0; justify-content: flex-end">
+        <span style="position: relative; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 6px; color: #94A3B8">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          <span class="mono" style="position: absolute; top: 1px; right: 0; display: inline-flex; align-items: center; justify-content: center; min-width: 15px; height: 15px; padding: 0 3px; border-radius: 8px; background: #EF4444; color: #0A1628; font-size: 10px; font-weight: 700; border: 2px solid #1E293B">7</span>
+        </span>
+        <span style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 6px; color: #94A3B8">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.2 9.2a3 3 0 0 1 5.7 1c0 2-2.9 2.6-2.9 2.6"/><path d="M12 17h.01"/></svg>
+        </span>
+        <div style="width: 1px; height: 20px; background: #2D4A6E; margin: 0 4px"></div>
+        <span style="display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 6px 0 4px; border-radius: 6px; background: #293548">
+          <span style="width: 24px; height: 24px; border-radius: 6px; background: rgba(139,92,246,0.16); border: 1px solid rgba(139,92,246,0.45); color: #C4B5FD; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600">AO</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </span>
+      </div>
+    </div>
+
+    <!-- ══ MAIN ══ -->
+    <div style="padding: 24px; display: flex; flex-direction: column; gap: 16px">
+
+      <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 20px">
+        <div style="display: flex; flex-direction: column; gap: 2px">
+          <h1 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.02em">Schools</h1>
+          <p style="margin: 0; color: #94A3B8">Every tenant on the platform. MRR normalised to NGN.</p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0">
+          <span style="display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 6px; background: #1E293B; border: 1px solid #2D4A6E; color: #F8FAFC; font-weight: 500">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><path d="M12 15V3"/></svg>
+            Export
+          </span>
+          <span style="display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 14px; border-radius: 6px; background: #3B82F6; color: #0A1628; font-weight: 600">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+            Register school
+          </span>
+        </div>
+      </div>
+
+      <!-- toolbar -->
+      <div style="display: flex; align-items: center; gap: 8px">
+        <div style="display: flex; align-items: center; gap: 8px; width: 320px; height: 32px; padding: 0 10px; border-radius: 6px; background: #16233A; border: 1px solid #2D4A6E">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <span style="flex-grow: 1; color: #64748B">Filter by name or slug…</span>
+        </div>
+        <span style="display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px; border-radius: 6px; background: #1E293B; border: 1px solid #2D4A6E; color: #94A3B8">
+          State
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </span>
+        <span style="display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px; border-radius: 6px; background: #1E293B; border: 1px solid #3B6090; color: #F8FAFC">
+          Plan
+          <span class="mono" style="display: inline-flex; align-items: center; height: 16px; padding: 0 5px; border-radius: 3px; background: #3B82F6; color: #0A1628; font-size: 11px; font-weight: 600">2</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </span>
+        <span style="display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px; border-radius: 6px; background: #1E293B; border: 1px solid #2D4A6E; color: #94A3B8">
+          Status
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </span>
+        <a href="#" style="font-size: 11px; margin-left: 4px">Clear filters</a>
+        <span style="margin-left: auto; font-size: 11px; color: #64748B">Sorted by <span style="color: #94A3B8">School A→Z</span></span>
+      </div>
+
+      <!-- stats summary -->
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px">
+        <div class="panel" style="padding: 10px 14px; display: flex; align-items: baseline; gap: 8px">
+          <span class="mono" style="font-size: 18px; font-weight: 600">1,347</span>
+          <span style="color: #94A3B8">total schools</span>
+        </div>
+        <div class="panel" style="padding: 10px 14px; display: flex; align-items: baseline; gap: 8px">
+          <span class="mono" style="font-size: 18px; font-weight: 600; color: #4ADE80">1,284</span>
+          <span style="color: #94A3B8">active</span>
+          <span class="mono" style="margin-left: auto; font-size: 11px; color: #64748B">95.3%</span>
+        </div>
+        <div class="panel" style="padding: 10px 14px; display: flex; align-items: baseline; gap: 8px">
+          <span class="mono" style="font-size: 18px; font-weight: 600; color: #FBBF24">41</span>
+          <span style="color: #94A3B8">on trial</span>
+          <span class="mono" style="margin-left: auto; font-size: 11px; color: #64748B">23 end &lt;7d</span>
+        </div>
+        <div class="panel" style="padding: 10px 14px; display: flex; align-items: baseline; gap: 8px">
+          <span class="mono" style="font-size: 18px; font-weight: 600; color: #F87171">22</span>
+          <span style="color: #94A3B8">suspended</span>
+          <span class="mono" style="margin-left: auto; font-size: 11px; color: #64748B">₦3.7M owed</span>
+        </div>
+      </div>
+
+      <!-- table -->
+      <div class="panel" style="overflow: hidden">
+
+        <div class="row" style="height: 34px; background: #16233A; border-bottom: 1px solid #2D4A6E">
+          <span class="cb" style="border-color: #3B6090"></span>
+          <span class="th" style="display: inline-flex; align-items: center; gap: 4px; color: #94A3B8">School
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+          </span>
+          <span class="th">State</span>
+          <span class="th">Plan</span>
+          <span class="th">Status</span>
+          <span class="th num">Students</span>
+          <span class="th num">MRR</span>
+          <span class="th num">Last active</span>
+          <span class="th">Health</span>
+          <span></span>
+        </div>
+
+        <div class="row">
+          <span class="cb"></span>
+          <span class="name"><svg width="15" height="11" viewBox="0 0 15 11" aria-label="Ghana"><rect width="15" height="3.67" y="0" fill="#CE1126" rx="1"/><rect width="15" height="3.66" y="3.67" fill="#FCD116"/><rect width="15" height="3.67" y="7.33" fill="#006B3F" rx="1"/><circle cx="7.5" cy="5.5" r="1.3" fill="#000"/></svg>Accra Ridge School</span>
+          <span style="color: #94A3B8">Greater Accra</span>
+          <span><span class="plan"><span class="dot" style="background: #3B82F6"></span>Starter</span></span>
+          <span><span class="badge" style="background: rgba(34,197,94,0.12); color: #4ADE80"><span style="width:5px;height:5px;border-radius:50%;background:#22C55E"></span>Active</span></span>
+          <span class="mono num">512</span>
+          <span class="mono num">₦12,800</span>
+          <span class="mono num" style="color: #94A3B8">8h</span>
+          <span class="hs"><span class="hs-t"><span style="display:block;width:63%;height:100%;background:#F59E0B"></span></span><span class="mono" style="width:20px;text-align:right;color:#FBBF24">63</span></span>
+          <span class="kebab"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+        </div>
+
+        <div class="row">
+          <span class="cb"></span>
+          <span class="name"><svg width="15" height="11" viewBox="0 0 15 11" aria-label="Nigeria"><rect width="5" height="11" x="0" fill="#008751" rx="1"/><rect width="5" height="11" x="5" fill="#FFFFFF"/><rect width="5" height="11" x="10" fill="#008751" rx="1"/></svg>Air Force Comprehensive</span>
+          <span style="color: #94A3B8">Plateau</span>
+          <span><span class="plan"><span class="dot" style="background: #D97706"></span>Growth</span></span>
+          <span><span class="badge" style="background: rgba(34,197,94,0.12); color: #4ADE80"><span style="width:5px;height:5px;border-radius:50%;background:#22C55E"></span>Active</span></span>
+          <span class="mono num">1,310</span>
+          <span class="mono num">₦65,500</span>
+          <span class="mono num" style="color: #94A3B8">3h</span>
+          <span class="hs"><span class="hs-t"><span style="display:block;width:72%;height:100%;background:#F59E0B"></span></span><span class="mono" style="width:20px;text-align:right;color:#FBBF24">72</span></span>
+          <span class="kebab"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+        </div>
+
+        <div class="row">
+          <span class="cb"></span>
+          <span class="name"><svg width="15" height="11" viewBox="0 0 15 11" aria-label="Nigeria"><rect width="5" height="11" x="0" fill="#008751" rx="1"/><rect width="5" height="11" x="5" fill="#FFFFFF"/><rect width="5" height="11" x="10" fill="#008751" rx="1"/></svg>Alhikmah Model Academy</span>
+          <span style="color: #94A3B8">Kano</span>
+          <span><span class="plan"><span class="dot" style="background: #3B82F6"></span>Starter</span></span>
+          <span><span class="badge" style="background: rgba(245,158,11,0.12); color: #FBBF24"><span style="width:5px;height:5px;border-radius:50%;background:#F59E0B"></span>Trial</span></span>
+          <span class="mono num">640</span>
+          <span class="mono num" style="color: #475569">—</span>
+          <span class="mono num" style="color: #94A3B8">3m</span>
+          <span class="hs"><span class="hs-t"><span style="display:block;width:61%;height:100%;background:#F59E0B"></span></span><span class="mono" style="width:20px;text-align:right;color:#FBBF24">61</span></span>
+          <span class="kebab"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+        </div>
+
+        <div class="row">
+          <span class="cb"></span>
+          <span class="name"><svg width="15" height="11" viewBox="0 0 15 11" aria-label="Nigeria"><rect width="5" height="11" x="0" fill="#008751" rx="1"/><rect width="5" height="11" x="5" fill="#FFFFFF"/><rect width="5" height="11" x="10" fill="#008751" rx="1"/></svg>Baptist High School</span>
+          <span style="color: #94A3B8">Edo</span>
+          <span><span class="plan"><span class="dot" style="background: #3B82F6"></span>Starter</span></span>
+          <span><span class="badge" style="background: rgba(34,197,94,0.12); color: #4ADE80"><span style="width:5px;height:5px;border-radius:50%;background:#22C55E"></span>Active</span></span>
+          <span class="mono num">720</span>
+          <span class="mono num">₦18,000</span>
+          <span class="mono num" style="color: #94A3B8">4h</span>
+          <span class="hs"><span class="hs-t"><span style="display:block;width:66%;height:100%;background:#F59E0B"></span></span><span class="mono" style="width:20px;text-align:right;color:#FBBF24">66</span></span>
+          <span class="kebab"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+        </div>
+
+        <!-- hover state -->
+        <div class="row" style="background: #293548">
+          <span class="cb"></span>
+          <span class="name"><svg width="15" height="11" viewBox="0 0 15 11" aria-label="Nigeria"><rect width="5" height="11" x="0" fill="#008751" rx="1"/><rect width="5" height="11" x="5" fill="#FFFFFF"/><rect width="5" height="11" x="10" fill="#008751" rx="1"/></svg>Bright Future Academy</span>
+          <span style="color: #94A3B8">Ogun</span>
+          <span><span class="plan"><span class="dot" style="background: #D97706"></span>Growth</span></span>
+          <span><span class="badge" style="background: rgba(34,197,94,0.12); color: #4ADE80"><span style="width:5px;height:5px;border-radius:50%;background:#22C55E"></span>Active</span></span>
+          <span class="mono num">980</span>
+          <span class="mono num">₦49,000</span>
+          <span class="mono num" style="color: #94A3B8">6h</span>
+          <span class="hs"><span class="hs-t"><span style="display:block;width:44%;height:100%;background:#EF4444"></span></span><span class="mono" style="width:20px;text-align:right;color:#F87171">44</span></span>
+          <span class="kebab" style="color: #94A3B8"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+        </div>
+
+        <div class="row">
+          <span class="cb"></span>
+          <span class="name"><svg width="15" height="11" viewBox="0 0 15 11" aria-label="Nigeria"><rect width="5" height="11" x="0" fill="#008751" rx="1"/><rect width="5" height="11" x="5" fill="#FFFFFF"/><rect width="5" height="11" x="10" fill="#008751" rx="1"/></svg>Chrisland School Ikeja</span>
+          <span style="color: #94A3B8">Lagos</span>
+          <span><span class="plan"><span class="dot" style="background: #8B5CF6"></span>Professional</span></span>
+          <span><span class="badge" style="background: rgba(34,197,94,0.12); color: #4ADE80"><span style="width:5px;height:5px;border-radius:50%;background:#22C55E"></span>Active</span></span>
+          <span class="mono num">1,640</span>
+          <span class="mono num">₦164,000</span>
+          <span class="mono num" style="color: #94A3B8">7m</span>
+          <span class="hs"><span class="hs-t"><span style="display:block;width:90%;height:100%;background:#22C55E"></span></span><span class="mono" style="width:20px;text-align:right;color:#4ADE80">90</span></span>
+          <span class="kebab"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+        </div>
+
+        <div class="row">
+          <span class="cb"></span>
+          <span class="name"><svg width="15" height="11" viewBox="0 0 15 11" aria-label="Nigeria"><rect width="5" height="11" x="0" fill="#008751" rx="1"/><rect width="5" height="11" x="5" fill="#FFFFFF"/><rect width="5" height="11" x="10" fill="#008751" rx="1"/></svg>Command Day Secondary</span>
+          <span style="color: #94A3B8">Kaduna</span>
+          <span><span class="plan"><span class="dot" style="background: #E11D48"></span>Government</span></span>
+          <span><span class="badge" style="background: rgba(239,68,68,0.12); color: #F87171"><span style="width:5px;height:5px;border-radius:50%;background:#EF4444"></span>Suspended</span></span>
+          <span class="mono num">1,430</span>
+          <span class="mono num" style="color: #475569">—</span>
+          <span class="mono num" style="color: #94A3B8">14d</span>
+          <span class="hs"><span class="hs-t"><span style="display:block;width:12%;height:100%;background:#EF4444"></span></span><span class="mono" style="width:20px;text-align:right;color:#F87171">12</span></span>
+          <span class="kebab"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+        </div>
+
+        <div class="row">
+          <span class="cb"></span>
+          <span class="name"><svg width="15" height="11" viewBox="0 0 15 11" aria-label="Nigeria"><rect width="5" height="11" x="0" fill="#008751" rx="1"/><rect width="5" height="11" x="5" fill="#FFFFFF"/><rect width="5" height="11" x="10" fill="#008751" rx="1"/></svg>Corona Secondary School</span>
+          <span style="color: #94A3B8">Lagos</span>
+          <span><span class="plan"><span class="dot" style="background: #0D9488"></span>Enterprise</span></span>
+          <span><span class="badge" style="background: rgba(34,197,94,0.12); color: #4ADE80"><span style="width:5px;height:5px;border-radius:50%;background:#22C55E"></span>Active</span></span>
+          <span class="mono num">1,890</span>
+          <span class="mono num">₦283,500</span>
+          <span class="mono num" style="color: #94A3B8">9m</span>
+          <span class="hs"><span class="hs-t"><span style="display:block;width:97%;height:100%;background:#22C55E"></span></span><span class="mono" style="width:20px;text-align:right;color:#4ADE80">97</span></span>
+          <span class="kebab"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+        </div>
+
+        <div class="row">
+          <span class="cb"></span>
+          <span class="name"><svg width="15" height="11" viewBox="0 0 15 11" aria-label="Nigeria"><rect width="5" height="11" x="0" fill="#008751" rx="1"/><rect width="5" height="11" x="5" fill="#FFFFFF"/><rect width="5" height="11" x="10" fill="#008751" rx="1"/></svg>Deeper Life High School</span>
+          <span style="color: #94A3B8">Anambra</span>
+          <span><span class="plan"><span class="dot" style="background: #D97706"></span>Growth</span></span>
+          <span><span class="badge" style="background: rgba(34,197,94,0.12); color: #4ADE80"><span style="width:5px;height:5px;border-radius:50%;background:#22C55E"></span>Active</span></span>
+          <span class="mono num">1,058</span>
+          <span class="mono num">₦52,900</span>
+          <span class="mono num" style="color: #94A3B8">5h</span>
+          <span class="hs"><span class="hs-t"><span style="display:block;width:69%;height:100%;background:#F59E0B"></span></span><span class="mono" style="width:20px;text-align:right;color:#FBBF24">69</span></span>
+          <span class="kebab"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+        </div>
+
+        <div class="row">
+          <span class="cb"></span>
+          <span class="name"><svg width="15" height="11" viewBox="0 0 15 11" aria-label="Nigeria"><rect width="5" height="11" x="0" fill="#008751" rx="1"/><rect width="5" height="11" x="5" fill="#FFFFFF"/><rect width="5" height="11" x="10" fill="#008751" rx="1"/></svg>Federal Government College</span>
+          <span style="color: #94A3B8">Kaduna</span>
+          <span><span class="plan"><span class="dot" style="background: #E11D48"></span>Government</span></span>
+          <span><span class="badge" style="background: rgba(34,197,94,0.12); color: #4ADE80"><span style="width:5px;height:5px;border-radius:50%;background:#22C55E"></span>Active</span></span>
+          <span class="mono num">3,120</span>
+          <span class="mono num">₦187,200</span>
+          <span class="mono num" style="color: #94A3B8">25m</span>
+          <span class="hs"><span class="hs-t"><span style="display:block;width:83%;height:100%;background:#22C55E"></span></span><span class="mono" style="width:20px;text-align:right;color:#4ADE80">83</span></span>
+          <span class="kebab"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+        </div>
+
+        <div class="row">
+          <span class="cb"></span>
+          <span class="name"><svg width="15" height="11" viewBox="0 0 15 11" aria-label="Nigeria"><rect width="5" height="11" x="0" fill="#008751" rx="1"/><rect width="5" height="11" x="5" fill="#FFFFFF"/><rect width="5" height="11" x="10" fill="#008751" rx="1"/></svg>Government Girls College</span>
+          <span style="color: #94A3B8">Yobe</span>
+          <span><span class="plan"><span class="dot" style="background: #E11D48"></span>Government</span></span>
+          <span><span class="badge" style="background: rgba(245,158,11,0.12); color: #FBBF24"><span style="width:5px;height:5px;border-radius:50%;background:#F59E0B"></span>Trial</span></span>
+          <span class="mono num">890</span>
+          <span class="mono num" style="color: #475569">—</span>
+          <span class="mono num" style="color: #94A3B8">2d</span>
+          <span class="hs"><span class="hs-t"><span style="display:block;width:41%;height:100%;background:#EF4444"></span></span><span class="mono" style="width:20px;text-align:right;color:#F87171">41</span></span>
+          <span class="kebab"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+        </div>
+
+        <div class="row">
+          <span class="cb"></span>
+          <span class="name"><svg width="15" height="11" viewBox="0 0 15 11" aria-label="Nigeria"><rect width="5" height="11" x="0" fill="#008751" rx="1"/><rect width="5" height="11" x="5" fill="#FFFFFF"/><rect width="5" height="11" x="10" fill="#008751" rx="1"/></svg>Grange School Ikeja</span>
+          <span style="color: #94A3B8">Lagos</span>
+          <span><span class="plan"><span class="dot" style="background: #0D9488"></span>Enterprise</span></span>
+          <span><span class="badge" style="background: rgba(34,197,94,0.12); color: #4ADE80"><span style="width:5px;height:5px;border-radius:50%;background:#22C55E"></span>Active</span></span>
+          <span class="mono num">1,020</span>
+          <span class="mono num">₦153,000</span>
+          <span class="mono num" style="color: #94A3B8">44m</span>
+          <span class="hs"><span class="hs-t"><span style="display:block;width:93%;height:100%;background:#22C55E"></span></span><span class="mono" style="width:20px;text-align:right;color:#4ADE80">93</span></span>
+          <span class="kebab"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+        </div>
+
+        <!-- selected state -->
+        <div class="row" style="background: rgba(59,130,246,0.10); box-shadow: inset 2px 0 0 #3B82F6">
+          <span style="width: 14px; height: 14px; border-radius: 3px; background: #3B82F6; display: flex; align-items: center; justify-content: center">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0A1628" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          </span>
+          <span class="name"><svg width="15" height="11" viewBox="0 0 15 11" aria-label="Nigeria"><rect width="5" height="11" x="0" fill="#008751" rx="1"/><rect width="5" height="11" x="5" fill="#FFFFFF"/><rect width="5" height="11" x="10" fill="#008751" rx="1"/></svg>Greenfield International School</span>
+          <span style="color: #94A3B8">Lagos</span>
+          <span><span class="plan"><span class="dot" style="background: #8B5CF6"></span>Professional</span></span>
+          <span><span class="badge" style="background: rgba(34,197,94,0.12); color: #4ADE80"><span style="width:5px;height:5px;border-radius:50%;background:#22C55E"></span>Active</span></span>
+          <span class="mono num">1,842</span>
+          <span class="mono num">₦184,200</span>
+          <span class="mono num" style="color: #94A3B8">4m</span>
+          <span class="hs"><span class="hs-t"><span style="display:block;width:92%;height:100%;background:#22C55E"></span></span><span class="mono" style="width:20px;text-align:right;color:#4ADE80">92</span></span>
+          <span class="kebab" style="color: #94A3B8"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+        </div>
+
+        <div class="row">
+          <span class="cb"></span>
+          <span class="name"><svg width="15" height="11" viewBox="0 0 15 11" aria-label="Nigeria"><rect width="5" height="11" x="0" fill="#008751" rx="1"/><rect width="5" height="11" x="5" fill="#FFFFFF"/><rect width="5" height="11" x="10" fill="#008751" rx="1"/></svg>Immaculate Heart College</span>
+          <span style="color: #94A3B8">Imo</span>
+          <span><span class="plan"><span class="dot" style="background: #D97706"></span>Growth</span></span>
+          <span><span class="badge" style="background: rgba(34,197,94,0.12); color: #4ADE80"><span style="width:5px;height:5px;border-radius:50%;background:#22C55E"></span>Active</span></span>
+          <span class="mono num">1,190</span>
+          <span class="mono num">₦59,500</span>
+          <span class="mono num" style="color: #94A3B8">6h</span>
+          <span class="hs"><span class="hs-t"><span style="display:block;width:74%;height:100%;background:#F59E0B"></span></span><span class="mono" style="width:20px;text-align:right;color:#FBBF24">74</span></span>
+          <span class="kebab"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+        </div>
+
+        <div class="row">
+          <span class="cb"></span>
+          <span class="name"><svg width="15" height="11" viewBox="0 0 15 11" aria-label="Nigeria"><rect width="5" height="11" x="0" fill="#008751" rx="1"/><rect width="5" height="11" x="5" fill="#FFFFFF"/><rect width="5" height="11" x="10" fill="#008751" rx="1"/></svg>Kano Central Model Academy</span>
+          <span style="color: #94A3B8">Kano</span>
+          <span><span class="plan"><span class="dot" style="background: #D97706"></span>Growth</span></span>
+          <span><span class="badge" style="background: rgba(34,197,94,0.12); color: #4ADE80"><span style="width:5px;height:5px;border-radius:50%;background:#22C55E"></span>Active</span></span>
+          <span class="mono num">2,410</span>
+          <span class="mono num">₦120,500</span>
+          <span class="mono num" style="color: #94A3B8">12m</span>
+          <span class="hs"><span class="hs-t"><span style="display:block;width:88%;height:100%;background:#22C55E"></span></span><span class="mono" style="width:20px;text-align:right;color:#4ADE80">88</span></span>
+          <span class="kebab"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+        </div>
+
+        <div class="row">
+          <span class="cb"></span>
+          <span class="name"><svg width="15" height="11" viewBox="0 0 15 11" aria-label="Nigeria"><rect width="5" height="11" x="0" fill="#008751" rx="1"/><rect width="5" height="11" x="5" fill="#FFFFFF"/><rect width="5" height="11" x="10" fill="#008751" rx="1"/></svg>Loyola Jesuit College</span>
+          <span style="color: #94A3B8">FCT</span>
+          <span><span class="plan"><span class="dot" style="background: #0D9488"></span>Enterprise</span></span>
+          <span><span class="badge" style="background: rgba(34,197,94,0.12); color: #4ADE80"><span style="width:5px;height:5px;border-radius:50%;background:#22C55E"></span>Active</span></span>
+          <span class="mono num">1,140</span>
+          <span class="mono num">₦171,000</span>
+          <span class="mono num" style="color: #94A3B8">18m</span>
+          <span class="hs"><span class="hs-t"><span style="display:block;width:94%;height:100%;background:#22C55E"></span></span><span class="mono" style="width:20px;text-align:right;color:#4ADE80">94</span></span>
+          <span class="kebab"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+        </div>
+
+        <div class="row">
+          <span class="cb"></span>
+          <span class="name"><svg width="15" height="11" viewBox="0 0 15 11" aria-label="Kenya"><rect width="15" height="3" y="0" fill="#000" rx="1"/><rect width="15" height="2.5" y="3" fill="#FFFFFF"/><rect width="15" height="3" y="5.5" fill="#BB0000"/><rect width="15" height="2.5" y="8.5" fill="#006600" rx="1"/></svg>Nairobi Hills Academy</span>
+          <span style="color: #94A3B8">Nairobi</span>
+          <span><span class="plan"><span class="dot" style="background: #D97706"></span>Growth</span></span>
+          <span><span class="badge" style="background: rgba(245,158,11,0.12); color: #FBBF24"><span style="width:5px;height:5px;border-radius:50%;background:#F59E0B"></span>Trial</span></span>
+          <span class="mono num">430</span>
+          <span class="mono num" style="color: #475569">—</span>
+          <span class="mono num" style="color: #94A3B8">1d</span>
+          <span class="hs"><span class="hs-t"><span style="display:block;width:55%;height:100%;background:#F59E0B"></span></span><span class="mono" style="width:20px;text-align:right;color:#FBBF24">55</span></span>
+          <span class="kebab"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+        </div>
+
+        <div class="row">
+          <span class="cb"></span>
+          <span class="name"><svg width="15" height="11" viewBox="0 0 15 11" aria-label="Nigeria"><rect width="5" height="11" x="0" fill="#008751" rx="1"/><rect width="5" height="11" x="5" fill="#FFFFFF"/><rect width="5" height="11" x="10" fill="#008751" rx="1"/></svg>Nurul Islam Academy</span>
+          <span style="color: #94A3B8">Sokoto</span>
+          <span><span class="plan"><span class="dot" style="background: #3B82F6"></span>Starter</span></span>
+          <span><span class="badge" style="background: rgba(245,158,11,0.12); color: #FBBF24"><span style="width:5px;height:5px;border-radius:50%;background:#F59E0B"></span>Trial</span></span>
+          <span class="mono num">385</span>
+          <span class="mono num" style="color: #475569">—</span>
+          <span class="mono num" style="color: #94A3B8">1h</span>
+          <span class="hs"><span class="hs-t"><span style="display:block;width:58%;height:100%;background:#F59E0B"></span></span><span class="mono" style="width:20px;text-align:right;color:#FBBF24">58</span></span>
+          <span class="kebab"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+        </div>
+
+        <div class="row">
+          <span class="cb"></span>
+          <span class="name"><svg width="15" height="11" viewBox="0 0 15 11" aria-label="Nigeria"><rect width="5" height="11" x="0" fill="#008751" rx="1"/><rect width="5" height="11" x="5" fill="#FFFFFF"/><rect width="5" height="11" x="10" fill="#008751" rx="1"/></svg>Pacesetters College</span>
+          <span style="color: #94A3B8">Rivers</span>
+          <span><span class="plan"><span class="dot" style="background: #8B5CF6"></span>Professional</span></span>
+          <span><span class="badge" style="background: rgba(34,197,94,0.12); color: #4ADE80"><span style="width:5px;height:5px;border-radius:50%;background:#22C55E"></span>Active</span></span>
+          <span class="mono num">2,310</span>
+          <span class="mono num">₦231,000</span>
+          <span class="mono num" style="color: #94A3B8">1h</span>
+          <span class="hs"><span class="hs-t"><span style="display:block;width:95%;height:100%;background:#22C55E"></span></span><span class="mono" style="width:20px;text-align:right;color:#4ADE80">95</span></span>
+          <span class="kebab"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+        </div>
+
+        <div class="row">
+          <span class="cb"></span>
+          <span class="name"><svg width="15" height="11" viewBox="0 0 15 11" aria-label="Nigeria"><rect width="5" height="11" x="0" fill="#008751" rx="1"/><rect width="5" height="11" x="5" fill="#FFFFFF"/><rect width="5" height="11" x="10" fill="#008751" rx="1"/></svg>Sardauna Memorial College</span>
+          <span style="color: #94A3B8">Kano</span>
+          <span><span class="plan"><span class="dot" style="background: #E11D48"></span>Government</span></span>
+          <span><span class="badge" style="background: rgba(34,197,94,0.12); color: #4ADE80"><span style="width:5px;height:5px;border-radius:50%;background:#22C55E"></span>Active</span></span>
+          <span class="mono num">2,760</span>
+          <span class="mono num">₦165,600</span>
+          <span class="mono num" style="color: #94A3B8">2h</span>
+          <span class="hs"><span class="hs-t"><span style="display:block;width:81%;height:100%;background:#22C55E"></span></span><span class="mono" style="width:20px;text-align:right;color:#4ADE80">81</span></span>
+          <span class="kebab"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+        </div>
+
+        <div class="row">
+          <span class="cb"></span>
+          <span class="name"><svg width="15" height="11" viewBox="0 0 15 11" aria-label="Nigeria"><rect width="5" height="11" x="0" fill="#008751" rx="1"/><rect width="5" height="11" x="5" fill="#FFFFFF"/><rect width="5" height="11" x="10" fill="#008751" rx="1"/></svg>St. Saviour's School</span>
+          <span style="color: #94A3B8">Lagos</span>
+          <span><span class="plan"><span class="dot" style="background: #0D9488"></span>Enterprise</span></span>
+          <span><span class="badge" style="background: rgba(34,197,94,0.12); color: #4ADE80"><span style="width:5px;height:5px;border-radius:50%;background:#22C55E"></span>Active</span></span>
+          <span class="mono num">640</span>
+          <span class="mono num">₦96,000</span>
+          <span class="mono num" style="color: #94A3B8">31m</span>
+          <span class="hs"><span class="hs-t"><span style="display:block;width:91%;height:100%;background:#22C55E"></span></span><span class="mono" style="width:20px;text-align:right;color:#4ADE80">91</span></span>
+          <span class="kebab"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+        </div>
+
+        <div class="row">
+          <span class="cb"></span>
+          <span class="name"><svg width="15" height="11" viewBox="0 0 15 11" aria-label="Nigeria"><rect width="5" height="11" x="0" fill="#008751" rx="1"/><rect width="5" height="11" x="5" fill="#FFFFFF"/><rect width="5" height="11" x="10" fill="#008751" rx="1"/></svg>Sunrise Model College</span>
+          <span style="color: #94A3B8">Oyo</span>
+          <span><span class="plan"><span class="dot" style="background: #D97706"></span>Growth</span></span>
+          <span><span class="badge" style="background: rgba(34,197,94,0.12); color: #4ADE80"><span style="width:5px;height:5px;border-radius:50%;background:#22C55E"></span>Active</span></span>
+          <span class="mono num">1,205</span>
+          <span class="mono num">₦60,250</span>
+          <span class="mono num" style="color: #94A3B8">1d</span>
+          <span class="hs"><span class="hs-t"><span style="display:block;width:38%;height:100%;background:#EF4444"></span></span><span class="mono" style="width:20px;text-align:right;color:#F87171">38</span></span>
+          <span class="kebab"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+        </div>
+
+        <div class="row">
+          <span class="cb"></span>
+          <span class="name"><svg width="15" height="11" viewBox="0 0 15 11" aria-label="Nigeria"><rect width="5" height="11" x="0" fill="#008751" rx="1"/><rect width="5" height="11" x="5" fill="#FFFFFF"/><rect width="5" height="11" x="10" fill="#008751" rx="1"/></svg>Trinity International</span>
+          <span style="color: #94A3B8">Abia</span>
+          <span><span class="plan"><span class="dot" style="background: #8B5CF6"></span>Professional</span></span>
+          <span><span class="badge" style="background: rgba(34,197,94,0.12); color: #4ADE80"><span style="width:5px;height:5px;border-radius:50%;background:#22C55E"></span>Active</span></span>
+          <span class="mono num">1,276</span>
+          <span class="mono num">₦127,600</span>
+          <span class="mono num" style="color: #94A3B8">22m</span>
+          <span class="hs"><span class="hs-t"><span style="display:block;width:86%;height:100%;background:#22C55E"></span></span><span class="mono" style="width:20px;text-align:right;color:#4ADE80">86</span></span>
+          <span class="kebab"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+        </div>
+
+        <div class="row">
+          <span class="cb"></span>
+          <span class="name"><svg width="15" height="11" viewBox="0 0 15 11" aria-label="Nigeria"><rect width="5" height="11" x="0" fill="#008751" rx="1"/><rect width="5" height="11" x="5" fill="#FFFFFF"/><rect width="5" height="11" x="10" fill="#008751" rx="1"/></svg>Unity Comprehensive School</span>
+          <span style="color: #94A3B8">Enugu</span>
+          <span><span class="plan"><span class="dot" style="background: #8B5CF6"></span>Professional</span></span>
+          <span><span class="badge" style="background: rgba(34,197,94,0.12); color: #4ADE80"><span style="width:5px;height:5px;border-radius:50%;background:#22C55E"></span>Active</span></span>
+          <span class="mono num">1,566</span>
+          <span class="mono num">₦156,600</span>
+          <span class="mono num" style="color: #94A3B8">2h</span>
+          <span class="hs"><span class="hs-t"><span style="display:block;width:79%;height:100%;background:#F59E0B"></span></span><span class="mono" style="width:20px;text-align:right;color:#FBBF24">79</span></span>
+          <span class="kebab"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+        </div>
+
+        <div class="row" style="border-bottom: 1px solid #2D4A6E">
+          <span class="cb"></span>
+          <span class="name" style="color: #94A3B8"><svg width="15" height="11" viewBox="0 0 15 11" aria-label="Nigeria" opacity=".5"><rect width="5" height="11" x="0" fill="#008751" rx="1"/><rect width="5" height="11" x="5" fill="#FFFFFF"/><rect width="5" height="11" x="10" fill="#008751" rx="1"/></svg>Winners Model School</span>
+          <span style="color: #64748B">Delta</span>
+          <span><span class="plan" style="color: #64748B"><span class="dot" style="background: #475569"></span>Growth</span></span>
+          <span><span class="badge" style="background: rgba(100,116,139,0.14); color: #94A3B8"><span style="width:5px;height:5px;border-radius:50%;background:#64748B"></span>Churned</span></span>
+          <span class="mono num" style="color: #475569">—</span>
+          <span class="mono num" style="color: #475569">—</span>
+          <span class="mono num" style="color: #64748B">62d</span>
+          <span class="hs"><span class="hs-t"></span><span class="mono" style="width:20px;text-align:right;color:#475569">0</span></span>
+          <span class="kebab"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+        </div>
+
+        <!-- pagination -->
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 44px; padding: 0 14px; background: #16233A">
+          <span style="color: #64748B; font-size: 11px">
+            Showing <span class="mono" style="color: #94A3B8">1–25</span> of
+            <span class="mono" style="color: #94A3B8">1,347</span> · 1 selected
+          </span>
+          <div style="display: flex; align-items: center; gap: 8px">
+            <span style="color: #64748B; font-size: 11px">Rows</span>
+            <span style="display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 8px; border-radius: 6px; background: #1E293B; border: 1px solid #2D4A6E">
+              <span class="mono" style="font-size: 11px">25</span>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </span>
+            <div style="width: 1px; height: 16px; background: #2D4A6E; margin: 0 2px"></div>
+            <span style="display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 6px; border: 1px solid #1E3A5F; color: #475569">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            </span>
+            <span class="mono" style="font-size: 11px; color: #94A3B8">1 / 54</span>
+            <span style="display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 6px; border: 1px solid #2D4A6E; color: #94A3B8">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            </span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

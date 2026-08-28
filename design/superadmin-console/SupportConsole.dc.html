@@ -1,0 +1,484 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  <style>
+    html, body { height: 100%; }
+    body { margin: 0; background: #0A1628; color: #F8FAFC;
+           font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+           font-size: 13px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+    a { color: #3B82F6; text-decoration: none; } a:hover { color: #60A5FA; }
+    .mono { font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+            font-variant-numeric: tabular-nums; }
+    .navsec { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+              color: #475569; padding: 0 12px; }
+    .nav { display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 12px;
+           border-radius: 6px; color: #94A3B8; }
+    .nav-active { background: rgba(59,130,246,.14); color: #F8FAFC; font-weight: 500;
+                  box-shadow: inset 2px 0 0 #3B82F6; }
+    .panel { background: #1E293B; border: 1px solid #1E3A5F; border-radius: 8px; }
+    .p-h { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+           padding: 13px 16px; border-bottom: 1px solid #1E3A5F; }
+    .p-t { margin: 0; font-size: 15px; font-weight: 600; }
+    .p-s { font-size: 11px; color: #64748B; }
+    .lbl { font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+           color: #64748B; }
+    .up { color: #22C55E; font-weight: 500; }
+    .down { color: #EF4444; font-weight: 500; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px;
+           border-radius: 6px; background: #1E293B; border: 1px solid #2D4A6E; color: #F8FAFC;
+           font-size: 13px; font-weight: 500; }
+    .btn-primary { background: #3B82F6; border-color: #3B82F6; color: #0A1628; font-weight: 600; }
+    .btn-sm { height: 26px; padding: 0 9px; font-size: 12px; border-radius: 5px; }
+    .tab { display: inline-flex; align-items: center; height: 34px; padding: 0 12px;
+           font-size: 13px; color: #94A3B8; border-bottom: 2px solid transparent; }
+    .tab-active { color: #F8FAFC; font-weight: 500; border-bottom-color: #3B82F6; }
+    .kv { display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+          padding: 7px 0; border-bottom: 1px solid #1E3A5F; }
+    .kv:last-child { border-bottom: 0; }
+    .kv-k { color: #94A3B8; flex-shrink: 0; }
+    .kv-v { text-align: right; }
+    .chip { display: inline-flex; align-items: center; gap: 5px; height: 20px; padding: 0 7px;
+            border-radius: 4px; font-size: 11px; font-weight: 500; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .redline { position: absolute; font-size: 10px; font-weight: 600; letter-spacing: .04em;
+               color: #C4B5FD; font-family: "JetBrains Mono", ui-monospace, monospace; }
+    .spec { border: 1px dashed rgba(139,92,246,.5); }
+
+    .fgroup { border-bottom: 1px solid #16233A; padding: 12px 0; }
+    .fgroup:last-child { border-bottom: 0; }
+    .fhead { display: flex; align-items: center; justify-content: space-between;
+             font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+             color: #64748B; margin-bottom: 8px; }
+    .cbrow { display: flex; align-items: center; gap: 8px; height: 26px; color: #94A3B8; }
+    .cb { width: 14px; height: 14px; border-radius: 3px; border: 1px solid #2D4A6E;
+          background: #16233A; flex-shrink: 0; }
+    .cb-on { background: #3B82F6; border-color: #3B82F6; display: flex;
+             align-items: center; justify-content: center; }
+    .count { margin-left: auto; font-size: 11px; color: #64748B; }
+    .trow { display: flex; gap: 10px; height: 72px; padding: 0 14px; align-items: center;
+            border-bottom: 1px solid #16233A; box-shadow: inset 2px 0 0 transparent; }
+    .trow-sel { background: #1E293B; box-shadow: inset 3px 0 0 #3B82F6; }
+    .sla { width: 46px; height: 3px; border-radius: 2px; background: #16233A; overflow: hidden; }
+    .bub { max-width: 268px; padding: 9px 11px; border-radius: 10px; font-size: 12.5px;
+           line-height: 1.5; }
+
+  </style>
+</helmet>
+<div style="display: flex; width: 1440px; min-height: 100%; background: #0A1628; position: relative">
+
+  <div style="width: 220px; flex-shrink: 0; border-right: 1px solid #1E3A5F; display: flex; flex-direction: column">
+    <div style="height: 56px; flex-shrink: 0; display: flex; align-items: center; gap: 10px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+      <div style="width: 28px; height: 28px; border-radius: 7px; background: #3B82F6; display: flex; align-items: center; justify-content: center">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0A1628" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c0 1 2.7 3 6 3s6-2 6-3v-5"/></svg>
+      </div>
+      <span style="font-size: 13px; font-weight: 600; color: #3B82F6">EduCore Africa</span>
+      <span style="border-radius: 999px; background: rgba(139,92,246,.15); padding: 1px 7px; font-size: 10px; font-weight: 600; text-transform: uppercase; color: #8B5CF6">Super</span>
+    </div>
+    <div style="flex-grow: 1; padding: 12px 8px; display: flex; flex-direction: column; gap: 4px">
+      <div class="navsec">Overview</div>
+      <span class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>Command Centre</span>
+      <div class="navsec" style="margin-top: 10px">Business</div>
+      <span class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/></svg>Schools</span>
+      <span class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Revenue</span>
+      <span class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>User Accounts</span>
+      <span class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>Analytics</span>
+      <div class="navsec" style="margin-top: 10px">Operations</div>
+      <span class="nav nav-active"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg>Support<span class="mono" style="margin-left: auto; display: inline-flex; align-items: center; height: 17px; padding: 0 6px; border-radius: 4px; background: rgba(239,68,68,.16); color: #F87171; font-size: 11px; font-weight: 600">7</span></span>
+      <span class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>Growth</span>
+      <div class="navsec" style="margin-top: 10px">Platform</div>
+      <span class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>System Health<span style="margin-left: auto; width: 6px; height: 6px; border-radius: 50%; background: #22C55E"></span></span>
+      <span class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>Configuration</span>
+      <span class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>Audit Log</span>
+    </div>
+    <div style="flex-shrink: 0; padding: 12px; border-top: 1px solid #1E3A5F; display: flex; align-items: center; gap: 10px">
+      <div style="width: 32px; height: 32px; border-radius: 8px; background: #1E293B; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600">AO</div>
+      <div style="line-height: 1.3; flex-grow: 1; min-width: 0">
+        <div style="font-size: 13px; font-weight: 500">Abdulmumin O.</div>
+        <div style="font-size: 11px; color: #64748B">Super Admin</div>
+      </div>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><path d="M21 12H9"/></svg>
+    </div>
+  </div>
+
+  <div style="flex-grow: 1; display: flex; flex-direction: column; min-width: 0">
+
+    <div style="height: 56px; flex-shrink: 0; background: #1E293B; border-bottom: 1px solid #1E3A5F; display: flex; align-items: center; gap: 16px; padding: 0 20px">
+      <div style="display: flex; align-items: center; gap: 6px; min-width: 0">
+        <span style="color: #64748B">Console</span>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        <span style="font-weight: 500">Support</span>
+      </div>
+      <div style="flex-grow: 1; display: flex; justify-content: center">
+        <div style="display: flex; align-items: center; gap: 8px; width: 420px; height: 32px; padding: 0 10px; border-radius: 6px; background: #16233A; border: 1px solid #2D4A6E">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <span style="flex-grow: 1; color: #64748B; overflow: hidden; white-space: nowrap">Search schools, users…</span>
+          <span class="mono" style="display: inline-flex; align-items: center; height: 18px; padding: 0 5px; border-radius: 4px; background: #293548; border: 1px solid #2D4A6E; color: #94A3B8; font-size: 11px">⌘K</span>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 6px">
+        <span style="position: relative; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; color: #94A3B8">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          <span class="mono" style="position: absolute; top: 1px; right: 0; display: inline-flex; align-items: center; justify-content: center; min-width: 15px; height: 15px; border-radius: 8px; background: #EF4444; color: #0A1628; font-size: 10px; font-weight: 700; border: 2px solid #1E293B">7</span>
+        </span>
+        <span style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; color: #94A3B8">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.2 9.2a3 3 0 0 1 5.7 1c0 2-2.9 2.6-2.9 2.6"/><path d="M12 17h.01"/></svg>
+        </span>
+        <span style="width: 24px; height: 24px; border-radius: 6px; background: rgba(139,92,246,.16); border: 1px solid rgba(139,92,246,.45); color: #C4B5FD; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600">AO</span>
+      </div>
+    </div>
+
+    <div style="flex-grow: 1; display: flex; min-height: 0">
+
+      <!-- ══ PANEL 1 · FILTERS · 260px ══ -->
+      <div style="width: 260px; flex-shrink: 0; border-right: 1px solid #1E3A5F; display: flex; flex-direction: column; background: #0D1B2E">
+        <div style="padding: 16px 16px 12px">
+          <h1 style="margin: 0 0 12px; font-size: 17px; font-weight: 600; letter-spacing: -.01em">Support Tickets</h1>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px">
+            <div style="border: 1px solid #1E3A5F; border-radius: 6px; background: #16233A; padding: 7px 8px">
+              <div class="mono" style="font-size: 17px; font-weight: 600; color: #3B82F6; line-height: 1.1">23</div>
+              <div style="font-size: 10px; color: #64748B; margin-top: 1px">Open</div>
+            </div>
+            <div style="border: 1px solid #1E3A5F; border-radius: 6px; background: #16233A; padding: 7px 8px">
+              <div class="mono" style="font-size: 17px; font-weight: 600; color: #8B5CF6; line-height: 1.1">7</div>
+              <div style="font-size: 10px; color: #64748B; margin-top: 1px">In prog.</div>
+            </div>
+            <div style="border: 1px solid #1E3A5F; border-radius: 6px; background: #16233A; padding: 7px 8px">
+              <div class="mono" style="font-size: 17px; font-weight: 600; color: #22C55E; line-height: 1.1">148</div>
+              <div style="font-size: 10px; color: #64748B; margin-top: 1px">Resolved</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex-grow: 1; overflow: hidden; padding: 0 16px">
+          <div class="fgroup">
+            <div class="fhead"><span>Status</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
+        <div class="cbrow"><span class="cb cb-on"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0A1628" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span style="color: #F8FAFC">Open</span><span class="count mono">23</span></div>
+        <div class="cbrow"><span class="cb cb-on"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0A1628" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span style="color: #F8FAFC">In progress</span><span class="count mono">7</span></div>
+        <div class="cbrow"><span class="cb"></span><span style="">Waiting on client</span><span class="count mono">4</span></div>
+        <div class="cbrow"><span class="cb"></span><span style="">Resolved</span><span class="count mono">148</span></div>
+        <div class="cbrow"><span class="cb"></span><span style="">Closed</span><span class="count mono">96</span></div>
+          </div>
+          <div class="fgroup">
+            <div class="fhead"><span>Priority</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
+        <div class="cbrow"><span class="cb cb-on"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0A1628" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="dot" style="background: #EF4444"></span><span style="color: #F8FAFC">Critical</span><span class="count mono">3</span></div>
+        <div class="cbrow"><span class="cb cb-on"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0A1628" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="dot" style="background: #F59E0B"></span><span style="color: #F8FAFC">High</span><span class="count mono">12</span></div>
+        <div class="cbrow"><span class="cb"></span><span class="dot" style="background: #3B82F6"></span><span style="">Medium</span><span class="count mono">8</span></div>
+        <div class="cbrow"><span class="cb"></span><span class="dot" style="background: #64748B"></span><span style="">Low</span><span class="count mono">4</span></div>
+          </div>
+          <div class="fgroup">
+            <div class="fhead"><span>Category</span></div>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px">
+              <span style="display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 999px; border: 1px solid; font-size: 12px; border-color: #3B82F6; background: rgba(59,130,246,.15); color: #F8FAFC">Billing</span>
+              <span style="display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 999px; border: 1px solid; font-size: 12px; border-color: #3B82F6; background: rgba(59,130,246,.15); color: #F8FAFC">Technical</span>
+              <span style="display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 999px; border: 1px solid; font-size: 12px; border-color: #2D4A6E; color: #94A3B8">Account</span>
+              <span style="display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 999px; border: 1px solid; font-size: 12px; border-color: #2D4A6E; color: #94A3B8">Feature</span>
+              <span style="display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 999px; border: 1px solid; font-size: 12px; border-color: #2D4A6E; color: #94A3B8">Other</span>
+            </div>
+          </div>
+          <div class="fgroup">
+            <div class="fhead"><span>Assigned to</span></div>
+            <div class="cbrow" style="height: 30px"><span class="cb cb-on"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0A1628" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span style="width: 20px; height: 20px; border-radius: 6px; background: rgba(13,148,136,.18); color: #5EEAD4; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; flex-shrink: 0">TA</span><span style="color: #F8FAFC">Tunde Adeyemi</span><span class="count mono">9</span></div>
+            <div class="cbrow" style="height: 30px"><span class="cb"></span><span style="width: 20px; height: 20px; border-radius: 6px; background: rgba(139,92,246,.18); color: #C4B5FD; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; flex-shrink: 0">IB</span><span style="">Ifeoma Balogun</span><span class="count mono">6</span></div>
+            <div class="cbrow" style="height: 30px"><span class="cb"></span><span style="width: 20px; height: 20px; border-radius: 6px; background: rgba(59,130,246,.18); color: #93C5FD; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; flex-shrink: 0">AO</span><span style="">Abdulmumin O.</span><span class="count mono">4</span></div>
+            <div class="cbrow" style="height: 30px"><span class="cb"></span><span style="width: 20px; height: 20px; border-radius: 7px; border: 1px dashed #2D4A6E; flex-shrink: 0"></span><span style="">Unassigned</span><span class="count mono">11</span></div>
+          </div>
+        </div>
+        <div style="flex-shrink: 0; padding: 12px 16px; border-top: 1px solid #1E3A5F">
+          <a href="#" style="font-size: 12px">Clear filters</a>
+          <span style="font-size: 11px; color: #64748B; margin-left: 6px">4 active</span>
+        </div>
+      </div>
+
+      <!-- ══ PANEL 2 · TICKET LIST · 440px ══ -->
+      <div style="width: 440px; flex-shrink: 0; border-right: 1px solid #1E3A5F; display: flex; flex-direction: column">
+        <div style="height: 44px; flex-shrink: 0; display: flex; align-items: center; gap: 4px; padding: 0 14px; border-bottom: 1px solid #1E3A5F">
+          <span style="font-size: 11px; color: #64748B; margin-right: 4px">Sort</span>
+          <span style="display: inline-flex; align-items: center; height: 24px; padding: 0 9px; border-radius: 5px; font-size: 12px; color: #94A3B8">Newest</span>
+          <span style="display: inline-flex; align-items: center; height: 24px; padding: 0 9px; border-radius: 5px; font-size: 12px; background: #293548; color: #F8FAFC; font-weight: 500">Priority</span>
+          <span style="display: inline-flex; align-items: center; height: 24px; padding: 0 9px; border-radius: 5px; font-size: 12px; color: #94A3B8">SLA</span>
+          <span class="mono" style="margin-left: auto; font-size: 11px; color: #64748B">30 of 178</span>
+        </div>
+        <div style="flex-grow: 1; overflow: hidden">
+      <div class="trow">
+        <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+          <div style="display: flex; align-items: center; gap: 7px">
+            <span class="mono" style="font-size: 11px; color: #64748B">TK-4471</span>
+            <span class="dot" style="background: #EF4444"></span>
+            <span style="font-size: 12px; color: #94A3B8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Chrisland Model Academy</span>
+          </div>
+          <div style="font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Paystack payments not reflecting on invoices since Monday</div>
+          <div style="display: flex; align-items: center; gap: 8px">
+            <span class="chip" style="background: rgba(217,119,6,.15); color: #FBBF24; height: 18px; padding: 0 6px">Billing</span>
+            <span style="font-size: 11px; color: #64748B">18m ago</span>
+            <span style="width: 20px; height: 20px; border-radius: 7px; border: 1px dashed #2D4A6E; flex-shrink: 0"></span>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0">
+          <span class="mono" style="font-size: 10px; color: #22C55E">43m left</span>
+          <div class="sla"><div style="width: 72%; height: 3px; background: #22C55E"></div></div>
+        </div>
+      </div>
+      <div class="trow trow-sel">
+        <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+          <div style="display: flex; align-items: center; gap: 7px">
+            <span class="mono" style="font-size: 11px; color: #64748B">TK-4468</span>
+            <span class="dot" style="background: #EF4444"></span>
+            <span style="font-size: 12px; color: #94A3B8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Greenfield International School</span>
+          </div>
+          <div style="font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Bulk report-card export times out for SS3 — 240 students</div>
+          <div style="display: flex; align-items: center; gap: 8px">
+            <span class="chip" style="background: rgba(59,130,246,.15); color: #93C5FD; height: 18px; padding: 0 6px">Technical</span>
+            <span style="font-size: 11px; color: #64748B">1h ago</span>
+            <span style="width: 20px; height: 20px; border-radius: 6px; background: rgba(13,148,136,.18); color: #5EEAD4; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; flex-shrink: 0">TA</span>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0">
+          <span class="mono" style="font-size: 10px; color: #F59E0B">22m left</span>
+          <div class="sla"><div style="width: 38%; height: 3px; background: #F59E0B"></div></div>
+        </div>
+      </div>
+      <div class="trow">
+        <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+          <div style="display: flex; align-items: center; gap: 7px">
+            <span class="mono" style="font-size: 11px; color: #64748B">TK-4462</span>
+            <span class="dot" style="background: #F59E0B"></span>
+            <span style="font-size: 12px; color: #94A3B8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Nurul Islam Comprehensive</span>
+          </div>
+          <div style="font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Attendance register will not save for JSS 2 arm B</div>
+          <div style="display: flex; align-items: center; gap: 8px">
+            <span class="chip" style="background: rgba(59,130,246,.15); color: #93C5FD; height: 18px; padding: 0 6px">Technical</span>
+            <span style="font-size: 11px; color: #64748B">3h ago</span>
+            <span style="width: 20px; height: 20px; border-radius: 6px; background: rgba(139,92,246,.18); color: #C4B5FD; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; flex-shrink: 0">IB</span>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0">
+          <span class="mono" style="font-size: 10px; color: #EF4444">2h over</span>
+          <div class="sla"><div style="width: 0%; height: 3px; background: #EF4444"></div></div>
+        </div>
+      </div>
+      <div class="trow">
+        <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+          <div style="display: flex; align-items: center; gap: 7px">
+            <span class="mono" style="font-size: 11px; color: #64748B">TK-4459</span>
+            <span class="dot" style="background: #F59E0B"></span>
+            <span style="font-size: 12px; color: #94A3B8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Pacesetters Academy</span>
+          </div>
+          <div style="font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Teacher cannot see her assigned classes after the term rollover</div>
+          <div style="display: flex; align-items: center; gap: 8px">
+            <span class="chip" style="background: rgba(139,92,246,.15); color: #C4B5FD; height: 18px; padding: 0 6px">Account</span>
+            <span style="font-size: 11px; color: #64748B">5h ago</span>
+            <span style="width: 20px; height: 20px; border-radius: 6px; background: rgba(13,148,136,.18); color: #5EEAD4; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; flex-shrink: 0">TA</span>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0">
+          <span class="mono" style="font-size: 10px; color: #22C55E">1h 48m left</span>
+          <div class="sla"><div style="width: 55%; height: 3px; background: #22C55E"></div></div>
+        </div>
+      </div>
+      <div class="trow">
+        <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+          <div style="display: flex; align-items: center; gap: 7px">
+            <span class="mono" style="font-size: 11px; color: #64748B">TK-4455</span>
+            <span class="dot" style="background: #3B82F6"></span>
+            <span style="font-size: 12px; color: #94A3B8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Emerald High School</span>
+          </div>
+          <div style="font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">SMS delivery failing for parents on MTN numbers</div>
+          <div style="display: flex; align-items: center; gap: 8px">
+            <span class="chip" style="background: rgba(59,130,246,.15); color: #93C5FD; height: 18px; padding: 0 6px">Technical</span>
+            <span style="font-size: 11px; color: #64748B">8h ago</span>
+            <span style="width: 20px; height: 20px; border-radius: 7px; border: 1px dashed #2D4A6E; flex-shrink: 0"></span>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0">
+          <span class="mono" style="font-size: 10px; color: #F59E0B">2h 30m left</span>
+          <div class="sla"><div style="width: 31%; height: 3px; background: #F59E0B"></div></div>
+        </div>
+      </div>
+      <div class="trow">
+        <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+          <div style="display: flex; align-items: center; gap: 7px">
+            <span class="mono" style="font-size: 11px; color: #64748B">TK-4451</span>
+            <span class="dot" style="background: #3B82F6"></span>
+            <span style="font-size: 12px; color: #94A3B8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Riverside Model School</span>
+          </div>
+          <div style="font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Request: add Cambridge Checkpoint to the curriculum list</div>
+          <div style="display: flex; align-items: center; gap: 8px">
+            <span class="chip" style="background: rgba(13,148,136,.15); color: #5EEAD4; height: 18px; padding: 0 6px">Feature</span>
+            <span style="font-size: 11px; color: #64748B">yesterday</span>
+            <span style="width: 20px; height: 20px; border-radius: 6px; background: rgba(59,130,246,.18); color: #93C5FD; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; flex-shrink: 0">AO</span>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0">
+          <span class="mono" style="font-size: 10px; color: #22C55E">1d 4h left</span>
+          <div class="sla"><div style="width: 84%; height: 3px; background: #22C55E"></div></div>
+        </div>
+      </div>
+      <div class="trow">
+        <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+          <div style="display: flex; align-items: center; gap: 7px">
+            <span class="mono" style="font-size: 11px; color: #64748B">TK-4444</span>
+            <span class="dot" style="background: #64748B"></span>
+            <span style="font-size: 12px; color: #94A3B8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Cornerstone College</span>
+          </div>
+          <div style="font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">How do I change the school logo on report cards?</div>
+          <div style="display: flex; align-items: center; gap: 8px">
+            <span class="chip" style="background: rgba(139,92,246,.15); color: #C4B5FD; height: 18px; padding: 0 6px">Account</span>
+            <span style="font-size: 11px; color: #64748B">2d ago</span>
+            <span style="width: 20px; height: 20px; border-radius: 6px; background: rgba(139,92,246,.18); color: #C4B5FD; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; flex-shrink: 0">IB</span>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0">
+          <span class="mono" style="font-size: 10px; color: #22C55E">14h left</span>
+          <div class="sla"><div style="width: 61%; height: 3px; background: #22C55E"></div></div>
+        </div>
+      </div>
+        </div>
+      </div>
+
+      <!-- ══ PANEL 3 · TICKET DETAIL · fills the rest (520px at 1440) ══ -->
+      <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column">
+        <div style="flex-shrink: 0; padding: 12px 16px; border-bottom: 1px solid #1E3A5F; display: flex; flex-direction: column; gap: 9px">
+          <div style="display: flex; align-items: center; gap: 8px">
+            <a href="#" style="font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Greenfield International School</a>
+            <span style="margin-left: auto; display: flex; gap: 6px">
+              <span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; width: 118px; padding: 0 9px; border-radius: 6px; background: #16233A; border: 1px solid #2D4A6E; font-size: 12px; color: #F8FAFC">
+          <span style="flex-grow: 1; overflow: hidden; white-space: nowrap">In progress</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; width: 96px; padding: 0 9px; border-radius: 6px; background: #16233A; border: 1px solid #2D4A6E; font-size: 12px; color: #F87171">
+          <span style="flex-grow: 1; overflow: hidden; white-space: nowrap">Critical</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </span>
+            </span>
+          </div>
+          <div style="font-size: 16px; font-weight: 600; line-height: 1.35">Bulk report-card export times out for SS3 — 240 students</div>
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+            <span class="mono" style="font-size: 11px; color: #64748B">TK-4468</span>
+            <span style="font-size: 11px; color: #64748B">Created 27/08/2026 09:14</span>
+            <span class="chip" style="background: rgba(59,130,246,.15); color: #93C5FD; height: 18px; padding: 0 6px">Technical</span>
+            <span style="margin-left: auto; display: inline-flex; align-items: center; gap: 6px">
+              <span style="width: 20px; height: 20px; border-radius: 6px; background: rgba(13,148,136,.18); color: #5EEAD4; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; flex-shrink: 0">TA</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; width: 138px; padding: 0 9px; border-radius: 6px; background: #16233A; border: 1px solid #2D4A6E; font-size: 12px; color: #F8FAFC">
+          <span style="flex-grow: 1; overflow: hidden; white-space: nowrap">Tunde Adeyemi</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </span>
+            </span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; padding-top: 2px">
+            <span class="dot" style="background: #F59E0B"></span>
+            <span class="mono" style="font-size: 11px; color: #FBBF24">22m left on the 1h first-response target</span>
+            <span class="btn btn-sm" style="margin-left: auto; border-color: rgba(239,68,68,.45); color: #F87171">Escalate</span>
+          </div>
+        </div>
+
+        <div style="flex-grow: 1; display: flex; min-height: 0">
+
+          <!-- conversation -->
+          <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; border-right: 1px solid #1E3A5F">
+            <div style="flex-grow: 1; padding: 14px 16px; display: flex; flex-direction: column; gap: 14px; overflow: hidden">
+        <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px">
+          <div class="bub" style="background: #1E293B; border: 1px solid #1E3A5F; border-bottom-left-radius: 3px">Good morning. When we try to export report cards for the whole of SS3 the page spins for about a minute and then shows an error. Smaller classes work fine. We have 240 students in that year and results are due Friday.</div>
+          <span style="font-size: 10px; color: #64748B; padding-left: 3px">Ada Okonkwo · School Admin · 09:14</span>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px">
+          <div class="bub" style="background: rgba(59,130,246,.2); border: 1px solid rgba(59,130,246,.35); border-bottom-right-radius: 3px">Thanks for flagging this — I can reproduce it on your account with SS3 and I am looking now. Single arms still export, so as a stop-gap you can pull SS3 A, B and C separately while I get to the root of it.</div>
+          <span style="font-size: 10px; color: #64748B; padding-right: 3px">Tunde Adeyemi · 09:41</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px">
+          <div style="background: rgba(69,26,3,.55); border: 1px solid rgba(217,119,6,.42); border-radius: 8px; padding: 9px 11px">
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FBBF24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.2 1.8 17.5A2 2 0 0 0 3.5 20.5h17a2 2 0 0 0 1.7-3L13.7 3.2a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+              <span style="font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #FBBF24">Internal — the school never sees this</span>
+            </div>
+            <div style="font-size: 12.5px; line-height: 1.5; color: #E2E8F0">Root cause is the PDF renderer holding every student in memory before it writes the first page. Ticketed with engineering as EC-882. Do not promise Friday until we know whether the fix ships tonight.</div>
+          </div>
+          <span style="font-size: 10px; color: #64748B; padding-left: 3px">Tunde Adeyemi · 10:06</span>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px">
+          <div class="bub" style="background: #1E293B; border: 1px solid #1E3A5F; border-bottom-left-radius: 3px">Understood, thank you. Exporting by arm worked for A and B.</div>
+          <span style="font-size: 10px; color: #64748B; padding-left: 3px">Ada Okonkwo · School Admin · 10:22</span>
+        </div>
+            </div>
+
+            <!-- reply box -->
+            <div style="flex-shrink: 0; border-top: 1px solid #1E3A5F; padding: 12px 16px">
+              <div style="min-height: 62px; border-radius: 7px; background: #16233A; border: 1px solid #2D4A6E; padding: 9px 11px; font-size: 12.5px; color: #475569">Reply to the school…</div>
+              <div style="display: flex; align-items: center; gap: 10px; margin-top: 9px">
+                <span style="display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: #94A3B8">
+                  <span style="width: 30px; height: 17px; border-radius: 999px; background: #293548; border: 1px solid #2D4A6E; display: inline-flex; align-items: center; padding: 0 2px">
+                    <span style="width: 12px; height: 12px; border-radius: 50%; background: #64748B"></span>
+                  </span>
+                  Internal note
+                </span>
+                <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; border: 1px solid #2D4A6E; color: #94A3B8">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21.4 11.05 12.25 20.2a5.5 5.5 0 0 1-7.78-7.78l9.2-9.19a3.67 3.67 0 0 1 5.18 5.18l-9.2 9.2a1.83 1.83 0 0 1-2.59-2.59l8.5-8.49"/></svg>
+                </span>
+                <span class="btn btn-primary btn-sm" style="margin-left: auto; height: 28px; padding: 0 12px">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0A1628" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+                  Send reply
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- panel sidebar -->
+          <div style="width: 168px; flex-shrink: 0; padding: 14px 12px; display: flex; flex-direction: column; gap: 12px; background: #0D1B2E">
+            <div>
+              <div class="lbl" style="margin-bottom: 7px">School health</div>
+              <a href="#" style="display: block; border: 1px solid #1E3A5F; border-radius: 7px; background: #16233A; padding: 11px; text-align: center; color: inherit">
+                <svg width="58" height="58" viewBox="0 0 64 64" style="display: block; margin: 0 auto">
+                  <circle cx="32" cy="32" r="26" fill="none" stroke="#16233A" stroke-width="7"/>
+                  <circle cx="32" cy="32" r="26" fill="none" stroke="#22C55E" stroke-width="7" stroke-linecap="round" stroke-dasharray="136.4 163.4" transform="rotate(-90 32 32)"/>
+                  <text x="32" y="37" text-anchor="middle" fill="#F8FAFC" font-family="JetBrains Mono, monospace" font-size="18" font-weight="700">83</text>
+                </svg>
+                <div style="font-size: 11px; color: #22C55E; font-weight: 500; margin-top: 5px">Excellent</div>
+                <div style="font-size: 10px; color: #64748B; margin-top: 1px">Professional · Lagos</div>
+              </a>
+            </div>
+
+            <div>
+              <div class="lbl" style="margin-bottom: 7px">This school</div>
+              <div style="font-size: 11px; color: #94A3B8; display: flex; flex-direction: column; gap: 5px">
+                <div style="display: flex; justify-content: space-between"><span>Open tickets</span><span class="mono" style="color: #F8FAFC">3</span></div>
+                <div style="display: flex; justify-content: space-between"><span>Last 90 days</span><span class="mono" style="color: #F8FAFC">11</span></div>
+                <div style="display: flex; justify-content: space-between"><span>MRR</span><span class="mono" style="color: #F8FAFC">₦233,333</span></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="lbl" style="margin-bottom: 7px">Quick actions</div>
+              <div style="display: flex; flex-direction: column; gap: 6px; align-items: stretch">
+                <span class="btn btn-sm" style="justify-content: center">View school</span>
+                <span class="btn btn-sm" style="justify-content: center">Impersonate</span>
+                <span class="btn btn-sm" style="justify-content: center; border-color: rgba(239,68,68,.4); color: #F87171">Suspend</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ══ REDLINES ══ -->
+    <div style="position: absolute; left: 0; top: 56px; width: 1440px; height: 22px; pointer-events: none">
+      <div style="position: absolute; left: 0; width: 220px; height: 22px; border-left: 1px dashed rgba(139,92,246,.55); border-right: 1px dashed rgba(139,92,246,.55)"></div>
+      <div class="redline" style="left: 78px; top: 4px">220 nav</div>
+      <div style="position: absolute; left: 220px; width: 260px; height: 22px; border-right: 1px dashed rgba(139,92,246,.55)"></div>
+      <div class="redline" style="left: 316px; top: 4px">260 filters</div>
+      <div style="position: absolute; left: 480px; width: 440px; height: 22px; border-right: 1px dashed rgba(139,92,246,.55)"></div>
+      <div class="redline" style="left: 662px; top: 4px">440 list</div>
+      <div class="redline" style="left: 1088px; top: 4px">520 detail (fluid)</div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

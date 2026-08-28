@@ -35,10 +35,17 @@ const ROLE_RULES: Array<{ prefix: string; roles: Role[] }> = [
 // app/.../[token]/route.ts handlers).
 const PUBLIC_PREFIXES = [
   "/auth",
+  "/api/impersonation",
   "/onboard",
   "/api/auth",
   "/api/webhooks",
   "/api/cron",
+  // A liveness probe behind auth is not a liveness probe: the Dockerfile
+  // HEALTHCHECK and the console's status board both call this anonymously.
+  "/api/health",
+  // Promo validation runs during signup, before any school or session exists.
+  // The route rate-limits itself and reveals nothing beyond yes/no.
+  "/api/promo",
   "/report-cards",
   "/midterm-reports",
   "/_next",
@@ -50,10 +57,33 @@ function isPublic(pathname: string) {
   return PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))
 }
 
+// Set by the Super Admin Console's read-only support pass. Presence alone
+// proves nothing — the grant is validated against the database in
+// lib/impersonation on every page — but it is enough to decide two things at
+// the edge: let the request reach that check, and refuse anything that writes.
+const IMPERSONATION_COOKIE = "educore.impersonation"
+
 export default auth((req) => {
   const { nextUrl } = req
   const pathname = nextUrl.pathname
   const isAuthed = !!req.auth?.user
+  const impersonating = req.cookies.has(IMPERSONATION_COOKIE)
+
+  // Read-only means read-only: no POST/PUT/PATCH/DELETE, which also covers
+  // every server action, since those are POSTs.
+  if (
+    impersonating &&
+    !isAuthed &&
+    req.method !== "GET" &&
+    req.method !== "HEAD" &&
+    // Leaving the session is the one write an impersonated viewer may make.
+    !pathname.startsWith("/api/impersonation")
+  ) {
+    return NextResponse.json(
+      { error: "This is a read-only EduCore Support session. Changes cannot be saved." },
+      { status: 403 },
+    )
+  }
 
   if (isPublic(pathname)) {
     // Pass schoolId header through for public API routes that still want it.
@@ -61,6 +91,9 @@ export default auth((req) => {
   }
 
   if (!isAuthed) {
+    // Hand impersonated reads to the page, which validates the grant itself.
+    if (impersonating) return NextResponse.next()
+
     // API routes get JSON 401 — they shouldn't render the login page.
     if (pathname.startsWith("/api/")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

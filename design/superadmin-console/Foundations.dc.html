@@ -1,0 +1,399 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  <style>
+    html, body { height: 100%; }
+    body { margin: 0; background: #0A1628; color: #F8FAFC;
+           font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+           font-size: 13px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+    a { color: #3B82F6; } a:hover { color: #60A5FA; }
+    .mono { font-family: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+            font-variant-numeric: tabular-nums; }
+    .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+               text-transform: uppercase; color: #64748B; }
+    .card { background: #1E293B; border: 1px solid #1E3A5F; border-radius: 8px; }
+  </style>
+</helmet>
+
+<div style="display: flex; flex-direction: column; gap: 32px; padding: 32px; background: #0A1628; min-height: 100%; box-sizing: border-box">
+
+  <!-- Header -->
+  <div style="display: flex; flex-direction: column; gap: 4px; border-bottom: 1px solid #1E3A5F; padding-bottom: 20px">
+    <div class="eyebrow">EduCore Africa · Super Admin Console</div>
+    <h1 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.02em">Foundations</h1>
+    <p style="margin: 0; color: #94A3B8; max-width: 640px">
+      Dark-first tokens for an internal operations console. Density over comfort: 13px body,
+      36px table rows, 4px spacing base. Every numeric field is tabular and monospaced.
+    </p>
+  </div>
+
+  <!-- ── Colour ────────────────────────────────────────────── -->
+  <div style="display: flex; flex-direction: column; gap: 16px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 18px; font-weight: 600">Colour</h2>
+      <span style="color: #64748B; font-size: 11px">4 background layers · 6 brand hues · 4 text ranks · 3 borders</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px">
+
+      <!-- Background layers -->
+      <div class="card" style="padding: 16px; display: flex; flex-direction: column; gap: 12px">
+        <div class="eyebrow">Background layers</div>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <div style="display: flex; align-items: center; gap: 12px">
+            <div style="width: 56px; height: 40px; border-radius: 6px; background: #0A1628; border: 1px solid #2D4A6E"></div>
+            <div style="display: flex; flex-direction: column; flex-grow: 1">
+              <span style="font-weight: 500">bg-base</span>
+              <span style="color: #64748B; font-size: 11px">Page canvas, sidebar</span>
+            </div>
+            <span class="mono" style="color: #94A3B8">#0A1628</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px">
+            <div style="width: 56px; height: 40px; border-radius: 6px; background: #1E293B; border: 1px solid #2D4A6E"></div>
+            <div style="display: flex; flex-direction: column; flex-grow: 1">
+              <span style="font-weight: 500">bg-surface</span>
+              <span style="color: #64748B; font-size: 11px">Cards, panels, topbar</span>
+            </div>
+            <span class="mono" style="color: #94A3B8">#1E293B</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px">
+            <div style="width: 56px; height: 40px; border-radius: 6px; background: #293548; border: 1px solid #2D4A6E"></div>
+            <div style="display: flex; flex-direction: column; flex-grow: 1">
+              <span style="font-weight: 500">bg-raised</span>
+              <span style="color: #64748B; font-size: 11px">Row hover, active nav</span>
+            </div>
+            <span class="mono" style="color: #94A3B8">#293548</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px">
+            <div style="width: 56px; height: 40px; border-radius: 6px; background: #334155; border: 1px solid #2D4A6E"></div>
+            <div style="display: flex; flex-direction: column; flex-grow: 1">
+              <span style="font-weight: 500">bg-overlay</span>
+              <span style="color: #64748B; font-size: 11px">Modals, dropdowns, tooltips</span>
+            </div>
+            <span class="mono" style="color: #94A3B8">#334155</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Text + border -->
+      <div class="card" style="padding: 16px; display: flex; flex-direction: column; gap: 12px">
+        <div class="eyebrow">Text</div>
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <div style="display: flex; align-items: baseline; gap: 12px">
+            <span style="color: #F8FAFC; font-weight: 500; width: 150px">text-primary</span>
+            <span style="color: #F8FAFC; flex-grow: 1">Metric values, headings</span>
+            <span class="mono" style="color: #94A3B8">#F8FAFC</span>
+          </div>
+          <div style="display: flex; align-items: baseline; gap: 12px">
+            <span style="color: #94A3B8; font-weight: 500; width: 150px">text-secondary</span>
+            <span style="color: #94A3B8; flex-grow: 1">Body copy, table cells</span>
+            <span class="mono" style="color: #94A3B8">#94A3B8</span>
+          </div>
+          <div style="display: flex; align-items: baseline; gap: 12px">
+            <span style="color: #64748B; font-weight: 500; width: 150px">text-muted</span>
+            <span style="color: #64748B; flex-grow: 1">Labels, captions, column heads</span>
+            <span class="mono" style="color: #94A3B8">#64748B</span>
+          </div>
+          <div style="display: flex; align-items: baseline; gap: 12px">
+            <span style="color: #475569; font-weight: 500; width: 150px">text-disabled</span>
+            <span style="color: #475569; flex-grow: 1">Disabled controls, empty cells</span>
+            <span class="mono" style="color: #94A3B8">#475569</span>
+          </div>
+        </div>
+
+        <div class="eyebrow" style="margin-top: 8px">Border</div>
+        <div style="display: flex; gap: 12px">
+          <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 6px">
+            <div style="height: 32px; border: 1px solid #1E3A5F; border-radius: 6px"></div>
+            <span style="color: #64748B; font-size: 11px">subtle</span>
+            <span class="mono" style="color: #94A3B8; font-size: 11px">#1E3A5F</span>
+          </div>
+          <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 6px">
+            <div style="height: 32px; border: 1px solid #2D4A6E; border-radius: 6px"></div>
+            <span style="color: #64748B; font-size: 11px">default</span>
+            <span class="mono" style="color: #94A3B8; font-size: 11px">#2D4A6E</span>
+          </div>
+          <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 6px">
+            <div style="height: 32px; border: 1px solid #3B6090; border-radius: 6px"></div>
+            <span style="color: #64748B; font-size: 11px">emphasis</span>
+            <span class="mono" style="color: #94A3B8; font-size: 11px">#3B6090</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Brand hues -->
+    <div class="card" style="padding: 16px; display: flex; flex-direction: column; gap: 12px">
+      <div class="eyebrow">Brand &amp; semantic</div>
+      <div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px">
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <div style="height: 48px; border-radius: 6px; background: #3B82F6"></div>
+          <span style="font-weight: 500">blue</span>
+          <span class="mono" style="color: #94A3B8; font-size: 11px">#3B82F6</span>
+          <span style="color: #64748B; font-size: 11px">Primary action, links, data</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <div style="height: 48px; border-radius: 6px; background: #14B8A6"></div>
+          <span style="font-weight: 500">teal</span>
+          <span class="mono" style="color: #94A3B8; font-size: 11px">#14B8A6</span>
+          <span style="color: #64748B; font-size: 11px">Secondary action</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <div style="height: 48px; border-radius: 6px; background: #22C55E"></div>
+          <span style="font-weight: 500">green</span>
+          <span class="mono" style="color: #94A3B8; font-size: 11px">#22C55E</span>
+          <span style="color: #64748B; font-size: 11px">Positive delta, Active, Paid</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <div style="height: 48px; border-radius: 6px; background: #F59E0B"></div>
+          <span style="font-weight: 500">amber</span>
+          <span class="mono" style="color: #94A3B8; font-size: 11px">#F59E0B</span>
+          <span style="color: #64748B; font-size: 11px">Warning, Trial, SLA at risk</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <div style="height: 48px; border-radius: 6px; background: #EF4444"></div>
+          <span style="font-weight: 500">red</span>
+          <span class="mono" style="color: #94A3B8; font-size: 11px">#EF4444</span>
+          <span style="color: #64748B; font-size: 11px">Error, churn, critical</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <div style="height: 48px; border-radius: 6px; background: #8B5CF6"></div>
+          <span style="font-weight: 500">purple</span>
+          <span class="mono" style="color: #94A3B8; font-size: 11px">#8B5CF6</span>
+          <span style="color: #64748B; font-size: 11px">AI / Intelligence only</span>
+        </div>
+      </div>
+      <p style="margin: 4px 0 0; color: #64748B; font-size: 11px; max-width: 720px">
+        Green, amber and red are reserved for state. They never stand in for a chart series —
+        chart hues come from the two ramps below.
+      </p>
+    </div>
+
+    <!-- Chart ramps -->
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px">
+      <div class="card" style="padding: 16px; display: flex; flex-direction: column; gap: 12px">
+        <div class="eyebrow">Categorical — plan mix (validated)</div>
+        <div style="display: flex; gap: 2px">
+          <div style="flex-grow: 1; height: 40px; border-radius: 6px 0 0 6px; background: #3B82F6"></div>
+          <div style="flex-grow: 1; height: 40px; background: #D97706"></div>
+          <div style="flex-grow: 1; height: 40px; background: #8B5CF6"></div>
+          <div style="flex-grow: 1; height: 40px; background: #0D9488"></div>
+          <div style="flex-grow: 1; height: 40px; border-radius: 0 6px 6px 0; background: #E11D48"></div>
+        </div>
+        <div class="mono" style="display: flex; gap: 2px; color: #64748B; font-size: 11px">
+          <span style="flex-grow: 1">#3B82F6</span>
+          <span style="flex-grow: 1">#D97706</span>
+          <span style="flex-grow: 1">#8B5CF6</span>
+          <span style="flex-grow: 1">#0D9488</span>
+          <span style="flex-grow: 1">#E11D48</span>
+        </div>
+        <p style="margin: 0; color: #64748B; font-size: 11px">
+          Fixed order, never cycled. Passes lightness band, chroma floor, CVD separation
+          (worst adjacent ΔE 10.2) and 3:1 contrast on <span class="mono">#1E293B</span>.
+        </p>
+      </div>
+
+      <div class="card" style="padding: 16px; display: flex; flex-direction: column; gap: 12px">
+        <div class="eyebrow">Sequential — density / magnitude</div>
+        <div style="display: flex; gap: 2px">
+          <div style="flex-grow: 1; height: 40px; border-radius: 6px 0 0 6px; background: #14243A; border: 1px solid #1E3A5F; box-sizing: border-box"></div>
+          <div style="flex-grow: 1; height: 40px; background: #1B3B5E"></div>
+          <div style="flex-grow: 1; height: 40px; background: #235489"></div>
+          <div style="flex-grow: 1; height: 40px; background: #2C6EB5"></div>
+          <div style="flex-grow: 1; height: 40px; background: #3B82F6"></div>
+          <div style="flex-grow: 1; height: 40px; border-radius: 0 6px 6px 0; background: #60A5FA"></div>
+        </div>
+        <div class="mono" style="display: flex; gap: 2px; color: #64748B; font-size: 11px">
+          <span style="flex-grow: 1">0</span>
+          <span style="flex-grow: 1">1–9</span>
+          <span style="flex-grow: 1">10–24</span>
+          <span style="flex-grow: 1">25–49</span>
+          <span style="flex-grow: 1">50–99</span>
+          <span style="flex-grow: 1">100+</span>
+        </div>
+        <p style="margin: 0; color: #64748B; font-size: 11px">
+          One hue, monotonic lightness. Used by the state choropleth and every storage /
+          utilisation bar. Brighter reads as more on a dark surface.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Typography ────────────────────────────────────────── -->
+  <div style="display: flex; flex-direction: column; gap: 16px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 18px; font-weight: 600">Typography</h2>
+      <span style="color: #64748B; font-size: 11px">Inter for interface · JetBrains Mono for anything numeric</span>
+    </div>
+
+    <div class="card" style="padding: 16px; display: flex; flex-direction: column">
+      <div style="display: grid; grid-template-columns: 180px 1fr 200px; gap: 16px; padding-bottom: 10px; border-bottom: 1px solid #1E3A5F">
+        <span class="eyebrow">Role</span>
+        <span class="eyebrow">Specimen</span>
+        <span class="eyebrow">Spec</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 180px 1fr 200px; gap: 16px; align-items: center; padding: 12px 0; border-bottom: 1px solid #1E3A5F">
+        <span style="color: #94A3B8">Heading 1</span>
+        <span style="font-size: 24px; font-weight: 700; letter-spacing: -0.02em">Command Centre</span>
+        <span class="mono" style="color: #64748B; font-size: 11px">24px / 700 / -0.02em</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 180px 1fr 200px; gap: 16px; align-items: center; padding: 12px 0; border-bottom: 1px solid #1E3A5F">
+        <span style="color: #94A3B8">Heading 2</span>
+        <span style="font-size: 18px; font-weight: 600">Monthly growth</span>
+        <span class="mono" style="color: #64748B; font-size: 11px">18px / 600</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 180px 1fr 200px; gap: 16px; align-items: center; padding: 12px 0; border-bottom: 1px solid #1E3A5F">
+        <span style="color: #94A3B8">Heading 3</span>
+        <span style="font-size: 15px; font-weight: 600">Revenue this month</span>
+        <span class="mono" style="color: #64748B; font-size: 11px">15px / 600</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 180px 1fr 200px; gap: 16px; align-items: center; padding: 12px 0; border-bottom: 1px solid #1E3A5F">
+        <span style="color: #94A3B8">Body</span>
+        <span style="font-size: 13px">Greenfield International School · Lagos</span>
+        <span class="mono" style="color: #64748B; font-size: 11px">13px / 400 / 1.5</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 180px 1fr 200px; gap: 16px; align-items: center; padding: 12px 0; border-bottom: 1px solid #1E3A5F">
+        <span style="color: #94A3B8">Caption</span>
+        <span style="font-size: 11px; color: #64748B">vs last month · updated 4 min ago</span>
+        <span class="mono" style="color: #64748B; font-size: 11px">11px / 400</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 180px 1fr 200px; gap: 16px; align-items: center; padding: 12px 0; border-bottom: 1px solid #1E3A5F">
+        <span style="color: #94A3B8">Data label</span>
+        <span class="mono" style="font-size: 13px; font-weight: 500">₦48,204,500 · 1,284 · 99.98%</span>
+        <span class="mono" style="color: #64748B; font-size: 11px">13px / JetBrains Mono</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 180px 1fr 200px; gap: 16px; align-items: center; padding: 12px 0">
+        <span style="color: #94A3B8">Metric value</span>
+        <span class="mono" style="font-size: 24px; font-weight: 600; letter-spacing: -0.01em">486,392</span>
+        <span class="mono" style="color: #64748B; font-size: 11px">24px / 600 / tabular</span>
+      </div>
+    </div>
+
+    <div class="card" style="padding: 16px; display: flex; align-items: center; gap: 24px">
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <span class="eyebrow">Why tabular</span>
+        <span style="color: #94A3B8">Proportional digits shift column edges row to row.</span>
+      </div>
+      <div style="display: flex; gap: 32px; margin-left: auto">
+        <div style="display: flex; flex-direction: column; gap: 2px; text-align: right">
+          <span style="color: #64748B; font-size: 11px">Proportional — drifts</span>
+          <span style="font-size: 13px">1,284</span>
+          <span style="font-size: 13px">486,392</span>
+          <span style="font-size: 13px">11,110</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 2px; text-align: right">
+          <span style="color: #64748B; font-size: 11px">Tabular — aligns</span>
+          <span class="mono" style="font-size: 13px">1,284</span>
+          <span class="mono" style="font-size: 13px">486,392</span>
+          <span class="mono" style="font-size: 13px">11,110</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Spacing & geometry ────────────────────────────────── -->
+  <div style="display: flex; flex-direction: column; gap: 16px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 18px; font-weight: 600">Spacing &amp; geometry</h2>
+      <span style="color: #64748B; font-size: 11px">4px base unit</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px">
+      <div class="card" style="padding: 16px; display: flex; flex-direction: column; gap: 10px">
+        <div class="eyebrow">Scale</div>
+        <div style="display: flex; align-items: center; gap: 12px">
+          <span class="mono" style="width: 36px; color: #94A3B8">4</span>
+          <div style="width: 4px; height: 16px; background: #3B82F6; border-radius: 2px"></div>
+          <span style="color: #64748B; font-size: 11px">Icon-to-label, badge padding</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px">
+          <span class="mono" style="width: 36px; color: #94A3B8">8</span>
+          <div style="width: 8px; height: 16px; background: #3B82F6; border-radius: 2px"></div>
+          <span style="color: #64748B; font-size: 11px">Cell padding, chip gaps</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px">
+          <span class="mono" style="width: 36px; color: #94A3B8">12</span>
+          <div style="width: 12px; height: 16px; background: #3B82F6; border-radius: 2px"></div>
+          <span style="color: #64748B; font-size: 11px">Control padding, nav item inset</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px">
+          <span class="mono" style="width: 36px; color: #94A3B8">16</span>
+          <div style="width: 16px; height: 16px; background: #3B82F6; border-radius: 2px"></div>
+          <span style="color: #64748B; font-size: 11px">Card padding, card-to-card gap</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px">
+          <span class="mono" style="width: 36px; color: #94A3B8">20</span>
+          <div style="width: 20px; height: 16px; background: #3B82F6; border-radius: 2px"></div>
+          <span style="color: #64748B; font-size: 11px">Row-to-row gap on the dashboard</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px">
+          <span class="mono" style="width: 36px; color: #94A3B8">24</span>
+          <div style="width: 24px; height: 16px; background: #3B82F6; border-radius: 2px"></div>
+          <span style="color: #64748B; font-size: 11px">Main content padding</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px">
+          <span class="mono" style="width: 36px; color: #94A3B8">32</span>
+          <div style="width: 32px; height: 16px; background: #3B82F6; border-radius: 2px"></div>
+          <span style="color: #64748B; font-size: 11px">Section separation</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px">
+          <span class="mono" style="width: 36px; color: #94A3B8">48</span>
+          <div style="width: 48px; height: 16px; background: #3B82F6; border-radius: 2px"></div>
+          <span style="color: #64748B; font-size: 11px">Page-level breathing room</span>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 20px">
+        <div class="card" style="padding: 16px; display: flex; flex-direction: column; gap: 12px">
+          <div class="eyebrow">Radius</div>
+          <div style="display: flex; gap: 12px">
+            <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 6px; align-items: center">
+              <div style="width: 100%; height: 36px; background: #293548; border: 1px solid #2D4A6E; border-radius: 4px"></div>
+              <span class="mono" style="color: #64748B; font-size: 11px">4 · badge</span>
+            </div>
+            <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 6px; align-items: center">
+              <div style="width: 100%; height: 36px; background: #293548; border: 1px solid #2D4A6E; border-radius: 6px"></div>
+              <span class="mono" style="color: #64748B; font-size: 11px">6 · control</span>
+            </div>
+            <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 6px; align-items: center">
+              <div style="width: 100%; height: 36px; background: #293548; border: 1px solid #2D4A6E; border-radius: 8px"></div>
+              <span class="mono" style="color: #64748B; font-size: 11px">8 · card</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="padding: 16px; display: flex; flex-direction: column; gap: 12px">
+          <div class="eyebrow">Control heights</div>
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <div style="display: flex; align-items: center; gap: 12px">
+              <div style="height: 28px; width: 96px; border-radius: 6px; background: #293548; border: 1px solid #2D4A6E"></div>
+              <span class="mono" style="color: #94A3B8">28</span>
+              <span style="color: #64748B; font-size: 11px">Small / in-table</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px">
+              <div style="height: 32px; width: 96px; border-radius: 6px; background: #293548; border: 1px solid #2D4A6E"></div>
+              <span class="mono" style="color: #94A3B8">32</span>
+              <span style="color: #64748B; font-size: 11px">Default button, input</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px">
+              <div style="height: 36px; width: 96px; border-radius: 6px; background: #293548; border: 1px solid #2D4A6E"></div>
+              <span class="mono" style="color: #94A3B8">36</span>
+              <span style="color: #64748B; font-size: 11px">Table row, nav item</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

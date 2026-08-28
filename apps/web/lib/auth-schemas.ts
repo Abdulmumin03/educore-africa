@@ -85,6 +85,15 @@ export type StepAcademicInput = z.infer<typeof stepAcademicSchema>
 export const PLANS = ["STARTER", "GROWTH", "PROFESSIONAL", "ENTERPRISE"] as const
 export const stepPlanSchema = z.object({
   plan: z.enum(PLANS),
+  // Optional, and normalised here so the server never has to guess at case or
+  // stray whitespace typed off a flyer.
+  promoCode: z
+    .string()
+    .trim()
+    .toUpperCase()
+    .max(24)
+    .optional()
+    .or(z.literal("")),
 })
 export type StepPlanInput = z.infer<typeof stepPlanSchema>
 

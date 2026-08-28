@@ -1,0 +1,415 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  <style>
+    html, body { height: 100%; }
+    body { margin: 0; background: #0A1628; color: #F8FAFC;
+           font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+           font-size: 13px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+    a { color: #3B82F6; text-decoration: none; } a:hover { color: #60A5FA; }
+    .mono { font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+            font-variant-numeric: tabular-nums; }
+    .navsec { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+              color: #475569; padding: 0 12px; }
+    .nav { display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 12px;
+           border-radius: 6px; color: #94A3B8; }
+    .nav-active { background: rgba(59,130,246,.14); color: #F8FAFC; font-weight: 500;
+                  box-shadow: inset 2px 0 0 #3B82F6; }
+    .panel { background: #1E293B; border: 1px solid #1E3A5F; border-radius: 8px; }
+    .p-h { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+           padding: 13px 16px; border-bottom: 1px solid #1E3A5F; }
+    .p-t { margin: 0; font-size: 15px; font-weight: 600; }
+    .p-s { font-size: 11px; color: #64748B; }
+    .lbl { font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+           color: #64748B; }
+    .up { color: #22C55E; font-weight: 500; }
+    .down { color: #EF4444; font-weight: 500; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px;
+           border-radius: 6px; background: #1E293B; border: 1px solid #2D4A6E; color: #F8FAFC;
+           font-size: 13px; font-weight: 500; }
+    .btn-primary { background: #3B82F6; border-color: #3B82F6; color: #0A1628; font-weight: 600; }
+    .btn-sm { height: 26px; padding: 0 9px; font-size: 12px; border-radius: 5px; }
+    .tab { display: inline-flex; align-items: center; height: 34px; padding: 0 12px;
+           font-size: 13px; color: #94A3B8; border-bottom: 2px solid transparent; }
+    .tab-active { color: #F8FAFC; font-weight: 500; border-bottom-color: #3B82F6; }
+    .kv { display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+          padding: 7px 0; border-bottom: 1px solid #1E3A5F; }
+    .kv:last-child { border-bottom: 0; }
+    .kv-k { color: #94A3B8; flex-shrink: 0; }
+    .kv-v { text-align: right; }
+    .chip { display: inline-flex; align-items: center; gap: 5px; height: 20px; padding: 0 7px;
+            border-radius: 4px; font-size: 11px; font-weight: 500; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .redline { position: absolute; font-size: 10px; font-weight: 600; letter-spacing: .04em;
+               color: #C4B5FD; font-family: "JetBrains Mono", ui-monospace, monospace; }
+    .spec { border: 1px dashed rgba(139,92,246,.5); }
+
+    .sec { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+           color: #8B5CF6; }
+    .note { font-size: 12px; color: #64748B; line-height: 1.55; max-width: 560px; }
+    .skel { background: #293548; border-radius: 4px; animation: pulse 1.6s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1 } 50% { opacity: .45 } }
+    .th { text-align: left; font-size: 11px; font-weight: 600; letter-spacing: .04em;
+          text-transform: uppercase; color: #64748B; padding: 0 12px 8px; }
+    .td { padding: 0 12px; height: 36px; border-top: 1px solid #16233A; }
+
+  </style>
+</helmet>
+<div style="width: 1240px; min-height: 100%; background: #0A1628; padding: 32px 36px 44px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px">
+
+  <div>
+    <h1 style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -.02em">Empty, loading, error &amp; toast</h1>
+    <p style="margin: 5px 0 0; font-size: 13px; color: #94A3B8; max-width: 720px">
+      Every table, chart and panel in the console resolves to one of these four. They share the panel frame,
+      the 8px radius and the same type ramp as the live states, so a screen does not change shape while it loads.
+    </p>
+  </div>
+
+      <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 8px">
+        <div class="sec">01 · Empty</div>
+        <div class="note">Centred in the content area the data would have filled — not in a smaller box, so the page does not resize when rows arrive. The subtext says <em>why</em> it is empty, because &ldquo;no results&rdquo; and &ldquo;nothing exists yet&rdquo; need different actions from the reader.</div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
+
+        <div class="panel">
+          <div class="p-h"><div><h2 class="p-t">Schools</h2><div class="p-s">Nothing registered yet</div></div></div>
+        <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 36px 24px">
+          <svg width="88" height="88" viewBox="0 0 96 96" fill="none">
+  <rect x="14" y="34" width="30" height="46" rx="3" stroke="#2D4A6E" stroke-width="2"/>
+  <rect x="52" y="46" width="30" height="34" rx="3" stroke="#2D4A6E" stroke-width="2"/>
+  <path d="M14 34 29 22l15 12" stroke="#2D4A6E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M52 46 67 36l15 10" stroke="#2D4A6E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M24 46h10M24 56h10M24 66h10" stroke="#1E3A5F" stroke-width="2" stroke-linecap="round"/>
+  <path d="M61 56h12M61 66h12" stroke="#1E3A5F" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="70" cy="26" r="10" stroke="#3B82F6" stroke-width="2"/>
+  <path d="m77 33 6 6" stroke="#3B82F6" stroke-width="2" stroke-linecap="round"/>
+</svg>
+          <div style="font-size: 15px; font-weight: 600; margin-top: 2px">No schools yet</div>
+          <div style="font-size: 12.5px; color: #94A3B8; max-width: 300px; line-height: 1.55">Nothing has been registered on the platform. The first school will appear here the moment it finishes signup.</div>
+          <div style="display: flex; gap: 8px; margin-top: 6px">
+            <span class="btn btn-primary">Register first school</span>
+          </div>
+        </div>
+        </div>
+
+        <div class="panel">
+          <div class="p-h"><div><h2 class="p-t">Support queue</h2><div class="p-s">Filtered to Critical + Unassigned</div></div></div>
+        <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 36px 24px">
+          <svg width="88" height="88" viewBox="0 0 96 96" fill="none">
+  <path d="M18 26h60a4 4 0 0 1 4 4v30a4 4 0 0 1-4 4H40L26 76V64h-8a4 4 0 0 1-4-4V30a4 4 0 0 1 4-4Z" stroke="#2D4A6E" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M30 38h36M30 48h24" stroke="#1E3A5F" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="70" cy="72" r="12" fill="#0A1628" stroke="#22C55E" stroke-width="2"/>
+  <path d="m65 72 4 4 7-8" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+          <div style="font-size: 15px; font-weight: 600; margin-top: 2px">Nothing critical is unassigned</div>
+          <div style="font-size: 12.5px; color: #94A3B8; max-width: 300px; line-height: 1.55">23 tickets are open, but none match these filters. That is the good outcome — clear the filters to see the rest of the queue.</div>
+          <div style="display: flex; gap: 8px; margin-top: 6px">
+            <span class="btn">Clear filters</span>
+          </div>
+        </div>
+        </div>
+
+        <div class="panel">
+          <div class="p-h"><div><h2 class="p-t">Search results</h2><div class="p-s">&ldquo;akwa ibom boarding&rdquo;</div></div></div>
+        <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 36px 24px">
+          <svg width="88" height="88" viewBox="0 0 96 96" fill="none">
+  <circle cx="42" cy="42" r="22" stroke="#2D4A6E" stroke-width="2"/>
+  <path d="m58 58 18 18" stroke="#2D4A6E" stroke-width="2" stroke-linecap="round"/>
+  <path d="M33 42h18" stroke="#1E3A5F" stroke-width="2" stroke-linecap="round"/>
+  <path d="M22 74h14M22 82h8" stroke="#16233A" stroke-width="2" stroke-linecap="round"/>
+</svg>
+          <div style="font-size: 15px; font-weight: 600; margin-top: 2px">No match for that search</div>
+          <div style="font-size: 12.5px; color: #94A3B8; max-width: 300px; line-height: 1.55">No school, user or ticket matches. Search covers school names, admin emails and ticket titles — try one term rather than a phrase.</div>
+        </div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 8px">
+        <div class="sec">02 · Loading</div>
+        <div class="note">Skeletons mirror the real layout: same row height, same column widths, same card footprint. They pulse together at 1.6s so the page reads as one thing loading rather than eight.</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px">
+
+        <!-- KPI + chart skeleton -->
+        <div style="display: flex; flex-direction: column; gap: 16px">
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+            <div class="panel" style="padding: 12px 13px; display: flex; flex-direction: column; gap: 8px">
+              <span class="skel" style="display: block; width: 66px; height: 9px; border-radius: 4px; "></span>
+              <span class="skel" style="display: block; width: 104px; height: 20px; border-radius: 5px; "></span>
+              <span class="skel" style="display: block; width: 48px; height: 9px; border-radius: 4px; "></span>
+            </div>
+            <div class="panel" style="padding: 12px 13px; display: flex; flex-direction: column; gap: 8px">
+              <span class="skel" style="display: block; width: 66px; height: 9px; border-radius: 4px; "></span>
+              <span class="skel" style="display: block; width: 104px; height: 20px; border-radius: 5px; "></span>
+              <span class="skel" style="display: block; width: 48px; height: 9px; border-radius: 4px; "></span>
+            </div>
+            <div class="panel" style="padding: 12px 13px; display: flex; flex-direction: column; gap: 8px">
+              <span class="skel" style="display: block; width: 66px; height: 9px; border-radius: 4px; "></span>
+              <span class="skel" style="display: block; width: 104px; height: 20px; border-radius: 5px; "></span>
+              <span class="skel" style="display: block; width: 48px; height: 9px; border-radius: 4px; "></span>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="p-h">
+              <div style="display: flex; flex-direction: column; gap: 6px">
+                <span class="skel" style="display: block; width: 128px; height: 12px; border-radius: 4px; "></span>
+                <span class="skel" style="display: block; width: 184px; height: 9px; border-radius: 4px; "></span>
+              </div>
+            </div>
+            <div style="padding: 16px">
+              <span class="skel" style="display: block; width: 100%; height: 168px; border-radius: 6px; "></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- table skeleton: 8 rows -->
+        <div class="panel">
+          <div class="p-h">
+            <div style="display: flex; flex-direction: column; gap: 6px">
+              <span class="skel" style="display: block; width: 96px; height: 12px; border-radius: 4px; "></span>
+              <span class="skel" style="display: block; width: 148px; height: 9px; border-radius: 4px; "></span>
+            </div>
+          </div>
+          <div style="padding: 12px 4px 8px">
+            <table style="width: 100%; border-collapse: collapse">
+              <thead>
+                <tr>
+                  <th class="th" style="width: 40%">School</th>
+                  <th class="th">Plan</th><th class="th">Students</th><th class="th">MRR</th>
+                  <th class="th" style="text-align: right">Health</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 188px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 62px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 54px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 78px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style="display: flex; justify-content: flex-end"><span class="skel" style="display: block; width: 30px; height: 9px; border-radius: 4px; "></span></span></td>
+                </tr>
+                <tr>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 152px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 68px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 46px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 84px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style="display: flex; justify-content: flex-end"><span class="skel" style="display: block; width: 30px; height: 9px; border-radius: 4px; "></span></span></td>
+                </tr>
+                <tr>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 204px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 58px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 58px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 72px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style="display: flex; justify-content: flex-end"><span class="skel" style="display: block; width: 30px; height: 9px; border-radius: 4px; "></span></span></td>
+                </tr>
+                <tr>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 168px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 72px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 50px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 80px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style="display: flex; justify-content: flex-end"><span class="skel" style="display: block; width: 30px; height: 9px; border-radius: 4px; "></span></span></td>
+                </tr>
+                <tr>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 142px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 60px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 56px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 76px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style="display: flex; justify-content: flex-end"><span class="skel" style="display: block; width: 30px; height: 9px; border-radius: 4px; "></span></span></td>
+                </tr>
+                <tr>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 196px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 66px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 44px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 88px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style="display: flex; justify-content: flex-end"><span class="skel" style="display: block; width: 30px; height: 9px; border-radius: 4px; "></span></span></td>
+                </tr>
+                <tr>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 160px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 62px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 52px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 74px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style="display: flex; justify-content: flex-end"><span class="skel" style="display: block; width: 30px; height: 9px; border-radius: 4px; "></span></span></td>
+                </tr>
+                <tr>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 176px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 70px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 48px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style=""><span class="skel" style="display: block; width: 82px; height: 9px; border-radius: 4px; "></span></span></td>
+                  <td class="td"><span style="display: flex; justify-content: flex-end"><span class="skel" style="display: block; width: 30px; height: 9px; border-radius: 4px; "></span></span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 8px">
+        <div class="sec">03 · Error</div>
+        <div class="note">The panel keeps its frame and gains a red border, so the failure lands where the data would have been rather than as a page-level banner. The technical line is shown, not hidden: an operator reporting this needs something to paste, and the readable sentence above it is what tells them whether to retry or escalate.</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px">
+
+        <div class="panel" style="border-color: rgba(239,68,68,.45)">
+          <div class="p-h" style="border-bottom-color: rgba(239,68,68,.28)">
+            <div><h2 class="p-t">Revenue by state</h2><div class="p-s">Last 12 months</div></div>
+          </div>
+          <div style="padding: 28px 24px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px">
+            <span style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 12px; background: rgba(239,68,68,.14); border: 1px solid rgba(239,68,68,.4)">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F87171" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.2 1.8 17.5A2 2 0 0 0 3.5 20.5h17a2 2 0 0 0 1.7-3L13.7 3.2a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+            </span>
+            <div style="font-size: 15px; font-weight: 600">Failed to load data</div>
+            <div style="font-size: 12.5px; color: #94A3B8; max-width: 380px; line-height: 1.55">
+              The query did not come back in time. Nothing is wrong with your session — this panel alone failed, and the rest of the page is live.
+            </div>
+            <code class="mono" style="display: block; max-width: 440px; margin-top: 2px; padding: 8px 11px; border-radius: 6px; background: #16233A; border: 1px solid #2D4A6E; color: #94A3B8; font-size: 11px; text-align: left; line-height: 1.5">
+              500 · GET /api/revenue/by-state<br>PrismaClientKnownRequestError P2024: timed out fetching a connection from the pool (10s)
+            </code>
+            <div style="display: flex; gap: 8px; margin-top: 6px">
+              <span class="btn btn-primary">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0A1628" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+                Retry
+              </span>
+              <span class="btn">Copy details</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 16px">
+
+          <!-- inline row-level error -->
+          <div class="panel">
+            <div class="p-h"><div><h2 class="p-t">Inline failure</h2><div class="p-s">One card in a healthy grid</div></div></div>
+            <div style="padding: 14px 16px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+              <div style="border: 1px solid #1E3A5F; border-radius: 8px; background: #16233A; padding: 12px 13px">
+                <div style="font-size: 11px; color: #64748B">MRR</div>
+                <div class="mono" style="font-size: 19px; font-weight: 600; margin-top: 3px">₦48,204,500</div>
+                <div style="font-size: 11px; color: #22C55E; margin-top: 4px">+6.8%</div>
+              </div>
+              <div style="border: 1px solid rgba(239,68,68,.4); border-radius: 8px; background: rgba(239,68,68,.06); padding: 12px 13px">
+                <div style="font-size: 11px; color: #64748B">Collections</div>
+                <div style="display: flex; align-items: center; gap: 6px; margin-top: 6px">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.2 1.8 17.5A2 2 0 0 0 3.5 20.5h17a2 2 0 0 0 1.7-3L13.7 3.2a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                  <span style="font-size: 12.5px; color: #F87171">Unavailable</span>
+                </div>
+                <a href="#" style="display: inline-block; font-size: 11px; margin-top: 6px">Retry this card</a>
+              </div>
+              <div style="border: 1px solid #1E3A5F; border-radius: 8px; background: #16233A; padding: 12px 13px">
+                <div style="font-size: 11px; color: #64748B">Churn</div>
+                <div class="mono" style="font-size: 19px; font-weight: 600; margin-top: 3px">1.8%</div>
+                <div style="font-size: 11px; color: #EF4444; margin-top: 4px">+0.3%</div>
+              </div>
+            </div>
+            <div style="padding: 0 16px 14px; font-size: 11px; color: #64748B">
+              One failed card does not take the row with it. A grid where one figure is missing is more useful than a grid replaced by an error.
+            </div>
+          </div>
+
+          <!-- unavailable, not failed -->
+          <div class="panel">
+            <div class="p-h"><div><h2 class="p-t">Unavailable ≠ error</h2><div class="p-s">Nothing broke; there is nothing to measure</div></div></div>
+            <div style="padding: 14px 16px">
+              <div style="border: 1px dashed #2D4A6E; border-radius: 7px; background: rgba(41,53,72,.35); padding: 12px 14px; font-size: 12.5px; color: #94A3B8; line-height: 1.55">
+                CSAT is not shown: support tickets carry no satisfaction survey, so there is nothing to average.
+              </div>
+              <div style="font-size: 11px; color: #64748B; margin-top: 10px">
+                Dashed border, no red, no retry button — the reader is not meant to do anything about it. Distinct from an error on purpose: a zero and &ldquo;we cannot measure this&rdquo; look identical otherwise.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 8px">
+        <div class="sec">04 · Toast</div>
+        <div class="note">Bottom-right, stacking upward, newest at the bottom. Auto-dismiss after 4s — except where an <strong style="color:#94A3B8;font-weight:600">Undo</strong> is offered, which holds for 8s so the window to change your mind is longer than the window to read it.</div>
+      </div>
+      <div style="display: grid; grid-template-columns: auto 1fr; gap: 28px; align-items: start">
+
+        <!-- the stack, as it appears bottom-right -->
+        <div style="border: 1px dashed #2D4A6E; border-radius: 10px; padding: 20px; background: rgba(13,27,46,.6)">
+          <div style="font-size: 11px; color: #64748B; margin-bottom: 12px">Bottom-right of the viewport, 20px inset, 10px gap</div>
+          <div style="display: flex; flex-direction: column; gap: 10px; align-items: flex-end">
+          <div style="position: relative; width: 372px; display: flex; align-items: flex-start; gap: 10px; padding: 12px 13px; border-radius: 8px; background: #1E293B; border: 1px solid #1E3A5F; box-shadow: 0 12px 28px rgba(0,0,0,.5), inset 3px 0 0 #22C55E; overflow: hidden">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg>
+            <div style="flex-grow: 1; min-width: 0">
+              <div style="font-size: 13px">Plan pricing saved.</div>
+              <div style="font-size: 11.5px; color: #94A3B8; margin-top: 2px">Existing subscriptions were not re-priced.</div>
+            </div>
+            
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" style="flex-shrink: 0; margin-top: 2px"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            <div style="position: absolute; left: 0; bottom: 0; height: 2px; width: 62%; background: rgba(34,197,94,.9); border-bottom-left-radius: 8px"></div>
+          </div>
+          <div style="position: relative; width: 372px; display: flex; align-items: flex-start; gap: 10px; padding: 12px 13px; border-radius: 8px; background: #1E293B; border: 1px solid #1E3A5F; box-shadow: 0 12px 28px rgba(0,0,0,.5), inset 3px 0 0 #22C55E; overflow: hidden">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg>
+            <div style="flex-grow: 1; min-width: 0">
+              <div style="font-size: 13px">Lead moved to Demo scheduled.</div>
+              
+            </div>
+            <a href="#" style="font-size: 12px; font-weight: 500; flex-shrink: 0">Undo</a>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" style="flex-shrink: 0; margin-top: 2px"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            <div style="position: absolute; left: 0; bottom: 0; height: 2px; width: 88%; background: rgba(34,197,94,.9); border-bottom-left-radius: 8px"></div>
+          </div>
+          <div style="position: relative; width: 372px; display: flex; align-items: flex-start; gap: 10px; padding: 12px 13px; border-radius: 8px; background: #1E293B; border: 1px solid #1E3A5F; box-shadow: 0 12px 28px rgba(0,0,0,.5), inset 3px 0 0 #F59E0B; overflow: hidden">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px"><path d="M10.3 3.2 1.8 17.5A2 2 0 0 0 3.5 20.5h17a2 2 0 0 0 1.7-3L13.7 3.2a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+            <div style="flex-grow: 1; min-width: 0">
+              <div style="font-size: 13px">Broadcast sent to 142 admins.</div>
+              <div style="font-size: 11.5px; color: #94A3B8; margin-top: 2px">SMS was recorded as requested — nothing was sent from the console.</div>
+            </div>
+            
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" style="flex-shrink: 0; margin-top: 2px"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            <div style="position: absolute; left: 0; bottom: 0; height: 2px; width: 34%; background: rgba(245,158,11,.9); border-bottom-left-radius: 8px"></div>
+          </div>
+          <div style="position: relative; width: 372px; display: flex; align-items: flex-start; gap: 10px; padding: 12px 13px; border-radius: 8px; background: #1E293B; border: 1px solid #1E3A5F; box-shadow: 0 12px 28px rgba(0,0,0,.5), inset 3px 0 0 #EF4444; overflow: hidden">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6"/><path d="m9 9 6 6"/></svg>
+            <div style="flex-grow: 1; min-width: 0">
+              <div style="font-size: 13px">Could not retry the failed jobs.</div>
+              <div style="font-size: 11.5px; color: #94A3B8; margin-top: 2px">Notifications has no worker — the queue does not exist yet.</div>
+            </div>
+            
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" style="flex-shrink: 0; margin-top: 2px"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            
+          </div>
+          </div>
+        </div>
+
+        <!-- anatomy -->
+        <div style="display: flex; flex-direction: column; gap: 12px">
+          <div class="panel" style="padding: 14px 16px">
+            <div class="lbl" style="margin-bottom: 8px">Anatomy</div>
+            <div class="kv"><span class="kv-k">Width</span><span class="kv-v mono">372px fixed</span></div>
+            <div class="kv"><span class="kv-k">Accent</span><span class="kv-v mono">inset 3px left border</span></div>
+            <div class="kv"><span class="kv-k">Elevation</span><span class="kv-v mono">0 12px 28px rgba(0,0,0,.5)</span></div>
+            <div class="kv"><span class="kv-k">Dismiss</span><span class="kv-v mono">4s · 8s with Undo</span></div>
+            <div class="kv"><span class="kv-k">Progress</span><span class="kv-v mono">2px foot, drains left→right</span></div>
+            <div class="kv"><span class="kv-k">Stack cap</span><span class="kv-v mono">4 visible, oldest drops</span></div>
+          </div>
+
+          <div class="panel" style="padding: 14px 16px">
+            <div class="lbl" style="margin-bottom: 8px">When each is used</div>
+            <div style="display: flex; flex-direction: column; gap: 9px; font-size: 12.5px; color: #94A3B8; line-height: 1.5">
+              <div style="display: flex; gap: 9px"><span class="dot" style="background: #22C55E; margin-top: 6px"></span><span><span style="color: #F8FAFC">Green</span> — the thing you asked for happened. Add <span style="color: #F8FAFC">Undo</span> only when the action is genuinely reversible in one call.</span></div>
+              <div style="display: flex; gap: 9px"><span class="dot" style="background: #F59E0B; margin-top: 6px"></span><span><span style="color: #F8FAFC">Amber</span> — it happened, but not entirely. A broadcast that reached the in-app inbox and not SMS is amber, never green.</span></div>
+              <div style="display: flex; gap: 9px"><span class="dot" style="background: #EF4444; margin-top: 6px"></span><span><span style="color: #F8FAFC">Red</span> — nothing happened. Carries the reason, no timer, and stays until dismissed.</span></div>
+            </div>
+          </div>
+
+          <div class="panel" style="padding: 14px 16px">
+            <div class="lbl" style="margin-bottom: 8px">Not a toast</div>
+            <div style="font-size: 12.5px; color: #94A3B8; line-height: 1.55">
+              Anything the operator must read before continuing — a destructive confirmation, an erasure, a broadcast about to reach 142 schools — is a dialog, not a toast. A message that auto-dismisses is a message you can miss.
+            </div>
+          </div>
+        </div>
+      </div>
+
+</div>
+</x-dc>
+</body>
+</html>

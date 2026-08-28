@@ -1,5 +1,7 @@
 import { PrismaClient, UserRole } from "@prisma/client"
 
+import { seedSuperAdmin } from "./prisma/seed-superadmin"
+
 const prisma = new PrismaClient()
 
 async function main() {
@@ -45,6 +47,11 @@ async function main() {
   })
 
   console.log(`Seeded school ${school.name} (${school.id})`)
+
+  // The Super Admin Console's own data. It is additive and idempotent, and it
+  // reads the school/student counts this seed has just written, so it runs
+  // last. `pnpm --filter @educore/database seed:superadmin` runs it alone.
+  await seedSuperAdmin()
 }
 
 main()

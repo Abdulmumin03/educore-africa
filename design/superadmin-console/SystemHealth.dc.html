@@ -1,0 +1,663 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  <style>
+    html, body { height: 100%; }
+    body { margin: 0; background: #0A1628; color: #F8FAFC;
+           font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+           font-size: 13px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+    a { color: #3B82F6; text-decoration: none; } a:hover { color: #60A5FA; }
+    .mono { font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+            font-variant-numeric: tabular-nums; }
+    .navsec { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+              color: #475569; padding: 0 12px; }
+    .nav { display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 12px;
+           border-radius: 6px; color: #94A3B8; }
+    .nav-active { background: rgba(59,130,246,.14); color: #F8FAFC; font-weight: 500;
+                  box-shadow: inset 2px 0 0 #3B82F6; }
+    .panel { background: #1E293B; border: 1px solid #1E3A5F; border-radius: 8px; }
+    .p-h { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+           padding: 13px 16px; border-bottom: 1px solid #1E3A5F; }
+    .p-t { margin: 0; font-size: 15px; font-weight: 600; }
+    .p-s { font-size: 11px; color: #64748B; }
+    .lbl { font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+           color: #64748B; }
+    .up { color: #22C55E; font-weight: 500; }
+    .down { color: #EF4444; font-weight: 500; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px;
+           border-radius: 6px; background: #1E293B; border: 1px solid #2D4A6E; color: #F8FAFC;
+           font-size: 13px; font-weight: 500; }
+    .btn-primary { background: #3B82F6; border-color: #3B82F6; color: #0A1628; font-weight: 600; }
+    .btn-sm { height: 26px; padding: 0 9px; font-size: 12px; border-radius: 5px; }
+    .tab { display: inline-flex; align-items: center; height: 34px; padding: 0 12px;
+           font-size: 13px; color: #94A3B8; border-bottom: 2px solid transparent; }
+    .tab-active { color: #F8FAFC; font-weight: 500; border-bottom-color: #3B82F6; }
+    .kv { display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+          padding: 7px 0; border-bottom: 1px solid #1E3A5F; }
+    .kv:last-child { border-bottom: 0; }
+    .kv-k { color: #94A3B8; flex-shrink: 0; }
+    .kv-v { text-align: right; }
+    .chip { display: inline-flex; align-items: center; gap: 5px; height: 20px; padding: 0 7px;
+            border-radius: 4px; font-size: 11px; font-weight: 500; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .redline { position: absolute; font-size: 10px; font-weight: 600; letter-spacing: .04em;
+               color: #C4B5FD; font-family: "JetBrains Mono", ui-monospace, monospace; }
+    .spec { border: 1px dashed rgba(139,92,246,.5); }
+
+    .svc { border: 1px solid #1E3A5F; border-radius: 8px; background: #1E293B;
+           border-top-width: 2px; padding: 12px 13px; display: flex; flex-direction: column; gap: 9px; }
+    .th { text-align: left; font-size: 11px; font-weight: 600; letter-spacing: .04em;
+          text-transform: uppercase; color: #64748B; padding: 0 10px 7px; }
+    .td { padding: 7px 10px; border-top: 1px solid #16233A; font-size: 12.5px; }
+
+  </style>
+</helmet>
+<div style="display: flex; width: 1440px; min-height: 100%; background: #0A1628">
+
+  <div style="width: 220px; flex-shrink: 0; border-right: 1px solid #1E3A5F; display: flex; flex-direction: column">
+    <div style="height: 56px; flex-shrink: 0; display: flex; align-items: center; gap: 10px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+      <div style="width: 28px; height: 28px; border-radius: 7px; background: #3B82F6; display: flex; align-items: center; justify-content: center">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0A1628" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c0 1 2.7 3 6 3s6-2 6-3v-5"/></svg>
+      </div>
+      <span style="font-size: 13px; font-weight: 600; color: #3B82F6">EduCore Africa</span>
+      <span style="border-radius: 999px; background: rgba(139,92,246,.15); padding: 1px 7px; font-size: 10px; font-weight: 600; text-transform: uppercase; color: #8B5CF6">Super</span>
+    </div>
+    <div style="flex-grow: 1; padding: 12px 8px; display: flex; flex-direction: column; gap: 4px">
+      <div class="navsec">Overview</div>
+      <span class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>Command Centre</span>
+      <div class="navsec" style="margin-top: 10px">Business</div>
+      <span class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/></svg>Schools</span>
+      <span class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Revenue</span>
+      <span class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>User Accounts</span>
+      <span class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>Analytics</span>
+      <div class="navsec" style="margin-top: 10px">Operations</div>
+      <span class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg>Support<span class="mono" style="margin-left: auto; display: inline-flex; align-items: center; height: 17px; padding: 0 6px; border-radius: 4px; background: rgba(239,68,68,.16); color: #F87171; font-size: 11px; font-weight: 600">7</span></span>
+      <span class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>Growth</span>
+      <div class="navsec" style="margin-top: 10px">Platform</div>
+      <span class="nav nav-active"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>System Health<span style="margin-left: auto; width: 6px; height: 6px; border-radius: 50%; background: #22C55E"></span></span>
+      <span class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>Configuration</span>
+      <span class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>Audit Log</span>
+    </div>
+    <div style="flex-shrink: 0; padding: 12px; border-top: 1px solid #1E3A5F; display: flex; align-items: center; gap: 10px">
+      <div style="width: 32px; height: 32px; border-radius: 8px; background: #1E293B; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600">AO</div>
+      <div style="line-height: 1.3; flex-grow: 1; min-width: 0">
+        <div style="font-size: 13px; font-weight: 500">Abdulmumin O.</div>
+        <div style="font-size: 11px; color: #64748B">Super Admin</div>
+      </div>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><path d="M21 12H9"/></svg>
+    </div>
+  </div>
+
+  <div style="flex-grow: 1; display: flex; flex-direction: column; min-width: 0">
+
+    <div style="height: 56px; flex-shrink: 0; background: #1E293B; border-bottom: 1px solid #1E3A5F; display: flex; align-items: center; gap: 16px; padding: 0 20px">
+      <div style="display: flex; align-items: center; gap: 6px; min-width: 0">
+        <span style="color: #64748B">Console</span>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        <span style="font-weight: 500">System Health</span>
+      </div>
+      <div style="flex-grow: 1; display: flex; justify-content: center">
+        <div style="display: flex; align-items: center; gap: 8px; width: 420px; height: 32px; padding: 0 10px; border-radius: 6px; background: #16233A; border: 1px solid #2D4A6E">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <span style="flex-grow: 1; color: #64748B; overflow: hidden; white-space: nowrap">Search schools, users…</span>
+          <span class="mono" style="display: inline-flex; align-items: center; height: 18px; padding: 0 5px; border-radius: 4px; background: #293548; border: 1px solid #2D4A6E; color: #94A3B8; font-size: 11px">⌘K</span>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 6px">
+        <span style="position: relative; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; color: #94A3B8">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          <span class="mono" style="position: absolute; top: 1px; right: 0; display: inline-flex; align-items: center; justify-content: center; min-width: 15px; height: 15px; border-radius: 8px; background: #EF4444; color: #0A1628; font-size: 10px; font-weight: 700; border: 2px solid #1E293B">7</span>
+        </span>
+        <span style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; color: #94A3B8">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.2 9.2a3 3 0 0 1 5.7 1c0 2-2.9 2.6-2.9 2.6"/><path d="M12 17h.01"/></svg>
+        </span>
+        <span style="width: 24px; height: 24px; border-radius: 6px; background: rgba(139,92,246,.16); border: 1px solid rgba(139,92,246,.45); color: #C4B5FD; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600">AO</span>
+      </div>
+    </div>
+
+    <div style="padding: 24px; display: flex; flex-direction: column; gap: 16px">
+
+      <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 20px">
+        <div>
+          <h1 style="margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -.02em">System health</h1>
+          <p style="margin: 3px 0 0; font-size: 13px; color: #94A3B8">1 service down · 1 degraded · probed 13:42:18, refreshing every 60s</p>
+        </div>
+        <div style="display: flex; gap: 8px">
+          <span class="btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>Re-probe</span>
+          <span class="btn">Incident log</span>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+      <div class="svc" style="border-top-color: #22C55E">
+        <div style="display: flex; align-items: center; gap: 8px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="15" rx="2"/><path d="M8 21h8"/><path d="M12 19v2"/></svg>
+          <span style="font-size: 13px; font-weight: 500">Web App</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: auto; transform: rotate(0deg)"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px">
+          <span class="dot" style="background: #22C55E"></span>
+          <span style="font-size: 12px; font-weight: 500; color: #22C55E">Operational</span>
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 14px">
+          <div>
+            <div style="font-size: 10px; color: #64748B">Response</div>
+            <div class="mono" style="font-size: 13px">142ms</div>
+          </div>
+          <div>
+            <div style="font-size: 10px; color: #64748B">Uptime this month</div>
+            <div class="mono" style="font-size: 13px">99.97%</div>
+          </div>
+        </div>
+      </div>
+      <div class="svc" style="border-top-color: #22C55E">
+        <div style="display: flex; align-items: center; gap: 8px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h9"/><circle cx="18" cy="17" r="2.5"/></svg>
+          <span style="font-size: 13px; font-weight: 500">API Server</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: auto; transform: rotate(0deg)"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px">
+          <span class="dot" style="background: #22C55E"></span>
+          <span style="font-size: 12px; font-weight: 500; color: #22C55E">Operational</span>
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 14px">
+          <div>
+            <div style="font-size: 10px; color: #64748B">Response</div>
+            <div class="mono" style="font-size: 13px">48ms</div>
+          </div>
+          <div>
+            <div style="font-size: 10px; color: #64748B">Uptime this month</div>
+            <div class="mono" style="font-size: 13px">99.99%</div>
+          </div>
+        </div>
+      </div>
+      <div class="svc" style="border-top-color: #22C55E">
+        <div style="display: flex; align-items: center; gap: 8px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5.5" rx="8" ry="3"/><path d="M4 5.5v13c0 1.7 3.6 3 8 3s8-1.3 8-3v-13"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>
+          <span style="font-size: 13px; font-weight: 500">PostgreSQL</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: auto; transform: rotate(0deg)"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px">
+          <span class="dot" style="background: #22C55E"></span>
+          <span style="font-size: 12px; font-weight: 500; color: #22C55E">Operational</span>
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 14px">
+          <div>
+            <div style="font-size: 10px; color: #64748B">Response</div>
+            <div class="mono" style="font-size: 13px">7ms</div>
+          </div>
+          <div>
+            <div style="font-size: 10px; color: #64748B">Uptime this month</div>
+            <div class="mono" style="font-size: 13px">100.00%</div>
+          </div>
+        </div>
+      </div>
+      <div class="svc" style="border-top-color: #22C55E">
+        <div style="display: flex; align-items: center; gap: 8px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m3 7 9-4 9 4-9 4-9-4Z"/><path d="m3 12 9 4 9-4"/><path d="m3 17 9 4 9-4"/></svg>
+          <span style="font-size: 13px; font-weight: 500">Redis</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: auto; transform: rotate(0deg)"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px">
+          <span class="dot" style="background: #22C55E"></span>
+          <span style="font-size: 12px; font-weight: 500; color: #22C55E">Operational</span>
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 14px">
+          <div>
+            <div style="font-size: 10px; color: #64748B">Response</div>
+            <div class="mono" style="font-size: 13px">2ms</div>
+          </div>
+          <div>
+            <div style="font-size: 10px; color: #64748B">Uptime this month</div>
+            <div class="mono" style="font-size: 13px">99.98%</div>
+          </div>
+        </div>
+      </div>
+      <div class="svc" style="border-top-color: #F59E0B">
+        <div style="display: flex; align-items: center; gap: 8px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 19a5 5 0 0 1-.6-9.96A7 7 0 0 1 19 8.4 4.5 4.5 0 0 1 18 19Z"/></svg>
+          <span style="font-size: 13px; font-weight: 500">AWS S3</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: auto; transform: rotate(0deg)"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px">
+          <span class="dot" style="background: #F59E0B"></span>
+          <span style="font-size: 12px; font-weight: 500; color: #F59E0B">Degraded</span>
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 14px">
+          <div>
+            <div style="font-size: 10px; color: #64748B">Response</div>
+            <div class="mono" style="font-size: 13px">1,840ms</div>
+          </div>
+          <div>
+            <div style="font-size: 10px; color: #64748B">Uptime this month</div>
+            <div class="mono" style="font-size: 13px">99.62%</div>
+          </div>
+        </div>
+      </div>
+      <div class="svc" style="border-top-color: #22C55E">
+        <div style="display: flex; align-items: center; gap: 8px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>
+          <span style="font-size: 13px; font-weight: 500">Paystack</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: auto; transform: rotate(0deg)"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px">
+          <span class="dot" style="background: #22C55E"></span>
+          <span style="font-size: 12px; font-weight: 500; color: #22C55E">Operational</span>
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 14px">
+          <div>
+            <div style="font-size: 10px; color: #64748B">Response</div>
+            <div class="mono" style="font-size: 13px">312ms</div>
+          </div>
+          <div>
+            <div style="font-size: 10px; color: #64748B">Uptime this month</div>
+            <div class="mono" style="font-size: 13px">99.91%</div>
+          </div>
+        </div>
+      </div>
+      <div class="svc" style="border-top-color: #EF4444">
+        <div style="display: flex; align-items: center; gap: 8px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 3 7v10l9 5 9-5V7Z"/><path d="m8.5 12 2.5 2.5L16 9.5"/></svg>
+          <span style="font-size: 13px; font-weight: 500">Flutterwave</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: auto; transform: rotate(180deg)"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px">
+          <span class="dot" style="background: #EF4444"></span>
+          <span style="font-size: 12px; font-weight: 500; color: #EF4444">Down</span>
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 14px">
+          <div>
+            <div style="font-size: 10px; color: #64748B">Response</div>
+            <div class="mono" style="font-size: 13px">—</div>
+          </div>
+          <div>
+            <div style="font-size: 10px; color: #64748B">Uptime this month</div>
+            <div class="mono" style="font-size: 13px">97.40%</div>
+          </div>
+        </div>
+        <div style="border-top: 1px solid #1E3A5F; padding-top: 9px; margin-top: 1px">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px">
+            <span style="font-size: 10px; color: #64748B">Last 7 days</span>
+            <span class="mono" style="font-size: 10px; color: #F87171">2 incidents</span>
+          </div>
+          <div style="display: flex; gap: 3px; align-items: flex-end"><span style="flex-grow: 1; height: 26px; border-radius: 2px; background: #22C55E"></span><span style="flex-grow: 1; height: 26px; border-radius: 2px; background: #22C55E"></span><span style="flex-grow: 1; height: 26px; border-radius: 2px; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; background: #16233A"><span style="height: 38%; background: #EF4444"></span><span style="height: 62%; background: #22C55E"></span></span><span style="flex-grow: 1; height: 26px; border-radius: 2px; background: #22C55E"></span><span style="flex-grow: 1; height: 26px; border-radius: 2px; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; background: #16233A"><span style="height: 60%; background: #EF4444"></span><span style="height: 40%; background: #22C55E"></span></span><span style="flex-grow: 1; height: 26px; border-radius: 2px; background: #22C55E"></span><span style="flex-grow: 1; height: 26px; border-radius: 2px; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; background: #16233A"><span style="height: 94%; background: #EF4444"></span><span style="height: 6%; background: #22C55E"></span></span></div>
+          <div style="display: flex; justify-content: space-between; margin-top: 4px">
+            <span class="mono" style="font-size: 9px; color: #475569">21 Aug</span>
+            <span class="mono" style="font-size: 9px; color: #475569">27 Aug</span>
+          </div>
+        </div>
+      </div>
+      <div class="svc" style="border-top-color: #22C55E">
+        <div style="display: flex; align-items: center; gap: 8px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H7l-3 3Z"/><path d="M9 9h6"/><path d="M9 12.5h4"/></svg>
+          <span style="font-size: 13px; font-weight: 500">Africa's Talking</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: auto; transform: rotate(0deg)"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px">
+          <span class="dot" style="background: #22C55E"></span>
+          <span style="font-size: 12px; font-weight: 500; color: #22C55E">Operational</span>
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 14px">
+          <div>
+            <div style="font-size: 10px; color: #64748B">Response</div>
+            <div class="mono" style="font-size: 13px">486ms</div>
+          </div>
+          <div>
+            <div style="font-size: 10px; color: #64748B">Uptime this month</div>
+            <div class="mono" style="font-size: 13px">99.88%</div>
+          </div>
+        </div>
+      </div>
+      <div class="svc" style="border-top-color: #22C55E">
+        <div style="display: flex; align-items: center; gap: 8px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="m5.5 6.5 13 11"/><path d="m18.5 6.5-13 11"/></svg>
+          <span style="font-size: 13px; font-weight: 500">Anthropic API</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: auto; transform: rotate(0deg)"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px">
+          <span class="dot" style="background: #22C55E"></span>
+          <span style="font-size: 12px; font-weight: 500; color: #22C55E">Operational</span>
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 14px">
+          <div>
+            <div style="font-size: 10px; color: #64748B">Response</div>
+            <div class="mono" style="font-size: 13px">704ms</div>
+          </div>
+          <div>
+            <div style="font-size: 10px; color: #64748B">Uptime this month</div>
+            <div class="mono" style="font-size: 13px">99.95%</div>
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 65fr 35fr; gap: 16px; align-items: start">
+
+        <!-- API error log -->
+        <div class="panel">
+          <div class="p-h">
+            <div>
+              <h2 class="p-t">API error log</h2>
+              <div class="p-s">Last 24 hours · grouped by endpoint, method and message</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; width: 220px; height: 28px; padding: 0 9px; border-radius: 6px; background: #16233A; border: 1px solid #2D4A6E">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+              <span style="font-size: 12px; color: #64748B">Filter by endpoint</span>
+            </div>
+          </div>
+
+          <div style="padding: 12px 6px 6px">
+            <table style="width: 100%; border-collapse: collapse">
+              <thead>
+                <tr>
+                  <th class="th" style="width: 74px">Time</th>
+                  <th class="th">Endpoint</th>
+                  <th class="th" style="width: 54px">Code</th>
+                  <th class="th">Message</th>
+                  <th class="th" style="width: 56px; text-align: right">Count</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="background: rgba(239,68,68,.09)">
+                  <td class="td mono" style="color: #64748B; font-size: 11px">13:41:02</td>
+                  <td class="td mono" style="font-size: 11.5px"><span style="color: #64748B">GET</span> /api/config/email-templates/:id<span class="chip" style="background: rgba(239,68,68,.2); color: #F87171; height: 16px; padding: 0 5px; font-size: 10px; margin-left: 6px">18% ERR</span></td>
+                  <td class="td mono" style="color: #EF4444; font-weight: 500">500</td>
+                  <td class="td" style="color: #94A3B8">Template renderer threw on an unclosed tag</td>
+                  <td class="td mono" style="text-align: right; color: #F87171">×14</td>
+                </tr>
+                <tr style="">
+                  <td class="td mono" style="color: #64748B; font-size: 11px">13:38:55</td>
+                  <td class="td mono" style="font-size: 11.5px"><span style="color: #64748B">POST</span> /api/revenue/refunds</td>
+                  <td class="td mono" style="color: #EF4444; font-weight: 500">502</td>
+                  <td class="td" style="color: #94A3B8">Paystack refused the refund (gateway timeout)</td>
+                  <td class="td mono" style="text-align: right; color: #94A3B8">×6</td>
+                </tr>
+                <tr style="">
+                  <td class="td mono" style="color: #64748B; font-size: 11px">13:36:20</td>
+                  <td class="td mono" style="font-size: 11.5px"><span style="color: #64748B">GET</span> /api/schools/:id/usage</td>
+                  <td class="td mono" style="color: #FBBF24; font-weight: 500">401</td>
+                  <td class="td" style="color: #94A3B8">Session expired after 30 minutes of inactivity</td>
+                  <td class="td mono" style="text-align: right; color: #F87171">×23</td>
+                </tr>
+                <tr style="">
+                  <td class="td mono" style="color: #64748B; font-size: 11px">13:31:47</td>
+                  <td class="td mono" style="font-size: 11.5px"><span style="color: #64748B">GET</span> /api/auth/me</td>
+                  <td class="td mono" style="color: #FBBF24; font-weight: 500">403</td>
+                  <td class="td" style="color: #94A3B8">Access denied: IP not allowed</td>
+                  <td class="td mono" style="text-align: right; color: #94A3B8">×8</td>
+                </tr>
+                <tr style="">
+                  <td class="td mono" style="color: #64748B; font-size: 11px">13:24:09</td>
+                  <td class="td mono" style="font-size: 11.5px"><span style="color: #64748B">PUT</span> /api/system/feature-flags/:id</td>
+                  <td class="td mono" style="color: #FBBF24; font-weight: 500">409</td>
+                  <td class="td" style="color: #94A3B8">Disable the flag before deleting it</td>
+                  <td class="td mono" style="text-align: right; color: #94A3B8">×2</td>
+                </tr>
+                <tr style="">
+                  <td class="td mono" style="color: #64748B; font-size: 11px">13:11:33</td>
+                  <td class="td mono" style="font-size: 11.5px"><span style="color: #64748B">POST</span> /api/support/tickets/:id/reply</td>
+                  <td class="td mono" style="color: #FBBF24; font-weight: 500">401</td>
+                  <td class="td" style="color: #94A3B8">Session revoked</td>
+                  <td class="td mono" style="text-align: right; color: #94A3B8">×5</td>
+                </tr>
+                <tr style="">
+                  <td class="td mono" style="color: #64748B; font-size: 11px">12:58:16</td>
+                  <td class="td mono" style="font-size: 11.5px"><span style="color: #64748B">GET</span> /api/analytics/feature-adoption</td>
+                  <td class="td mono" style="color: #EF4444; font-weight: 500">500</td>
+                  <td class="td" style="color: #94A3B8">Statement timeout after 30s</td>
+                  <td class="td mono" style="text-align: right; color: #94A3B8">×1</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="padding: 9px 16px; border-top: 1px solid #1E3A5F; font-size: 11px; color: #64748B">
+            A row turns red when that endpoint&rsquo;s error rate crosses 10% on a meaningful sample — a single failure on a quiet endpoint is not a spike.
+          </div>
+        </div>
+
+        <!-- Job queues -->
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <div class="panel" style="padding: 12px 14px">
+            <div style="display: flex; align-items: center; gap: 8px">
+              <span style="font-size: 13px; font-weight: 500">Attendance SMS</span>
+              <span class="mono" style="font-size: 10px; color: #475569">attendance_sms</span>
+              <span class="dot" style="margin-left: auto; background: #22C55E"></span>
+            </div>
+            <div style="display: flex; align-items: baseline; gap: 16px; margin-top: 8px">
+              <div>
+                <div style="font-size: 10px; color: #64748B">Pending</div>
+                <div class="mono" style="font-size: 16px; font-weight: 600">214</div>
+              </div>
+              <div>
+                <div style="font-size: 10px; color: #64748B">Failed</div>
+                <div class="mono" style="font-size: 16px; font-weight: 600; color: #F87171">6</div>
+              </div>
+              <div style="margin-left: auto; text-align: right">
+                <div style="font-size: 10px; color: #64748B">Processed 24h</div>
+                <div class="mono" style="font-size: 13px; color: #94A3B8">4,820</div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 2px; height: 4px; margin-top: 9px; border-radius: 2px; overflow: hidden; background: #16233A">
+              <span style="width: 99.9%; background: #22C55E"></span>
+              <span style="flex-grow: 1; background: #EF4444"></span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-top: 9px">
+              <span class="btn btn-sm" style="border-color: rgba(239,68,68,.45); color: #F87171">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+                Retry 6 failed
+              </span>
+              <span style="font-size: 11px; color: #64748B">oldest 3h ago</span>
+            </div>
+          </div>
+          <div class="panel" style="padding: 12px 14px">
+            <div style="display: flex; align-items: center; gap: 8px">
+              <span style="font-size: 13px; font-weight: 500">Notifications</span>
+              <span class="mono" style="font-size: 10px; color: #475569">notifications</span>
+              <span class="dot" style="margin-left: auto; background: #22C55E"></span>
+            </div>
+            <div style="display: flex; align-items: baseline; gap: 16px; margin-top: 8px">
+              <div>
+                <div style="font-size: 10px; color: #64748B">Pending</div>
+                <div class="mono" style="font-size: 16px; font-weight: 600">41</div>
+              </div>
+              <div>
+                <div style="font-size: 10px; color: #64748B">Failed</div>
+                <div class="mono" style="font-size: 16px; font-weight: 600; color: #475569">0</div>
+              </div>
+              <div style="margin-left: auto; text-align: right">
+                <div style="font-size: 10px; color: #64748B">Processed 24h</div>
+                <div class="mono" style="font-size: 13px; color: #94A3B8">1,194</div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 2px; height: 4px; margin-top: 9px; border-radius: 2px; overflow: hidden; background: #16233A">
+              <span style="width: 100.0%; background: #22C55E"></span>
+              <span style="flex-grow: 1; background: #16233A"></span>
+            </div>
+          </div>
+          <div class="panel" style="padding: 12px 14px">
+            <div style="display: flex; align-items: center; gap: 8px">
+              <span style="font-size: 13px; font-weight: 500">AI scoring</span>
+              <span class="mono" style="font-size: 10px; color: #475569">ai_scoring</span>
+              <span class="dot" style="margin-left: auto; background: #22C55E"></span>
+            </div>
+            <div style="display: flex; align-items: baseline; gap: 16px; margin-top: 8px">
+              <div>
+                <div style="font-size: 10px; color: #64748B">Pending</div>
+                <div class="mono" style="font-size: 16px; font-weight: 600">3</div>
+              </div>
+              <div>
+                <div style="font-size: 10px; color: #64748B">Failed</div>
+                <div class="mono" style="font-size: 16px; font-weight: 600; color: #F87171">2</div>
+              </div>
+              <div style="margin-left: auto; text-align: right">
+                <div style="font-size: 10px; color: #64748B">Processed 24h</div>
+                <div class="mono" style="font-size: 13px; color: #94A3B8">88</div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 2px; height: 4px; margin-top: 9px; border-radius: 2px; overflow: hidden; background: #16233A">
+              <span style="width: 97.8%; background: #22C55E"></span>
+              <span style="flex-grow: 1; background: #EF4444"></span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-top: 9px">
+              <span class="btn btn-sm" style="border-color: rgba(239,68,68,.45); color: #F87171">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+                Retry 2 failed
+              </span>
+              <span style="font-size: 11px; color: #64748B">oldest 3h ago</span>
+            </div>
+          </div>
+          <div class="panel" style="padding: 12px 14px">
+            <div style="display: flex; align-items: center; gap: 8px">
+              <span style="font-size: 13px; font-weight: 500">Report generation</span>
+              <span class="mono" style="font-size: 10px; color: #475569">report_generation</span>
+              <span class="dot" style="margin-left: auto; background: #22C55E"></span>
+            </div>
+            <div style="display: flex; align-items: baseline; gap: 16px; margin-top: 8px">
+              <div>
+                <div style="font-size: 10px; color: #64748B">Pending</div>
+                <div class="mono" style="font-size: 16px; font-weight: 600">0</div>
+              </div>
+              <div>
+                <div style="font-size: 10px; color: #64748B">Failed</div>
+                <div class="mono" style="font-size: 16px; font-weight: 600; color: #475569">0</div>
+              </div>
+              <div style="margin-left: auto; text-align: right">
+                <div style="font-size: 10px; color: #64748B">Processed 24h</div>
+                <div class="mono" style="font-size: 13px; color: #94A3B8">312</div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 2px; height: 4px; margin-top: 9px; border-radius: 2px; overflow: hidden; background: #16233A">
+              <span style="width: 100.0%; background: #22C55E"></span>
+              <span style="flex-grow: 1; background: #16233A"></span>
+            </div>
+          </div>
+          <div class="panel" style="padding: 12px 14px">
+            <div style="display: flex; align-items: center; gap: 8px">
+              <span style="font-size: 13px; font-weight: 500">Email delivery</span>
+              <span class="mono" style="font-size: 10px; color: #475569">email_delivery</span>
+              <span class="dot" style="margin-left: auto; background: #22C55E"></span>
+            </div>
+            <div style="display: flex; align-items: baseline; gap: 16px; margin-top: 8px">
+              <div>
+                <div style="font-size: 10px; color: #64748B">Pending</div>
+                <div class="mono" style="font-size: 16px; font-weight: 600">17</div>
+              </div>
+              <div>
+                <div style="font-size: 10px; color: #64748B">Failed</div>
+                <div class="mono" style="font-size: 16px; font-weight: 600; color: #475569">0</div>
+              </div>
+              <div style="margin-left: auto; text-align: right">
+                <div style="font-size: 10px; color: #64748B">Processed 24h</div>
+                <div class="mono" style="font-size: 13px; color: #94A3B8">906</div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 2px; height: 4px; margin-top: 9px; border-radius: 2px; overflow: hidden; background: #16233A">
+              <span style="width: 100.0%; background: #22C55E"></span>
+              <span style="flex-grow: 1; background: #16233A"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px">
+
+        <!-- P50/P95/P99 -->
+        <div class="panel">
+          <div class="p-h">
+            <div>
+              <h2 class="p-t">API response time</h2>
+              <div class="p-s">P50 / P95 / P99 by hour, last 24 hours</div>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center">
+              <span style="display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: #94A3B8"><span style="width: 12px; height: 2px; border-radius: 1px; background: #60A5FA"></span>P50</span>
+              <span style="display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: #94A3B8"><span style="width: 12px; height: 2px; border-radius: 1px; background: #3B82F6"></span>P95</span>
+              <span style="display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: #94A3B8"><span style="width: 12px; height: 2px; border-radius: 1px; background: #1D4ED8"></span>P99</span>
+            </div>
+          </div>
+          <div style="padding: 14px 16px 10px">
+            <svg width="560" height="176" viewBox="0 0 560 176" style="display: block; width: 100%">
+              <line x1="40" y1="156.0" x2="552" y2="156.0" stroke="#16233A" stroke-width="1"/>
+              <text x="33" y="159.5" text-anchor="end" fill="#475569" font-family="JetBrains Mono, monospace" font-size="9">0</text>
+              <line x1="40" y1="119.0" x2="552" y2="119.0" stroke="#16233A" stroke-width="1"/>
+              <text x="33" y="122.5" text-anchor="end" fill="#475569" font-family="JetBrains Mono, monospace" font-size="9">150</text>
+              <line x1="40" y1="82.0" x2="552" y2="82.0" stroke="#16233A" stroke-width="1"/>
+              <text x="33" y="85.5" text-anchor="end" fill="#475569" font-family="JetBrains Mono, monospace" font-size="9">300</text>
+              <line x1="40" y1="45.0" x2="552" y2="45.0" stroke="#16233A" stroke-width="1"/>
+              <text x="33" y="48.5" text-anchor="end" fill="#475569" font-family="JetBrains Mono, monospace" font-size="9">450</text>
+              <line x1="40" y1="8.0" x2="552" y2="8.0" stroke="#16233A" stroke-width="1"/>
+              <text x="33" y="11.5" text-anchor="end" fill="#475569" font-family="JetBrains Mono, monospace" font-size="9">600</text>
+              <polyline points="40.0,146.6 62.3,147.1 84.5,147.6 106.8,147.4 129.0,147.9 151.3,147.6 173.6,147.1 195.8,145.9 218.1,143.2 240.3,139.2 262.6,137.7 284.9,138.5 307.1,139.7 329.4,140.5 351.7,138.7 373.9,135.8 396.2,134.3 418.4,136.5 440.7,140.2 463.0,142.4 485.2,144.2 507.5,145.4 529.7,146.1 552.0,146.4" fill="none" stroke="#60A5FA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <polyline points="40.0,132.3 62.3,133.3 84.5,134.3 106.8,133.8 129.0,134.8 151.3,134.0 173.6,132.8 195.8,128.4 218.1,119.5 240.3,107.7 262.6,103.2 284.9,105.4 307.1,109.6 329.4,111.8 351.7,106.2 373.9,95.3 396.2,89.9 418.4,98.8 440.7,112.1 463.0,119.5 485.2,124.4 507.5,128.4 529.7,130.8 552.0,131.8" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <polyline points="40.0,111.1 62.3,112.6 84.5,114.6 106.8,113.6 129.0,115.5 151.3,114.1 173.6,111.6 195.8,103.2 218.1,85.0 240.3,59.3 262.6,48.0 284.9,53.4 307.1,64.2 329.4,68.7 351.7,56.8 373.9,29.7 396.2,11.0 418.4,38.6 440.7,70.2 463.0,85.5 485.2,95.8 507.5,103.7 529.7,108.1 552.0,110.1" fill="none" stroke="#1D4ED8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <text x="40.0" y="171" text-anchor="middle" fill="#475569" font-family="JetBrains Mono, monospace" font-size="9">14:00</text>
+              <text x="173.6" y="171" text-anchor="middle" fill="#475569" font-family="JetBrains Mono, monospace" font-size="9">20:00</text>
+              <text x="307.1" y="171" text-anchor="middle" fill="#475569" font-family="JetBrains Mono, monospace" font-size="9">02:00</text>
+              <text x="440.7" y="171" text-anchor="middle" fill="#475569" font-family="JetBrains Mono, monospace" font-size="9">08:00</text>
+              <text x="552.0" y="171" text-anchor="middle" fill="#475569" font-family="JetBrains Mono, monospace" font-size="9">13:00</text>
+            </svg>
+            <div style="font-size: 11px; color: #64748B; margin-top: 6px">
+              Sampled at the session guard every protected route shares, so this is a floor on handler time. An hour with no traffic is a gap, not a zero.
+            </div>
+          </div>
+        </div>
+
+        <!-- DB pool -->
+        <div class="panel">
+          <div class="p-h"><div><h2 class="p-t">Database pool</h2><div class="p-s">pg_stat_activity</div></div></div>
+          <div style="padding: 16px; display: flex; flex-direction: column; align-items: center">
+        <svg width="132" height="132" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="46" fill="none" stroke="#16233A" stroke-width="10"
+                  stroke-linecap="round" stroke-dasharray="216.8 289.0"
+                  transform="rotate(135 60 60)"/>
+          <circle cx="60" cy="60" r="46" fill="none" stroke="#3B82F6" stroke-width="10"
+                  stroke-linecap="round" stroke-dasharray="147.4 289.0"
+                  transform="rotate(135 60 60)"/>
+          <text x="60" y="56" text-anchor="middle" fill="#F8FAFC" font-family="JetBrains Mono, monospace" font-size="24" font-weight="700">68</text>
+          <text x="60" y="72" text-anchor="middle" fill="#64748B" font-family="Inter, sans-serif" font-size="10">in use</text>
+        </svg>
+        <div style="text-align: center; font-size: 11px; color: #94A3B8; margin-top: 2px">68 of 100 connections</div>
+            <div style="display: flex; gap: 14px; margin-top: 12px">
+              <div style="text-align: center"><div class="mono" style="font-size: 14px; color: #22C55E">12</div><div style="font-size: 10px; color: #64748B">Active</div></div>
+              <div style="text-align: center"><div class="mono" style="font-size: 14px; color: #94A3B8">56</div><div style="font-size: 10px; color: #64748B">Idle</div></div>
+              <div style="text-align: center"><div class="mono" style="font-size: 14px; color: #FBBF24">3</div><div style="font-size: 10px; color: #64748B">Waiting</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Redis memory -->
+        <div class="panel">
+          <div class="p-h"><div><h2 class="p-t">Redis memory</h2><div class="p-s">INFO memory</div></div></div>
+          <div style="padding: 16px; display: flex; flex-direction: column; align-items: center">
+        <svg width="132" height="132" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="46" fill="none" stroke="#16233A" stroke-width="10"
+                  stroke-linecap="round" stroke-dasharray="216.8 289.0"
+                  transform="rotate(135 60 60)"/>
+          <circle cx="60" cy="60" r="46" fill="none" stroke="#0D9488" stroke-width="10"
+                  stroke-linecap="round" stroke-dasharray="153.9 289.0"
+                  transform="rotate(135 60 60)"/>
+          <text x="60" y="56" text-anchor="middle" fill="#F8FAFC" font-family="JetBrains Mono, monospace" font-size="24" font-weight="700">71%</text>
+          <text x="60" y="72" text-anchor="middle" fill="#64748B" font-family="Inter, sans-serif" font-size="10">used</text>
+        </svg>
+        <div style="text-align: center; font-size: 11px; color: #94A3B8; margin-top: 2px">1.42 GB of 2.00 GB</div>
+            <div style="display: flex; gap: 14px; margin-top: 12px">
+              <div style="text-align: center"><div class="mono" style="font-size: 14px; color: #94A3B8">48,201</div><div style="font-size: 10px; color: #64748B">Keys</div></div>
+              <div style="text-align: center"><div class="mono" style="font-size: 14px; color: #94A3B8">allkeys-lru</div><div style="font-size: 10px; color: #64748B">Eviction</div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,297 @@
+{
+  "pages": [
+    {
+      "id": "page-1",
+      "name": "Screens"
+    },
+    {
+      "id": "page-2",
+      "name": "Design system"
+    },
+    {
+      "id": "page-3",
+      "name": "Inner pages"
+    },
+    {
+      "id": "page-4",
+      "name": "Support & system"
+    },
+    {
+      "id": "page-5",
+      "name": "Responsive & states"
+    }
+  ],
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "page": "page-1",
+      "title": "Command Centre",
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 1720
+    },
+    {
+      "file": "Shell.dc.html",
+      "page": "page-1",
+      "title": "Console shell — 1440×900 with redlines",
+      "x": 1560,
+      "y": 0,
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "file": "Schools.dc.html",
+      "page": "page-1",
+      "title": "School directory",
+      "x": 1560,
+      "y": 1080,
+      "w": 1440,
+      "h": 1340
+    },
+    {
+      "file": "Foundations.dc.html",
+      "page": "page-2",
+      "title": "Foundations — colour, type, spacing",
+      "x": 0,
+      "y": 0,
+      "w": 1180,
+      "h": 2060
+    },
+    {
+      "file": "Components.dc.html",
+      "page": "page-2",
+      "title": "Component library",
+      "x": 1300,
+      "y": 0,
+      "w": 1220,
+      "h": 2440
+    },
+    {
+      "file": "SchoolProfile.dc.html",
+      "page": "page-3",
+      "title": "School profile — Overview",
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 1400
+    },
+    {
+      "file": "SchoolSubscription.dc.html",
+      "page": "page-3",
+      "title": "School profile — Subscription tab",
+      "x": 1560,
+      "y": 0,
+      "w": 1440,
+      "h": 1000
+    },
+    {
+      "file": "SchoolUsage.dc.html",
+      "page": "page-3",
+      "title": "School profile — Usage tab",
+      "x": 3120,
+      "y": 0,
+      "w": 1440,
+      "h": 1160
+    },
+    {
+      "file": "Revenue.dc.html",
+      "page": "page-3",
+      "title": "Revenue Intelligence",
+      "x": 0,
+      "y": 1500,
+      "w": 1440,
+      "h": 2080
+    },
+    {
+      "file": "AdoptionHeatmap.dc.html",
+      "page": "page-3",
+      "title": "Analytics — Feature Adoption",
+      "x": 1560,
+      "y": 1500,
+      "w": 1440,
+      "h": 940
+    },
+    {
+      "file": "CohortRetention.dc.html",
+      "page": "page-3",
+      "title": "Analytics — Cohort Retention",
+      "x": 3120,
+      "y": 1500,
+      "w": 1440,
+      "h": 1140
+    },
+    {
+      "file": "GrowthFunnel.dc.html",
+      "page": "page-3",
+      "title": "Analytics — Growth Funnel",
+      "x": 1560,
+      "y": 2820,
+      "w": 1440,
+      "h": 820
+    },
+    {
+      "file": "SupportConsole.dc.html",
+      "page": "page-4",
+      "title": "Support ticket console — 3 panels, 1440×900",
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 1000
+    },
+    {
+      "file": "SystemHealth.dc.html",
+      "page": "page-4",
+      "title": "System health console — 1440",
+      "x": 1560,
+      "y": 0,
+      "w": 1440,
+      "h": 1700
+    },
+    {
+      "file": "Narrow1280.dc.html",
+      "page": "page-5",
+      "title": "Command Centre at 1280 — icon rail, wrapped KPIs, stacked charts",
+      "x": 0,
+      "y": 0,
+      "w": 1280,
+      "h": 1240
+    },
+    {
+      "file": "NarrowSupport.dc.html",
+      "page": "page-5",
+      "title": "Support console at 1280 — filters collapsed",
+      "x": 1400,
+      "y": 0,
+      "w": 1280,
+      "h": 880
+    },
+    {
+      "file": "States.dc.html",
+      "page": "page-5",
+      "title": "Empty · loading · error · toast",
+      "x": 2800,
+      "y": 0,
+      "w": 1240,
+      "h": 2540
+    }
+  ],
+  "annotations": [
+    {
+      "id": "responsive",
+      "page": "page-1",
+      "x": 0,
+      "y": -210,
+      "w": 420,
+      "text": "RESPONSIVE — min 1280px\n\nDrawn at 1440×900. The console is desktop-only; below 1280 it shows a \"use a larger screen\" gate rather than reflowing.\n\n1440+  sidebar 220 fixed · content fluid · KPI row 6-up\n1366   KPI row 6-up, chart row 60/40 holds\n1280   KPI row wraps to 3+3 · row 3 stacks · sidebar collapses to 56px icon rail on toggle\n\nMax content width is unbounded — this is a data console, so wide monitors get more table, not more margin."
+    },
+    {
+      "id": "schema-gap",
+      "page": "page-1",
+      "x": 480,
+      "y": -210,
+      "w": 460,
+      "text": "NOT IN THE SCHEMA YET\n\nThese screens show fields the database does not have. Billing lands in a later prompt; treat them as the spec for it:\n\n· Plan (Starter/Growth/Professional/Enterprise/Government) — no plan or subscription model exists\n· MRR / ARR / collections rate\n· Trial and Churned as school states — School only has isActive\n· Health score (0–100)\n· Last active timestamp\n\nEverything else — school, state, students, staff, support tickets, audit — is real and already queryable."
+    },
+    {
+      "id": "chart-note",
+      "page": "page-1",
+      "x": 1000,
+      "y": -210,
+      "w": 420,
+      "text": "ONE SHARED AXIS, NOT DUAL\n\nThe brief asked for a dual-axis chart for Monthly Growth. Signups and churn are the same unit — schools per month — so they share one axis instead.\n\nA second y-scale would let the two lines be positioned arbitrarily against each other and make the gap between them meaningless. With one axis the net add is readable directly off the chart.\n\nIf you want the dual-axis version anyway, say so and I will swap it."
+    },
+    {
+      "id": "impl-order",
+      "page": "page-2",
+      "x": 0,
+      "y": -190,
+      "w": 460,
+      "text": "IMPLEMENTING THIS\n\nThe console already uses Inter, a 56px topbar and 24px main padding — those carry over unchanged. What changes:\n\n1. Replace the slate shadcn tokens in app/globals.css with this palette (the CSS variables are already in place, so it is a values-only edit)\n2. Sidebar 240 → 220, and add the four nav section headers\n3. Add JetBrains Mono + a .mono utility for every numeric cell\n4. Table rows to 36px\n\nThe categorical plan palette passed all six colour checks against #1E293B — worst adjacent CVD ΔE 10.2. Do not substitute hues without re-running the validator."
+    },
+    {
+      "id": "heatmap-ramp",
+      "page": "page-3",
+      "x": 0,
+      "y": -230,
+      "w": 440,
+      "text": "HEATMAP RAMP IS INVERTED FROM THE BRIEF\n\nThe brief asks for white (0%) → deep blue (100%). On a #0A1628 surface that reads backwards: white is the highest-contrast colour available, so empty cells would shout and full cells would recede.\n\nBoth heatmaps run near-background → bright blue instead, matching the sequential ramp already in the design system: brighter means more.\n\nSay the word if you want the light-mode direction anyway."
+    },
+    {
+      "id": "inner-data",
+      "page": "page-3",
+      "x": 480,
+      "y": -230,
+      "w": 470,
+      "text": "NUMBERS ARE INTERNALLY CONSISTENT\n\nEverything ties back to the SA-02 figures, so the pages can be read together:\n\n· 1,284 active schools · MRR ₦48,204,500 · ARR ₦578,454,000\n· Plan mix 512 / 431 / 236 / 74 / 31 and the plan MRR split both still sum correctly\n· The stacked area ends on exactly those five plan values\n· Lagos 255 · Kano 127 · FCT 96 — same as the Command Centre choropleth\n· The funnel ends at 1,284 — the same schools\n· Greenfield's payment history sums to its ₦2,241,000 lifetime value\n\nStill NOT in the schema: plan, MRR, health score, trial/churn states, API-call and storage metering. All of it waits on a billing and metering model."
+    },
+    {
+      "id": "inner-scope",
+      "page": "page-3",
+      "x": 1010,
+      "y": -230,
+      "w": 440,
+      "text": "TABS DRAWN VS TABS STUBBED\n\nThe school profile has seven tabs; three are drawn (Overview, Subscription, Usage) because those are the ones the brief specified. Financials, Users, Support and Activity Log are in the tab strip but not designed yet.\n\nAnalytics has six tabs; three are drawn (Feature Adoption, Cohort Retention, Growth Funnel). Geographic, NPS and API Performance are named in the strip only.\n\nSay which of the remaining seven you want next and I will add them to this page."
+    },
+    {
+      "id": "sa09-panels",
+      "page": "page-4",
+      "x": 0,
+      "y": -300,
+      "w": 460,
+      "text": "THREE PANELS, MEASURED\n\n220 nav + 260 filters + 440 list + 520 detail = 1440.\n\nThe detail panel is the one under pressure. Its own sidebar takes 168 of that 520, leaving 352 for the conversation — readable (about 45 characters at 12.5px) but the tightest column in the console.\n\nAt 1280 that sum does not work, so the filter panel collapses to a 44px strip and the detail sidebar turns into a horizontal band. See the 1280 frame on the next page."
+    },
+    {
+      "id": "sa09-shipped",
+      "page": "page-4",
+      "x": 520,
+      "y": -300,
+      "w": 480,
+      "text": "THIS DIFFERS FROM WHAT IS RUNNING\n\nSA-07 shipped the support console with a 320px filter sidebar, a full-width queue and the ticket in a right-hand SLIDE-OVER — not a third resident panel — precisely because 520px is thin for a conversation.\n\nDrawn here as the brief specifies, so treat this as a proposed change rather than a record of the build. The tradeoff:\n\n· 3 panels — the queue stays visible while you read a ticket, no context loss between tickets\n· slide-over — the thread gets 560px+ and the queue is one Escape away\n\nSay which you want and I will make the code match."
+    },
+    {
+      "id": "sa09-sla",
+      "page": "page-4",
+      "x": 1560,
+      "y": -300,
+      "w": 440,
+      "text": "SLA BAR READS AS TIME LEFT\n\nFull green = comfortable, part amber = inside the last quarter of the window, empty red = past target. It drains as the clock runs, so the bar and the label say the same thing two ways — the label alone would fail anyone scanning the column, the bar alone would encode state in colour.\n\nThese are the three states lib/support.ts already computes (ok / at-risk / breached), so the design needs no new logic."
+    },
+    {
+      "id": "sa09-gauges",
+      "page": "page-4",
+      "x": 2060,
+      "y": -300,
+      "w": 470,
+      "text": "CIRCULAR GAUGES — ONE CAVEAT\n\nDrawn as briefed. The shipped System Health page uses linear bars instead, for a reason worth deciding on before switching:\n\nA ring needs a maximum to be a fraction of. Redis on this platform often runs with no `maxmemory` set, and Postgres behind a pooler does not always report `max_connections`. The live page falls back to a number plus a sentence saying there is no ceiling to draw against; a circular gauge has no honest way to show that, and drawing a full ring would be a lie.\n\nIf you want the rings, the empty-max case needs its own treatment — greyed ring with the raw figure in the middle would work."
+    },
+    {
+      "id": "sa09-narrow",
+      "page": "page-5",
+      "x": 0,
+      "y": -300,
+      "w": 460,
+      "text": "1280 IS THE FLOOR, NOT A BREAKPOINT LADDER\n\nBelow 1280 the console shows a \"use a larger screen\" gate rather than reflowing — a data console on a phone is a worse tool, not a smaller one. So there is exactly one adaptation, and it is this frame.\n\nWhat moves at 1280:\n· sidebar 220 → 56 icon rail; section headers become dividers, because a truncated word is worse than a rule\n· KPI row 6-up → two rows of 3\n· chart row 60/40 → stacked full width\n· breadcrumb keeps the leaf and drops the rest to an ellipsis\n· search 420 → 260\n· wide tables scroll sideways with the school column pinned"
+    },
+    {
+      "id": "sa09-collapse",
+      "page": "page-5",
+      "x": 1400,
+      "y": -300,
+      "w": 450,
+      "text": "COLLAPSED, NOT HIDDEN\n\nThe filter panel becomes a 44px strip rather than disappearing, and the strip keeps the active-filter count on it.\n\nA filter that is silently applied while its UI is off screen is how somebody reads \"3 open tickets\" and misses twenty. The badge is the whole point of the strip; the toggle is secondary.\n\nThe detail sidebar rotates to a horizontal band for the opposite reason: keeping it as a 168px column would leave the conversation NARROWER at 1280 than it is at 1440."
+    },
+    {
+      "id": "sa09-states",
+      "page": "page-5",
+      "x": 2800,
+      "y": -300,
+      "w": 470,
+      "text": "FOUR STATES, ONE FRAME\n\nEmpty, loading, error and toast share the panel frame and type ramp of the live state, so a screen does not change shape as it resolves.\n\nTwo distinctions the sheet is built around:\n\n· EMPTY vs NO MATCH — \"nothing exists yet\" wants a create button, \"nothing matches\" wants the filters cleared. Same layout, different subtext and different action.\n\n· ERROR vs UNAVAILABLE — red with a Retry means something broke and you should try again. Dashed grey with no button means there is genuinely nothing to measure (CSAT has no survey behind it). Conflating them trains people to ignore both.\n\nSkeleton widths are deliberately ragged so a loading table reads as text arriving, not as a progress bar."
+    }
+  ],
+  "launch": {
+    "view": "canvas",
+    "page": "page-4"
+  }
+}

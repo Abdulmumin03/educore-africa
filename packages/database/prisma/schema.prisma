@@ -386,6 +386,20 @@ model School {
   studentRouteAssignments StudentRouteAssignment[]
   curricula               Curriculum[]
   reportTemplates         ReportTemplate[]
+  supportTickets          SupportTicket[]
+  subscription            SchoolSubscription?
+  promoRedemptions        PromoRedemption[]
+  dataAccessLogs          DataAccessLog[]
+  referralsMade           Referral[]                @relation("ReferralReferrer")
+  referralsReceived       Referral[]                @relation("ReferralReferred")
+  churnRiskScores         ChurnRiskScore[]
+  npsResponses            NpsResponse[]
+  subscriptionTxns        SubscriptionTransaction[]
+  subscriptionRefunds     SubscriptionRefund[]
+  subscriptionRevisions   SubscriptionRevision[]
+  crmNotes                SchoolCrmNote[]
+  usageSnapshots          SchoolUsageSnapshot[]
+  impersonationGrants     ImpersonationGrant[]
 
   @@index([slug])
   @@index([deletedAt])
@@ -605,15 +619,15 @@ model Subject {
 }
 
 model Curriculum {
-  id                 String  @id @default(cuid())
-  schoolId           String  @map("school_id")
-  code               String // free-form school-defined code, e.g. "WAEC", "IGCSE", "CHECKPOINT"
-  name               String
-  examBodyCode       String  @default("NONE") @map("exam_body_code") // WAEC | CAMBRIDGE | IB | NECO | NONE — drives report-card sheet selection
-  isDefault          Boolean @default(false) @map("is_default")
-  gradingScale       Json    @map("grading_scale") // shape: GradingSettings from lib/school-settings
-  aiPromptHint       String? @map("ai_prompt_hint") // pasted into lesson-plan + question-bank prompts
-  midtermComponents  Json    @default("[]") @map("midterm_components") // subset of gradingScale.caComponents — names summed for the midterm report
+  id                String  @id @default(cuid())
+  schoolId          String  @map("school_id")
+  code              String // free-form school-defined code, e.g. "WAEC", "IGCSE", "CHECKPOINT"
+  name              String
+  examBodyCode      String  @default("NONE") @map("exam_body_code") // WAEC | CAMBRIDGE | IB | NECO | NONE — drives report-card sheet selection
+  isDefault         Boolean @default(false) @map("is_default")
+  gradingScale      Json    @map("grading_scale") // shape: GradingSettings from lib/school-settings
+  aiPromptHint      String? @map("ai_prompt_hint") // pasted into lesson-plan + question-bank prompts
+  midtermComponents Json    @default("[]") @map("midterm_components") // subset of gradingScale.caComponents — names summed for the midterm report
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
@@ -2384,4 +2398,1128 @@ model StudentRouteAssignment {
   @@index([stopId])
   @@index([deletedAt])
   @@map("student_route_assignments")
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SUPER ADMIN CONSOLE
+//
+// Internal EduCore Africa staff app (apps/superadmin). These tables live
+// in the SAME database as the school platform but are deliberately NOT
+// tenant-scoped — a super-admin sees across every school. They must never
+// be exposed through the school-facing app.
+// ═══════════════════════════════════════════════════════════════════
+
+enum SuperAdminRole {
+  SUPER_ADMIN // full platform control, incl. other super-admin accounts
+  BUSINESS_ADMIN
+  FINANCE_ADMIN
+  SALES_ADMIN
+  SUPPORT_ADMIN
+  ANALYTICS_ADMIN
+  ENGINEERING_ADMIN
+}
+
+model SuperAdminUser {
+  id           String         @id @default(cuid())
+  email        String         @unique
+  name         String
+  role         SuperAdminRole
+  passwordHash String         @map("password_hash")
+  totpSecret   String?        @map("totp_secret") // base32 seed, only set once TOTP enrolment completes
+  totpEnabled  Boolean        @default(false) @map("totp_enabled")
+  allowedIPs   String[]       @default([]) @map("allowed_ips") // per-user allowlist; empty = fall back to ALLOWED_IPS env
+  lastLoginAt  DateTime?      @map("last_login_at")
+  lastLoginIP  String?        @map("last_login_ip")
+  isActive     Boolean        @default(true) @map("is_active")
+
+  // Lockout counters live here rather than in Redis so a cache flush can
+  // never hand an attacker a fresh set of attempts.
+  failedLoginAttempts Int       @default(0) @map("failed_login_attempts")
+  lockedUntil         DateTime? @map("locked_until")
+  totpConfirmedAt     DateTime? @map("totp_confirmed_at")
+
+  // The notification feed is derived from real rows (signups, payments,
+  // tickets, security events) rather than stored, so "read" is a single
+  // watermark: anything newer than this is unread for this admin.
+  notificationsReadAt DateTime? @map("notifications_read_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  sessions       SuperAdminSession[]
+  auditLogs      SuperAdminAuditLog[]
+  dataAccessLogs DataAccessLog[]
+  backupCodes    SuperAdminBackupCode[]
+  trustedDevices SuperAdminTrustedDevice[]
+
+  @@index([email])
+  @@map("super_admin_users")
+}
+
+model SuperAdminSession {
+  id        String @id @default(cuid())
+  userId    String @map("user_id")
+  token     String @unique // opaque session id mirrored into the JWT so sessions stay revocable
+  ipAddress String @map("ip_address")
+  userAgent String @map("user_agent")
+
+  // Two clocks: `expiresAt` slides forward on activity (30 min idle), while
+  // `absoluteExpiresAt` is fixed at creation (8 h) and never moves.
+  expiresAt         DateTime  @map("expires_at")
+  absoluteExpiresAt DateTime  @map("absolute_expires_at")
+  lastActiveAt      DateTime  @default(now()) @map("last_active_at")
+  revokedAt         DateTime? @map("revoked_at")
+  revokedReason     String?   @map("revoked_reason") // "logout" | "concurrent-limit" | "admin"
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user SuperAdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([userId, revokedAt])
+  @@map("super_admin_sessions")
+}
+
+model SuperAdminAuditLog {
+  id String @id @default(cuid())
+
+  // Nullable: IP_BLOCKED and LOGIN_FAILED for an unknown address have no
+  // account to attribute to, and those are exactly the rows worth keeping.
+  userId     String?  @map("user_id")
+  action     String // "school.suspend", "payment.refund", "config.update", ...
+  target     String // "school:clv123", "user:abc"
+  targetType String   @map("target_type") // "school" | "user" | "payment" | "config"
+  details    Json?
+  ipAddress  String   @map("ip_address")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user SuperAdminUser? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([targetType])
+  @@index([createdAt])
+  @@index([action])
+  @@map("super_admin_audit_logs")
+}
+
+model SuperAdminBackupCode {
+  id        String    @id @default(cuid())
+  userId    String    @map("user_id")
+  codeHash  String    @map("code_hash") // bcrypt; the plaintext is shown once at enrolment
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user SuperAdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("super_admin_backup_codes")
+}
+
+model SuperAdminTrustedDevice {
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  tokenHash  String   @unique @map("token_hash") // sha256 of the cookie value
+  label      String // coarse user-agent summary, for the security screen
+  ipAddress  String   @map("ip_address")
+  expiresAt  DateTime @map("expires_at")
+  lastUsedAt DateTime @default(now()) @map("last_used_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user SuperAdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("super_admin_trusted_devices")
+}
+
+model PlatformMetricSnapshot {
+  id            String   @id @default(cuid())
+  snapshotDate  DateTime @unique @map("snapshot_date") // one row per day, midnight UTC
+  totalSchools  Int      @map("total_schools")
+  activeSchools Int      @map("active_schools")
+  totalStudents Int      @map("total_students")
+  totalStaff    Int      @map("total_staff")
+  mrr           Decimal  @db.Decimal(14, 2)
+  newSignups    Int      @map("new_signups")
+  churned       Int
+  trialSchools  Int      @map("trial_schools")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([snapshotDate])
+  @@map("platform_metric_snapshots")
+}
+
+enum TicketCategory {
+  BILLING
+  TECHNICAL
+  FEATURE_REQUEST
+  ACCOUNT
+  OTHER
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING_ON_CLIENT
+  RESOLVED
+  CLOSED
+}
+
+model SupportTicket {
+  id          String         @id @default(cuid())
+  schoolId    String         @map("school_id")
+  title       String
+  description String
+  category    TicketCategory
+  priority    TicketPriority @default(MEDIUM)
+  status      TicketStatus   @default(OPEN)
+  assignedTo  String?        @map("assigned_to") // SuperAdminUser.id — kept loose so unassignment never cascades
+  resolvedAt  DateTime?      @map("resolved_at")
+
+  /// First staff reply. Stored rather than derived because SLA reporting reads
+  /// it for every ticket in a range, and deriving it means a comment scan.
+  firstResponseAt DateTime? @map("first_response_at")
+  escalatedAt     DateTime? @map("escalated_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  school   School          @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  comments TicketComment[]
+
+  @@index([schoolId])
+  @@index([status])
+  @@index([assignedTo])
+  @@index([createdAt])
+  @@map("support_tickets")
+}
+
+model TicketComment {
+  id         String   @id @default(cuid())
+  ticketId   String   @map("ticket_id")
+  authorId   String   @map("author_id") // SuperAdminUser.id or school User.id, resolved by the caller
+  body       String
+  isInternal Boolean  @default(false) @map("is_internal") // internal notes are never shown to the school
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  ticket SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+  @@map("ticket_comments")
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// COMMERCIAL LAYER (SA-05)
+//
+// EduCore's own business model — what a school pays US, as opposed to
+// what parents pay the school (FeeInvoice/Payment above). Only the
+// Super Admin Console reads these; the school-facing app never does.
+// ═══════════════════════════════════════════════════════════════════
+
+enum SchoolPlan {
+  STARTER
+  GROWTH
+  PROFESSIONAL
+  ENTERPRISE
+  GOVERNMENT
+}
+
+enum SubscriptionStatus {
+  TRIAL
+  ACTIVE
+  PAST_DUE
+  SUSPENDED
+  CHURNED
+}
+
+enum BillingCycle {
+  MONTHLY
+  TERMLY // three months — the common cadence for Nigerian schools
+  ANNUAL
+}
+
+model SchoolSubscription {
+  id       String             @id @default(cuid())
+  schoolId String             @unique @map("school_id")
+  plan     SchoolPlan
+  status   SubscriptionStatus @default(TRIAL)
+  cycle    BillingCycle       @default(TERMLY)
+
+  /// Charged per cycle. Monthly-equivalent (for MRR) is derived, never stored,
+  /// so a cycle change can never leave the two out of step.
+  amount   Decimal @db.Decimal(12, 2)
+  currency String  @default("NGN")
+  seats    Int? // student seats included; null = uncapped
+
+  trialEndsAt DateTime? @map("trial_ends_at")
+  startedAt   DateTime  @default(now()) @map("started_at")
+  renewsAt    DateTime? @map("renews_at")
+  cancelledAt DateTime? @map("cancelled_at")
+  churnReason String?   @map("churn_reason")
+
+  promoCode     String? @map("promo_code")
+  promoPercent  Int?    @map("promo_percent")
+  paymentMethod String? @map("payment_method") // "Paystack · Visa •••• 4821"
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  school    School                    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  txns      SubscriptionTransaction[]
+  revisions SubscriptionRevision[]
+
+  @@index([status])
+  @@index([plan])
+  @@index([renewsAt])
+  @@index([cancelledAt])
+  @@map("school_subscriptions")
+}
+
+enum CrmNoteCategory {
+  SALES
+  SUPPORT
+  CALL
+  ONBOARDING
+  GENERAL
+}
+
+model SchoolCrmNote {
+  id       String          @id @default(cuid())
+  schoolId String          @map("school_id")
+  authorId String          @map("author_id") // SuperAdminUser.id
+  category CrmNoteCategory @default(GENERAL)
+  body     String
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@index([schoolId, createdAt])
+  @@map("school_crm_notes")
+}
+
+/// One row per school per month. Written by the metering job; the console
+/// only reads. Storage is in MB so the column stays an Int.
+model SchoolUsageSnapshot {
+  id       String   @id @default(cuid())
+  schoolId String   @map("school_id")
+  month    DateTime @map("month") // first day of the month, UTC
+
+  apiCalls      Int     @default(0) @map("api_calls")
+  storageMb     Int     @default(0) @map("storage_mb")
+  smsSent       Int     @default(0) @map("sms_sent")
+  logins        Int     @default(0)
+  studentsAdded Int     @default(0) @map("students_added")
+  feesProcessed Decimal @default(0) @map("fees_processed") @db.Decimal(14, 2)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@unique([schoolId, month])
+  @@index([month])
+  @@map("school_usage_snapshots")
+}
+
+/// A time-boxed, read-only pass into one school's own app. The console
+/// stores only a hash: the plaintext is handed to the browser once and is
+/// never recoverable from the database.
+model ImpersonationGrant {
+  id               String @id @default(cuid())
+  tokenHash        String @unique @map("token_hash")
+  schoolId         String @map("school_id")
+  superAdminUserId String @map("super_admin_user_id")
+
+  reason    String?
+  ipAddress String    @map("ip_address")
+  userAgent String?   @map("user_agent")
+  expiresAt DateTime  @map("expires_at")
+  startedAt DateTime  @default(now()) @map("started_at")
+  /// Set when the session is ended explicitly; a null value with a past
+  /// expiresAt just means it lapsed.
+  endedAt   DateTime? @map("ended_at")
+  /// First time the school app redeemed the token.
+  usedAt    DateTime? @map("used_at")
+
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@index([schoolId])
+  @@index([expiresAt])
+  @@index([superAdminUserId])
+  @@map("impersonation_grants")
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SUBSCRIPTION BILLING (SA-06)
+//
+// What EduCore charges a school, and what came back. Reuses PaymentChannel
+// for the gateway so there is one vocabulary for "how money moved" across
+// both billing directions.
+// ═══════════════════════════════════════════════════════════════════
+
+enum TransactionStatus {
+  PENDING
+  SUCCESSFUL
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+model SubscriptionTransaction {
+  id             String  @id @default(cuid())
+  schoolId       String  @map("school_id")
+  subscriptionId String? @map("subscription_id")
+
+  description String
+  amount      Decimal @db.Decimal(12, 2)
+  currency    String  @default("NGN")
+
+  gateway PaymentChannel
+  status  TransactionStatus @default(PENDING)
+
+  /// Our own idempotency key, shown in the UI as the transaction ref.
+  reference  String  @unique
+  /// The gateway's id, for deep-linking into their dashboard.
+  gatewayRef String? @map("gateway_ref")
+
+  failureReason String?   @map("failure_reason")
+  attempts      Int       @default(1)
+  lastAttemptAt DateTime? @map("last_attempt_at")
+
+  /// Billing window this charge covers.
+  periodStart DateTime? @map("period_start")
+  periodEnd   DateTime? @map("period_end")
+  dueDate     DateTime? @map("due_date")
+  paidAt      DateTime? @map("paid_at")
+
+  /// Dunning state, written by the failed-payments screen.
+  remindersSent  Int       @default(0) @map("reminders_sent")
+  lastReminderAt DateTime? @map("last_reminder_at")
+  resolvedAt     DateTime? @map("resolved_at")
+  resolvedById   String?   @map("resolved_by_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  school       School               @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  subscription SchoolSubscription?  @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  refunds      SubscriptionRefund[]
+
+  @@index([schoolId, createdAt])
+  @@index([status])
+  @@index([gateway])
+  @@index([dueDate])
+  @@map("subscription_transactions")
+}
+
+enum RefundReason {
+  REQUEST
+  DUPLICATE
+  ERROR
+  GOODWILL
+}
+
+enum RefundStatus {
+  PENDING
+  APPROVED
+  PROCESSING
+  COMPLETED
+  REJECTED
+  FAILED
+}
+
+model SubscriptionRefund {
+  id            String @id @default(cuid())
+  transactionId String @map("transaction_id")
+  schoolId      String @map("school_id")
+
+  /// Copied at request time so the log still reads correctly if the
+  /// transaction is later amended.
+  originalAmount Decimal      @map("original_amount") @db.Decimal(12, 2)
+  amount         Decimal      @db.Decimal(12, 2)
+  reason         RefundReason
+  status         RefundStatus @default(PENDING)
+  note           String?
+
+  requestedById String    @map("requested_by_id")
+  approvedById  String?   @map("approved_by_id")
+  approvedAt    DateTime? @map("approved_at")
+
+  /// Set once a gateway actually processed it. Null means recorded only.
+  gatewayRef    String? @map("gateway_ref")
+  gatewaySent   Boolean @default(false) @map("gateway_sent")
+  failureReason String? @map("failure_reason")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  transaction SubscriptionTransaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  school      School                  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@index([schoolId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("subscription_refunds")
+}
+
+enum RevisionKind {
+  NEW
+  UPGRADE
+  DOWNGRADE
+  PRICE_CHANGE
+  CYCLE_CHANGE
+  CHURN
+  REACTIVATION
+}
+
+/// Append-only history of a subscription's commercial terms. Without it net
+/// revenue retention cannot separate expansion from contraction — the current
+/// amount tells you nothing about what the school used to pay.
+model SubscriptionRevision {
+  id             String @id @default(cuid())
+  subscriptionId String @map("subscription_id")
+  schoolId       String @map("school_id")
+
+  kind RevisionKind
+
+  fromPlan    SchoolPlan?
+  toPlan      SchoolPlan?
+  fromMonthly Decimal?    @map("from_monthly") @db.Decimal(12, 2)
+  toMonthly   Decimal     @map("to_monthly") @db.Decimal(12, 2)
+
+  effectiveAt DateTime @map("effective_at")
+  actorId     String?  @map("actor_id")
+  note        String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  subscription SchoolSubscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  school       School             @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@index([subscriptionId, effectiveAt])
+  @@index([schoolId])
+  @@index([effectiveAt])
+  @@map("subscription_revisions")
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// VOICE OF CUSTOMER + BROADCAST (SA-07)
+// ═══════════════════════════════════════════════════════════════════
+
+enum NpsRole {
+  SCHOOL_ADMIN
+  TEACHER
+  PARENT
+  STUDENT
+}
+
+/// One survey response. NPS is computed from these on read — storing a rolled
+/// up score would go stale the moment a response arrived.
+model NpsResponse {
+  id       String  @id @default(cuid())
+  schoolId String  @map("school_id")
+  userId   String? @map("user_id")
+
+  role    NpsRole
+  /// 0–10, the standard NPS question.
+  score   Int
+  comment String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@index([schoolId])
+  @@index([createdAt])
+  @@index([role])
+  @@map("nps_responses")
+}
+
+enum BroadcastStatus {
+  DRAFT
+  SCHEDULED
+  SENDING
+  SENT
+  FAILED
+  CANCELLED
+}
+
+enum BroadcastAudience {
+  ALL
+  BY_PLAN
+  BY_STATE
+  BY_STATUS
+  CUSTOM
+}
+
+model Broadcast {
+  id    String @id @default(cuid())
+  title String
+  body  String
+
+  audience       BroadcastAudience
+  /// { plans: [], states: [], statuses: [], schoolIds: [] } — whichever the
+  /// audience type uses.
+  audienceFilter Json?             @map("audience_filter")
+
+  /// Channels requested. Only IN_APP is actually dispatched by the console;
+  /// SMS and EMAIL are recorded as requested and handed to the school app's
+  /// worker, which owns those senders.
+  channels NotificationChannel[]
+
+  status       BroadcastStatus @default(DRAFT)
+  scheduledFor DateTime?       @map("scheduled_for")
+  sentAt       DateTime?       @map("sent_at")
+
+  schoolCount      Int      @default(0) @map("school_count")
+  recipientCount   Int      @default(0) @map("recipient_count")
+  inAppSent        Int      @default(0) @map("in_app_sent")
+  estimatedSmsCost Decimal? @map("estimated_sms_cost") @db.Decimal(12, 2)
+  failureReason    String?  @map("failure_reason")
+
+  createdById String   @map("created_by_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("broadcasts")
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SA-08 · PLATFORM OPERATIONS
+// Feature flags, plan/pricing config, promo codes, message templates,
+// platform announcements, NDPR compliance and the sales pipeline.
+// All of it is console-owned: the school app reads, it never writes.
+// ═══════════════════════════════════════════════════════════════════
+
+enum FeatureFlagScope {
+  GLOBAL
+  BY_PLAN
+  BY_SCHOOL
+  BY_STATE
+}
+
+model FeatureFlag {
+  id          String  @id @default(cuid())
+  /// snake_case, referenced from code — immutable once other code reads it.
+  key         String  @unique
+  label       String
+  description String?
+
+  enabled      Boolean          @default(false)
+  defaultValue Boolean          @default(false) @map("default_value")
+  /// 0–100. Applied deterministically per school id, never re-rolled per
+  /// request, so a school does not flip between variants on refresh.
+  rollout      Int              @default(100)
+  scope        FeatureFlagScope @default(GLOBAL)
+  /// Plan names, school ids or state names, depending on `scope`.
+  scopeValues  String[]         @default([]) @map("scope_values")
+
+  createdById String?  @map("created_by_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([enabled])
+  @@map("feature_flags")
+}
+
+/// Catalogue pricing per plan. Deliberately separate from
+/// SchoolSubscription.amount: changing the catalogue must never silently
+/// re-price a school that already signed a contract.
+model PlanConfig {
+  id          String     @id @default(cuid())
+  plan        SchoolPlan @unique
+  label       String
+  monthly     Decimal    @db.Decimal(12, 2)
+  termly      Decimal    @db.Decimal(12, 2)
+  annual      Decimal    @db.Decimal(12, 2)
+  /// null = uncapped.
+  maxStudents Int?       @map("max_students")
+  storageGb   Int        @default(5) @map("storage_gb")
+  smsCredits  Int        @default(0) @map("sms_credits")
+  /// Module keys from lib/analytics MODULES.
+  modules     String[]   @default([])
+  isPublic    Boolean    @default(true) @map("is_public")
+
+  updatedById String?  @map("updated_by_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("plan_configs")
+}
+
+enum PromoDiscountType {
+  PERCENT
+  FIXED
+}
+
+model PromoCode {
+  id            String            @id @default(cuid())
+  code          String            @unique
+  discountType  PromoDiscountType @map("discount_type")
+  /// Percent (0–100) or naira, per discountType.
+  discountValue Decimal           @map("discount_value") @db.Decimal(12, 2)
+  /// Empty = every plan.
+  plans         SchoolPlan[]      @default([])
+  expiresAt     DateTime?         @map("expires_at")
+  /// null = unlimited.
+  maxUses       Int?              @map("max_uses")
+  usedCount     Int               @default(0) @map("used_count")
+  isActive      Boolean           @default(true) @map("is_active")
+  note          String?
+
+  createdById String?  @map("created_by_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  redemptions PromoRedemption[]
+
+  @@index([isActive])
+  @@map("promo_codes")
+}
+
+/// One row per successful redemption. usedCount is the cached count; this is
+/// the ledger, so a disputed discount can be traced to a school and a date.
+model PromoRedemption {
+  id          String     @id @default(cuid())
+  promoCodeId String     @map("promo_code_id")
+  schoolId    String     @map("school_id")
+  plan        SchoolPlan
+  /// Naira taken off, resolved at redemption time.
+  amountOff   Decimal    @map("amount_off") @db.Decimal(12, 2)
+  redeemedAt  DateTime   @default(now()) @map("redeemed_at")
+
+  promoCode PromoCode @relation(fields: [promoCodeId], references: [id], onDelete: Cascade)
+  school    School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@unique([promoCodeId, schoolId])
+  @@index([schoolId])
+  @@map("promo_redemptions")
+}
+
+enum MessageTemplateKind {
+  EMAIL
+  SMS
+}
+
+model MessageTemplate {
+  id          String              @id @default(cuid())
+  kind        MessageTemplateKind
+  /// snake_case identifier the sender looks up, e.g. "renewal_reminder".
+  key         String
+  label       String
+  description String?
+  /// Null for SMS.
+  subject     String?
+  body        String
+  /// Merge tags this template is allowed to use, for the editor sidebar.
+  mergeTags   String[]            @default([]) @map("merge_tags")
+  isActive    Boolean             @default(true) @map("is_active")
+
+  updatedById String?  @map("updated_by_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  versions MessageTemplateVersion[]
+
+  @@unique([kind, key])
+  @@map("message_templates")
+}
+
+/// Append-only history so a bad edit can be rolled back. Only the most recent
+/// few are shown, but nothing is deleted — an outgoing message that upset
+/// somebody has to be traceable to the exact wording that was live.
+model MessageTemplateVersion {
+  id         String   @id @default(cuid())
+  templateId String   @map("template_id")
+  version    Int
+  subject    String?
+  body       String
+  editedById String?  @map("edited_by_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  template MessageTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@unique([templateId, version])
+  @@index([templateId, createdAt])
+  @@map("message_template_versions")
+}
+
+enum PlatformAnnouncementType {
+  INFO
+  WARNING
+  MAINTENANCE
+}
+
+/// A persistent banner inside school dashboards. Unlike a Broadcast (SA-07),
+/// which writes a notification once, this stays on screen for its window.
+model PlatformAnnouncement {
+  id    String                   @id @default(cuid())
+  title String
+  body  String
+  type  PlatformAnnouncementType @default(INFO)
+
+  startsAt    DateTime     @map("starts_at")
+  endsAt      DateTime?    @map("ends_at")
+  /// Empty = every plan.
+  targetPlans SchoolPlan[] @default([]) @map("target_plans")
+  isActive    Boolean      @default(true) @map("is_active")
+  dismissible Boolean      @default(true)
+
+  createdById String   @map("created_by_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([isActive, startsAt])
+  @@map("platform_announcements")
+}
+
+/// Every time console staff read a school's data. NDPR requires a
+/// cross-tenant access record, and the generic audit log does not distinguish
+/// "read a school's students" from "changed a plan".
+model DataAccessLog {
+  id         String @id @default(cuid())
+  staffId    String @map("staff_id")
+  schoolId   String @map("school_id")
+  /// What was read, e.g. "school.students", "school.financials".
+  scope      String
+  /// The console path that produced the read.
+  path       String
+  /// Null while the view is still open.
+  durationMs Int?   @map("duration_ms")
+  ipAddress  String @map("ip_address")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  staff  SuperAdminUser @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  school School         @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@index([schoolId, createdAt])
+  @@index([staffId, createdAt])
+  @@map("data_access_logs")
+}
+
+enum DataRequestType {
+  ACCESS
+  DELETION
+  PORTABILITY
+}
+
+enum DataRequestStatus {
+  RECEIVED
+  IN_PROGRESS
+  COMPLETED
+  DENIED
+}
+
+model DataSubjectRequest {
+  id     String            @id @default(cuid())
+  type   DataRequestType
+  status DataRequestStatus @default(RECEIVED)
+
+  subjectName  String  @map("subject_name")
+  subjectEmail String  @map("subject_email")
+  /// Null when the requester is not tied to one tenant.
+  schoolId     String? @map("school_id")
+  /// Which user record the request resolves to, once identified.
+  userId       String? @map("user_id")
+  details      String?
+
+  receivedAt  DateTime  @default(now()) @map("received_at")
+  /// NDPR gives 30 days. Stored rather than computed so a change to the
+  /// statutory window cannot silently re-date requests already in flight.
+  dueAt       DateTime  @map("due_at")
+  completedAt DateTime? @map("completed_at")
+  resolution  String?
+
+  handledById String?  @map("handled_by_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  deletions DataDeletionRecord[]
+
+  @@index([status, dueAt])
+  @@map("data_subject_requests")
+}
+
+/// Permanent proof that a deletion happened. Kept after the data is gone —
+/// that is the point: the record of erasure must outlive what was erased.
+model DataDeletionRecord {
+  id        String  @id @default(cuid())
+  requestId String  @map("request_id")
+  schoolId  String? @map("school_id")
+  /// What was anonymised, and how many rows.
+  summary   Json
+  /// Whether the subject's rows were anonymised or hard-deleted.
+  method    String
+
+  executedById String   @map("executed_by_id")
+  executedAt   DateTime @default(now()) @map("executed_at")
+
+  request DataSubjectRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@index([requestId])
+  @@map("data_deletion_records")
+}
+
+enum LeadStage {
+  NEW
+  CONTACTED
+  DEMO_SCHEDULED
+  TRIAL_STARTED
+  CONVERTED
+  LOST
+}
+
+model Lead {
+  id           String  @id @default(cuid())
+  schoolName   String  @map("school_name")
+  contactName  String  @map("contact_name")
+  contactEmail String? @map("contact_email")
+  contactPhone String? @map("contact_phone")
+  state        String?
+  /// Rough student count the lead reported.
+  sizeEstimate Int?    @map("size_estimate")
+  source       String?
+  notes        String?
+
+  stage    LeadStage @default(NEW)
+  /// Ordering within a kanban column. Fractional gaps keep a drag from
+  /// rewriting every card in the column.
+  position Float     @default(1000)
+
+  ownerId           String?  @map("owner_id")
+  /// Set when the lead becomes a real tenant.
+  convertedSchoolId String?  @map("converted_school_id")
+  lostReason        String?  @map("lost_reason")
+  stageChangedAt    DateTime @default(now()) @map("stage_changed_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([stage, position])
+  @@map("leads")
+}
+
+enum ReferralStatus {
+  PENDING
+  SIGNED_UP
+  CONVERTED
+  REWARDED
+}
+
+model Referral {
+  id               String  @id @default(cuid())
+  referrerSchoolId String  @map("referrer_school_id")
+  code             String  @unique
+  referredSchoolId String? @map("referred_school_id")
+
+  status       ReferralStatus @default(PENDING)
+  /// Free months earned, resolved from the tier table at award time.
+  rewardMonths Int            @default(0) @map("reward_months")
+  rewardedAt   DateTime?      @map("rewarded_at")
+
+  createdById String?  @map("created_by_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  referrer School  @relation("ReferralReferrer", fields: [referrerSchoolId], references: [id], onDelete: Cascade)
+  referred School? @relation("ReferralReferred", fields: [referredSchoolId], references: [id], onDelete: SetNull)
+
+  @@index([referrerSchoolId])
+  @@index([status])
+  @@map("referrals")
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SA-10 · AI INTELLIGENCE & REPORTING
+// Churn scoring, weekly growth recommendations, the report builder and
+// its scheduler. Console-owned; the school app never writes here.
+// ═══════════════════════════════════════════════════════════════════
+
+enum ChurnRiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+/// One row per school per scoring run. History is KEPT rather than
+/// overwritten: a school moving LOW → CRITICAL is the signal worth acting on,
+/// and a table that only holds today's number cannot show it. `isLatest` is
+/// maintained on write so the directory badge is a plain indexed lookup
+/// instead of a per-row correlated subquery.
+model ChurnRiskScore {
+  id       String @id @default(cuid())
+  schoolId String @map("school_id")
+  /// Groups every score computed in the same run.
+  batchId  String @map("batch_id")
+
+  level ChurnRiskLevel
+  /// 0–100, higher = more likely to churn.
+  score Int
+
+  primaryReason     String  @map("primary_reason")
+  recommendedAction String  @map("recommended_action")
+  /// The observed inputs, so a score can be argued with rather than trusted.
+  signals           Json
+  /// True only when Claude wrote the reason and action; the score itself is
+  /// always arithmetic.
+  generated         Boolean @default(false)
+
+  isLatest   Boolean  @default(true) @map("is_latest")
+  computedAt DateTime @default(now()) @map("computed_at")
+
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@unique([schoolId, batchId])
+  @@index([isLatest, level])
+  @@index([schoolId, computedAt])
+  @@map("churn_risk_scores")
+}
+
+/// A weekly batch of platform-level growth initiatives. Kept as rows rather
+/// than a cache entry so last week's advice can be compared with what actually
+/// happened.
+model GrowthRecommendation {
+  id      String @id @default(cuid())
+  batchId String @map("batch_id")
+  /// 1-based display order within the batch.
+  rank    Int
+
+  title     String
+  rationale String
+  action    String
+  /// LOW | MEDIUM | HIGH, as judged against the figures supplied.
+  impact    String
+  effort    String
+  /// Which metrics the recommendation was drawn from.
+  basedOn   String[] @default([]) @map("based_on")
+
+  generated   Boolean  @default(false)
+  generatedAt DateTime @default(now()) @map("generated_at")
+
+  @@unique([batchId, rank])
+  @@index([generatedAt])
+  @@map("growth_recommendations")
+}
+
+enum ReportSource {
+  SCHOOLS
+  REVENUE
+  USERS
+  TICKETS
+  USAGE
+  FEATURE_ADOPTION
+}
+
+enum ReportSchedule {
+  NONE
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+model ReportConfig {
+  id          String       @id @default(cuid())
+  name        String
+  description String?
+  source      ReportSource
+
+  /// Column keys from the source's field catalogue, in display order.
+  fields  String[] @default([])
+  /// [{ field, operator, value }] — validated against the catalogue on save.
+  filters Json     @default("[]")
+
+  sortField String? @map("sort_field")
+  sortDir   String  @default("desc") @map("sort_dir")
+  /// null = every matching row, capped by the engine's hard ceiling.
+  rowLimit  Int?    @map("row_limit")
+
+  schedule   ReportSchedule @default(NONE)
+  /// Where a scheduled run is delivered. Empty = download link only.
+  recipients String[]       @default([])
+
+  createdById String    @map("created_by_id")
+  lastRunAt   DateTime? @map("last_run_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  runs ReportRunLog[]
+
+  @@index([schedule])
+  @@index([createdById])
+  @@map("report_configs")
+}
+
+enum ReportRunStatus {
+  RUNNING
+  SUCCEEDED
+  FAILED
+}
+
+model ReportRunLog {
+  id       String          @id @default(cuid())
+  configId String          @map("config_id")
+  status   ReportRunStatus @default(RUNNING)
+  /// "schedule" | "manual"
+  trigger  String          @default("manual")
+
+  rows        Int?
+  /// Where the file can be fetched from, and how long that stays true.
+  downloadUrl String?   @map("download_url")
+  expiresAt   DateTime? @map("expires_at")
+  /// Which channels actually carried it, e.g. { "s3": false, "email": 2 }.
+  delivery    Json?
+  error       String?
+
+  startedAt  DateTime  @default(now()) @map("started_at")
+  finishedAt DateTime? @map("finished_at")
+  durationMs Int?      @map("duration_ms")
+
+  config ReportConfig @relation(fields: [configId], references: [id], onDelete: Cascade)
+
+  @@index([configId, startedAt])
+  @@map("report_run_logs")
+}
+
+enum ExportJobStatus {
+  QUEUED
+  RUNNING
+  READY
+  FAILED
+}
+
+/// An ad-hoc export from any console table. The row is the job's public
+/// record; the bytes live in Redis under the same id with a short TTL, because
+/// this platform has no object store it can rely on being configured.
+model ExportJob {
+  id       String          @id @default(cuid())
+  status   ExportJobStatus @default(QUEUED)
+  source   ReportSource
+  /// "xlsx" | "csv"
+  format   String          @default("xlsx")
+  filters  Json            @default("{}")
+  filename String
+
+  rows      Int?
+  bytes     Int?
+  error     String?
+  expiresAt DateTime? @map("expires_at")
+
+  requestedById String    @map("requested_by_id")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  finishedAt    DateTime? @map("finished_at")
+
+  @@index([requestedById, createdAt])
+  @@map("export_jobs")
 }

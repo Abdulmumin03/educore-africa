@@ -1,0 +1,558 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  <style>
+    html, body { height: 100%; }
+    body { margin: 0; background: #0A1628; color: #F8FAFC;
+           font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+           font-size: 13px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+    a { color: #3B82F6; text-decoration: none; } a:hover { color: #60A5FA; }
+    .mono { font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+            font-variant-numeric: tabular-nums; }
+    .navsec { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+              color: #475569; padding: 0 12px; }
+    .nav { display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 12px;
+           border-radius: 6px; color: #94A3B8; }
+    .nav-active { background: rgba(59,130,246,.14); color: #F8FAFC; font-weight: 500;
+                  box-shadow: inset 2px 0 0 #3B82F6; }
+    .panel { background: #1E293B; border: 1px solid #1E3A5F; border-radius: 8px; }
+    .p-h { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+           padding: 13px 16px; border-bottom: 1px solid #1E3A5F; }
+    .p-t { margin: 0; font-size: 15px; font-weight: 600; }
+    .p-s { font-size: 11px; color: #64748B; }
+    .lbl { font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+           color: #64748B; }
+    .up { color: #22C55E; font-weight: 500; }
+    .down { color: #EF4444; font-weight: 500; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px;
+           border-radius: 6px; background: #1E293B; border: 1px solid #2D4A6E; color: #F8FAFC;
+           font-size: 13px; font-weight: 500; }
+    .btn-primary { background: #3B82F6; border-color: #3B82F6; color: #0A1628; font-weight: 600; }
+    .tab { display: inline-flex; align-items: center; height: 34px; padding: 0 12px;
+           font-size: 13px; color: #94A3B8; border-bottom: 2px solid transparent; }
+    .tab-active { color: #F8FAFC; font-weight: 500; border-bottom-color: #3B82F6; }
+    .kv { display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+          padding: 7px 0; border-bottom: 1px solid #1E3A5F; }
+    .kv:last-child { border-bottom: 0; }
+    .kv-k { color: #94A3B8; flex-shrink: 0; }
+    .kv-v { text-align: right; }
+  </style>
+</helmet>
+
+<div style="display: flex; width: 1440px; min-height: 100%; background: #0A1628">
+
+  <!-- ══ SIDEBAR ══ -->
+  <div style="width: 220px; flex-shrink: 0; border-right: 1px solid #1E3A5F; display: flex; flex-direction: column">
+    <div style="height: 56px; flex-shrink: 0; display: flex; align-items: center; gap: 10px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+      <div style="width: 28px; height: 28px; border-radius: 7px; background: #3B82F6; display: flex; align-items: center; justify-content: center">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0A1628" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c0 1 2.7 3 6 3s6-2 6-3v-5"/></svg>
+      </div>
+      <span style="font-size: 13px; font-weight: 600; color: #3B82F6">EduCore Africa</span>
+      <span style="border-radius: 999px; background: rgba(139,92,246,.15); padding: 1px 7px; font-size: 10px; font-weight: 600; text-transform: uppercase; color: #8B5CF6">Super</span>
+    </div>
+    <div style="flex-grow: 1; padding: 12px 8px; display: flex; flex-direction: column; gap: 4px">
+      <div class="navsec">Overview</div>
+      <span class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>Command Centre</span>
+      <div class="navsec" style="margin-top: 10px">Business</div>
+      <span class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/></svg>Schools</span>
+      <span class="nav nav-active"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="1.75" stroke-linecap="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Revenue</span>
+      <span class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>User Accounts</span>
+      <span class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>Analytics</span>
+      <div class="navsec" style="margin-top: 10px">Operations</div>
+      <span class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg>Support<span class="mono" style="margin-left: auto; display: inline-flex; align-items: center; height: 17px; padding: 0 6px; border-radius: 4px; background: rgba(239,68,68,.16); color: #F87171; font-size: 11px; font-weight: 600">7</span></span>
+      <span class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>Growth</span>
+      <div class="navsec" style="margin-top: 10px">Platform</div>
+      <span class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>System Health<span style="margin-left: auto; width: 6px; height: 6px; border-radius: 50%; background: #22C55E"></span></span>
+      <span class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>Configuration</span>
+      <span class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>Audit Log</span>
+    </div>
+    <div style="flex-shrink: 0; padding: 12px; border-top: 1px solid #1E3A5F; display: flex; align-items: center; gap: 10px">
+      <div style="width: 32px; height: 32px; border-radius: 8px; background: #1E293B; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600">AO</div>
+      <div style="line-height: 1.3; flex-grow: 1; min-width: 0">
+        <div style="font-size: 13px; font-weight: 500">Abdulmumin O.</div>
+        <div style="font-size: 11px; color: #64748B">Super Admin</div>
+      </div>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><path d="M21 12H9"/></svg>
+    </div>
+  </div>
+
+  <!-- ══ RIGHT ══ -->
+  <div style="flex-grow: 1; display: flex; flex-direction: column; min-width: 0">
+
+    <div style="height: 56px; flex-shrink: 0; background: #1E293B; border-bottom: 1px solid #1E3A5F; display: flex; align-items: center; gap: 16px; padding: 0 20px">
+      <div style="display: flex; align-items: center; gap: 6px; min-width: 0">
+        <span style="color: #64748B">Console</span>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        <span style="font-weight: 500">Revenue</span>
+      </div>
+      <div style="flex-grow: 1; display: flex; justify-content: center">
+        <div style="display: flex; align-items: center; gap: 8px; width: 420px; height: 32px; padding: 0 10px; border-radius: 6px; background: #16233A; border: 1px solid #2D4A6E">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <span style="flex-grow: 1; color: #64748B">Search schools, users…</span>
+          <span class="mono" style="display: inline-flex; align-items: center; height: 18px; padding: 0 5px; border-radius: 4px; background: #293548; border: 1px solid #2D4A6E; color: #94A3B8; font-size: 11px">⌘K</span>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 6px">
+        <span style="position: relative; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; color: #94A3B8">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          <span class="mono" style="position: absolute; top: 1px; right: 0; display: inline-flex; align-items: center; justify-content: center; min-width: 15px; height: 15px; border-radius: 8px; background: #EF4444; color: #0A1628; font-size: 10px; font-weight: 700; border: 2px solid #1E293B">7</span>
+        </span>
+        <span style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; color: #94A3B8">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.2 9.2a3 3 0 0 1 5.7 1c0 2-2.9 2.6-2.9 2.6"/><path d="M12 17h.01"/></svg>
+        </span>
+        <span style="width: 24px; height: 24px; border-radius: 6px; background: rgba(139,92,246,.16); border: 1px solid rgba(139,92,246,.45); color: #C4B5FD; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600">AO</span>
+      </div>
+    </div>
+
+    <!-- ══ MAIN ══ -->
+
+    <div style="padding: 24px; display: flex; flex-direction: column; gap: 16px">
+
+      <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 20px">
+        <div>
+          <h1 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -.02em">Revenue Intelligence</h1>
+          <p style="margin: 2px 0 0; color: #94A3B8">Across 1,284 active schools in 37 states · all amounts NGN</p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0"><span class="btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 10h18"/><path d="M8 2v4"/><path d="M16 2v4"/></svg>
+            <span class="mono">01/09/2025 – 26/08/2026</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </span>
+          <span class="btn btn-primary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><path d="M12 15V3"/></svg>
+            Export Report
+          </span></div>
+      </div>
+
+      <!-- ROW 1 — KPI -->
+      <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px">
+        <div class="panel" style="padding: 13px 15px">
+          <div class="lbl">MRR</div>
+          <div class="mono" style="margin-top: 5px; font-size: 24px; font-weight: 700; letter-spacing: -.01em">₦48,204,500</div>
+          <div style="margin-top: 3px; font-size: 11px; color: #64748B"><span class="up">↑ 8.4%</span> vs last month</div>
+        </div>
+        <div class="panel" style="padding: 13px 15px">
+          <div class="lbl">ARR</div>
+          <div class="mono" style="margin-top: 5px; font-size: 24px; font-weight: 700; letter-spacing: -.01em">₦578,454,000</div>
+          <div style="margin-top: 3px; font-size: 11px; color: #64748B"><span class="up">↑ 8.4%</span> run rate</div>
+        </div>
+        <div class="panel" style="padding: 13px 15px">
+          <div class="lbl">Revenue this month</div>
+          <div class="mono" style="margin-top: 5px; font-size: 24px; font-weight: 700; letter-spacing: -.01em">₦44,540,958</div>
+          <div style="margin-top: 3px; font-size: 11px; color: #64748B"><span class="up">↑ 6.1%</span> 92.4% collected</div>
+        </div>
+        <div class="panel" style="padding: 13px 15px">
+          <div class="lbl">Avg revenue / school</div>
+          <div class="mono" style="margin-top: 5px; font-size: 24px; font-weight: 700; letter-spacing: -.01em">₦37,542</div>
+          <div style="margin-top: 3px; font-size: 11px; color: #64748B"><span class="up">↑ 3.2%</span> across 1,284 schools</div>
+        </div>
+        <div class="panel" style="padding: 13px 15px">
+          <div class="lbl">Net revenue retention</div>
+          <div class="mono" style="margin-top: 5px; font-size: 24px; font-weight: 700; letter-spacing: -.01em">108.6%</div>
+          <div style="margin-top: 3px; font-size: 11px; color: #64748B"><span class="down">↓ 1.4%</span> expansion − churn</div>
+        </div>
+      </div>
+
+      <!-- ROW 2 — stacked area -->
+      <div class="panel">
+        <div class="p-h">
+          <div><h2 class="p-t">Revenue by plan tier</h2><span class="p-s">Monthly recurring revenue, last 12 months</span></div>
+          <div style="display: flex; align-items: center; gap: 14px; flex-shrink: 0"><span style="display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: #94A3B8">
+                <span style="width: 10px; height: 10px; border-radius: 2px; background: #3B82F6"></span>Starter
+              </span><span style="display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: #94A3B8">
+                <span style="width: 10px; height: 10px; border-radius: 2px; background: #D97706"></span>Growth
+              </span><span style="display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: #94A3B8">
+                <span style="width: 10px; height: 10px; border-radius: 2px; background: #8B5CF6"></span>Professional
+              </span><span style="display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: #94A3B8">
+                <span style="width: 10px; height: 10px; border-radius: 2px; background: #0D9488"></span>Enterprise
+              </span><span style="display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: #94A3B8">
+                <span style="width: 10px; height: 10px; border-radius: 2px; background: #E11D48"></span>Government
+              </span></div>
+        </div>
+        <div style="padding: 14px 16px; position: relative">
+          <svg width="100%" viewBox="0 0 1140 250" fill="none" role="img" aria-label="Stacked area chart of monthly recurring revenue by plan tier, September 2025 to August 2026">
+            <g stroke="#1E3A5F" stroke-width="1"><line x1="60" y1="220.0" x2="1100" y2="220.0"/><line x1="60" y1="180.0" x2="1100" y2="180.0"/><line x1="60" y1="140.0" x2="1100" y2="140.0"/><line x1="60" y1="100.0" x2="1100" y2="100.0"/><line x1="60" y1="60.0" x2="1100" y2="60.0"/><line x1="60" y1="20.0" x2="1100" y2="20.0"/></g>
+            <polygon points="60,202.4 155,201.6 249,200.8 344,200.0 438,199.6 533,198.8 627,198.0 722,197.6 816,196.8 911,196.4 1005,196.0 1100,195.6 1100,220.0 1005,220.0 911,220.0 816,220.0 722,220.0 627,220.0 533,220.0 438,220.0 344,220.0 249,220.0 155,220.0 60,220.0" fill="#3B82F6" fill-opacity="0.75"/><polygon points="60,166.8 155,164.4 249,162.0 344,159.6 438,157.6 533,155.2 627,152.8 722,150.8 816,148.8 911,147.2 1005,145.6 1100,144.0 1100,195.6 1005,196.0 911,196.4 816,196.8 722,197.6 627,198.0 533,198.8 438,199.6 344,200.0 249,200.8 155,201.6 60,202.4" fill="#D97706" fill-opacity="0.75"/><polygon points="60,123.6 155,119.2 249,114.8 344,110.0 438,105.6 533,100.8 627,96.0 722,91.6 816,87.6 911,84.0 1005,80.8 1100,78.0 1100,144.0 1005,145.6 911,147.2 816,148.8 722,150.8 627,152.8 533,155.2 438,157.6 344,159.6 249,162.0 155,164.4 60,166.8" fill="#8B5CF6" fill-opacity="0.75"/><polygon points="60,98.8 155,93.2 249,87.6 344,81.2 438,75.2 533,69.2 627,62.8 722,57.2 816,52.0 911,47.2 1005,43.2 1100,39.6 1100,78.0 1005,80.8 911,84.0 816,87.6 722,91.6 627,96.0 533,100.8 438,105.6 344,110.0 249,114.8 155,119.2 60,123.6" fill="#0D9488" fill-opacity="0.75"/><polygon points="60,84.8 155,79.2 249,74.0 344,67.6 438,62.0 533,56.0 627,49.6 722,44.4 816,39.2 911,34.4 1005,30.8 1100,27.2 1100,39.6 1005,43.2 911,47.2 816,52.0 722,57.2 627,62.8 533,69.2 438,75.2 344,81.2 249,87.6 155,93.2 60,98.8" fill="#E11D48" fill-opacity="0.75"/>
+            <polyline points="60,202.4 155,201.6 249,200.8 344,200.0 438,199.6 533,198.8 627,198.0 722,197.6 816,196.8 911,196.4 1005,196.0 1100,195.6" fill="none" stroke="#3B82F6" stroke-width="1.5"/><polyline points="60,166.8 155,164.4 249,162.0 344,159.6 438,157.6 533,155.2 627,152.8 722,150.8 816,148.8 911,147.2 1005,145.6 1100,144.0" fill="none" stroke="#D97706" stroke-width="1.5"/><polyline points="60,123.6 155,119.2 249,114.8 344,110.0 438,105.6 533,100.8 627,96.0 722,91.6 816,87.6 911,84.0 1005,80.8 1100,78.0" fill="none" stroke="#8B5CF6" stroke-width="1.5"/><polyline points="60,98.8 155,93.2 249,87.6 344,81.2 438,75.2 533,69.2 627,62.8 722,57.2 816,52.0 911,47.2 1005,43.2 1100,39.6" fill="none" stroke="#0D9488" stroke-width="1.5"/><polyline points="60,84.8 155,79.2 249,74.0 344,67.6 438,62.0 533,56.0 627,49.6 722,44.4 816,39.2 911,34.4 1005,30.8 1100,27.2" fill="none" stroke="#E11D48" stroke-width="1.5"/>
+            <g fill="#64748B" font-family="JetBrains Mono, monospace" font-size="10" text-anchor="end"><text x="52" y="224.0">₦0M</text><text x="52" y="184.0">₦10M</text><text x="52" y="144.0">₦20M</text><text x="52" y="104.0">₦30M</text><text x="52" y="64.0">₦40M</text><text x="52" y="24.0">₦50M</text></g>
+            <g fill="#64748B" font-family="Inter, sans-serif" font-size="10" text-anchor="middle"><text x="60" y="240">Sep</text><text x="155" y="240">Oct</text><text x="249" y="240">Nov</text><text x="344" y="240">Dec</text><text x="438" y="240">Jan</text><text x="533" y="240">Feb</text><text x="627" y="240">Mar</text><text x="722" y="240">Apr</text><text x="816" y="240">May</text><text x="911" y="240">Jun</text><text x="1005" y="240">Jul</text><text x="1100" y="240">Aug</text></g>
+            <line x1="816" y1="20" x2="816" y2="220" stroke="#F8FAFC" stroke-width="1" stroke-dasharray="3 3" opacity="0.5"/>
+          </svg>
+          <div style="position: absolute; left: 63%; top: 34px; width: 208px; padding: 10px 12px; border-radius: 8px; background: #334155; border: 1px solid #3B6090; box-shadow: 0 14px 34px rgba(0,0,0,.5)">
+            <div style="font-weight: 600; margin-bottom: 6px">May 2026</div>
+            <div style="display: flex; flex-direction: column; gap: 5px; font-size: 11px; color: #94A3B8">
+                <div style="display: flex; align-items: center; gap: 8px">
+                  <span style="width: 7px; height: 7px; border-radius: 2px; background: #E11D48"></span>
+                  <span style="flex-grow: 1">Government</span>
+                  <span class="mono" style="color: #F8FAFC">₦3.2M</span>
+                </div><div style="display: flex; align-items: center; gap: 8px">
+                  <span style="width: 7px; height: 7px; border-radius: 2px; background: #0D9488"></span>
+                  <span style="flex-grow: 1">Enterprise</span>
+                  <span class="mono" style="color: #F8FAFC">₦8.9M</span>
+                </div><div style="display: flex; align-items: center; gap: 8px">
+                  <span style="width: 7px; height: 7px; border-radius: 2px; background: #8B5CF6"></span>
+                  <span style="flex-grow: 1">Professional</span>
+                  <span class="mono" style="color: #F8FAFC">₦15.3M</span>
+                </div><div style="display: flex; align-items: center; gap: 8px">
+                  <span style="width: 7px; height: 7px; border-radius: 2px; background: #D97706"></span>
+                  <span style="flex-grow: 1">Growth</span>
+                  <span class="mono" style="color: #F8FAFC">₦12.0M</span>
+                </div><div style="display: flex; align-items: center; gap: 8px">
+                  <span style="width: 7px; height: 7px; border-radius: 2px; background: #3B82F6"></span>
+                  <span style="flex-grow: 1">Starter</span>
+                  <span class="mono" style="color: #F8FAFC">₦5.8M</span>
+                </div>
+              <div style="display: flex; justify-content: space-between; border-top: 1px solid #3B6090; padding-top: 5px; margin-top: 2px">
+                <span style="color: #F8FAFC; font-weight: 600">Total</span>
+                <span class="mono" style="color: #F8FAFC; font-weight: 600">₦45.2M</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 3 — states + churn -->
+      <div style="display: grid; grid-template-columns: 11fr 9fr; gap: 16px; align-items: start">
+
+        <div class="panel">
+          <div class="p-h">
+            <div><h2 class="p-t">Revenue by state</h2><span class="p-s">Top 10 of 37 · sorted by MRR</span></div>
+            <span class="mono" style="font-size: 13px; font-weight: 600; flex-shrink: 0">₦35,567,000</span>
+          </div>
+          <div style="display: grid; grid-template-columns: 1.3fr .8fr 1.2fr .9fr 1.3fr; align-items: center; gap: 12px; height: 32px; padding: 0 16px; background: #16233A; border-bottom: 1px solid #1E3A5F">
+            <span class="lbl">State</span><span class="lbl" style="text-align: right">Schools</span>
+            <span class="lbl" style="text-align: right">MRR</span><span class="lbl" style="text-align: right">vs last</span>
+            <span class="lbl">Top plan</span>
+          </div>
+            <div style="display: grid; grid-template-columns: 1.3fr .8fr 1.2fr .9fr 1.3fr; align-items: center; gap: 12px; height: 34px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+              <span>Lagos</span>
+              <span class="mono" style="text-align: right; color: #94A3B8">255</span>
+              <span class="mono" style="text-align: right">₦11,412,000</span>
+              <span class="mono up" style="text-align: right">+9.2%</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: #94A3B8"><span style="width: 6px; height: 6px; border-radius: 2px; background: #8B5CF6"></span>Professional</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1.3fr .8fr 1.2fr .9fr 1.3fr; align-items: center; gap: 12px; height: 34px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+              <span>Kano</span>
+              <span class="mono" style="text-align: right; color: #94A3B8">127</span>
+              <span class="mono" style="text-align: right">₦4,826,000</span>
+              <span class="mono up" style="text-align: right">+6.1%</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: #94A3B8"><span style="width: 6px; height: 6px; border-radius: 2px; background: #D97706"></span>Growth</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1.3fr .8fr 1.2fr .9fr 1.3fr; align-items: center; gap: 12px; height: 34px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+              <span>FCT</span>
+              <span class="mono" style="text-align: right; color: #94A3B8">96</span>
+              <span class="mono" style="text-align: right">₦4,608,000</span>
+              <span class="mono up" style="text-align: right">+12.4%</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: #94A3B8"><span style="width: 6px; height: 6px; border-radius: 2px; background: #0D9488"></span>Enterprise</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1.3fr .8fr 1.2fr .9fr 1.3fr; align-items: center; gap: 12px; height: 34px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+              <span>Kaduna</span>
+              <span class="mono" style="text-align: right; color: #94A3B8">78</span>
+              <span class="mono" style="text-align: right">₦2,886,000</span>
+              <span class="mono down" style="text-align: right">−2.8%</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: #94A3B8"><span style="width: 6px; height: 6px; border-radius: 2px; background: #E11D48"></span>Government</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1.3fr .8fr 1.2fr .9fr 1.3fr; align-items: center; gap: 12px; height: 34px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+              <span>Oyo</span>
+              <span class="mono" style="text-align: right; color: #94A3B8">71</span>
+              <span class="mono" style="text-align: right">₦2,698,000</span>
+              <span class="mono up" style="text-align: right">+5.4%</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: #94A3B8"><span style="width: 6px; height: 6px; border-radius: 2px; background: #D97706"></span>Growth</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1.3fr .8fr 1.2fr .9fr 1.3fr; align-items: center; gap: 12px; height: 34px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+              <span>Rivers</span>
+              <span class="mono" style="text-align: right; color: #94A3B8">58</span>
+              <span class="mono" style="text-align: right">₦2,610,000</span>
+              <span class="mono up" style="text-align: right">+8.8%</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: #94A3B8"><span style="width: 6px; height: 6px; border-radius: 2px; background: #8B5CF6"></span>Professional</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1.3fr .8fr 1.2fr .9fr 1.3fr; align-items: center; gap: 12px; height: 34px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+              <span>Ogun</span>
+              <span class="mono" style="text-align: right; color: #94A3B8">64</span>
+              <span class="mono" style="text-align: right">₦2,432,000</span>
+              <span class="mono up" style="text-align: right">+3.9%</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: #94A3B8"><span style="width: 6px; height: 6px; border-radius: 2px; background: #D97706"></span>Growth</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1.3fr .8fr 1.2fr .9fr 1.3fr; align-items: center; gap: 12px; height: 34px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+              <span>Anambra</span>
+              <span class="mono" style="text-align: right; color: #94A3B8">39</span>
+              <span class="mono" style="text-align: right">₦1,521,000</span>
+              <span class="mono up" style="text-align: right">+7.2%</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: #94A3B8"><span style="width: 6px; height: 6px; border-radius: 2px; background: #8B5CF6"></span>Professional</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1.3fr .8fr 1.2fr .9fr 1.3fr; align-items: center; gap: 12px; height: 34px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+              <span>Enugu</span>
+              <span class="mono" style="text-align: right; color: #94A3B8">36</span>
+              <span class="mono" style="text-align: right">₦1,404,000</span>
+              <span class="mono up" style="text-align: right">+4.5%</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: #94A3B8"><span style="width: 6px; height: 6px; border-radius: 2px; background: #D97706"></span>Growth</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1.3fr .8fr 1.2fr .9fr 1.3fr; align-items: center; gap: 12px; height: 34px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+              <span>Edo</span>
+              <span class="mono" style="text-align: right; color: #94A3B8">30</span>
+              <span class="mono" style="text-align: right">₦1,170,000</span>
+              <span class="mono up" style="text-align: right">+1.8%</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: #94A3B8"><span style="width: 6px; height: 6px; border-radius: 2px; background: #3B82F6"></span>Starter</span>
+            </div>
+          <div style="padding: 10px 16px; background: #16233A; font-size: 11px; color: #64748B">
+            These 10 states carry <span class="mono" style="color: #94A3B8">73.8%</span> of platform MRR.
+            Kaduna is the only one shrinking — two Government contracts lapsed.
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="p-h">
+            <div><h2 class="p-t">Churn analysis</h2><span class="p-s">Schools lost per month and churn rate</span></div>
+            <div style="display: flex; align-items: center; gap: 12px; flex-shrink: 0">
+              <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: #94A3B8"><span style="width: 10px; height: 10px; border-radius: 2px; background: #EF4444"></span>Churned</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: #94A3B8"><svg width="14" height="4"><line x1="0" y1="2" x2="14" y2="2" stroke="#FBBF24" stroke-width="2"/></svg>Rate %</span>
+            </div>
+          </div>
+          <div style="padding: 12px 16px 0">
+            <svg width="100%" viewBox="0 0 500 176" fill="none" role="img" aria-label="Monthly churn count with churn rate overlay">
+              <g stroke="#1E3A5F" stroke-width="1">
+                <line x1="40" y1="150" x2="480" y2="150"/><line x1="40" y1="110" x2="480" y2="110"/>
+                <line x1="40" y1="70" x2="480" y2="70"/><line x1="40" y1="30" x2="480" y2="30"/>
+              </g>
+              <g fill="#64748B" font-family="JetBrains Mono, monospace" font-size="9" text-anchor="end">
+                <text x="34" y="154">0</text><text x="34" y="114">5</text><text x="34" y="74">10</text><text x="34" y="34">15</text>
+              </g>
+              <rect x="28" y="78" width="24" height="72" rx="3" fill="#EF4444" fill-opacity="0.8"/><rect x="67" y="62" width="24" height="88" rx="3" fill="#EF4444" fill-opacity="0.8"/><rect x="106" y="86" width="24" height="64" rx="3" fill="#EF4444" fill-opacity="0.8"/><rect x="145" y="54" width="24" height="96" rx="3" fill="#EF4444" fill-opacity="0.8"/><rect x="184" y="70" width="24" height="80" rx="3" fill="#EF4444" fill-opacity="0.8"/><rect x="223" y="38" width="24" height="112" rx="3" fill="#EF4444" fill-opacity="0.8"/><rect x="263" y="62" width="24" height="88" rx="3" fill="#EF4444" fill-opacity="0.8"/><rect x="302" y="78" width="24" height="72" rx="3" fill="#EF4444" fill-opacity="0.8"/><rect x="341" y="46" width="24" height="104" rx="3" fill="#EF4444" fill-opacity="0.8"/><rect x="380" y="54" width="24" height="96" rx="3" fill="#EF4444" fill-opacity="0.8"/><rect x="419" y="70" width="24" height="80" rx="3" fill="#EF4444" fill-opacity="0.8"/><rect x="458" y="86" width="24" height="64" rx="3" fill="#EF4444" fill-opacity="0.8"/>
+              <polyline points="40,72.0 79,56.0 118,82.0 157,50.0 196,67.0 235,35.0 275,60.0 314,77.0 353,46.0 392,55.0 431,71.0 470,88.0" fill="none" stroke="#FBBF24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <g fill="#64748B" font-family="Inter, sans-serif" font-size="9" text-anchor="middle"><text x="40" y="168">Sep</text><text x="79" y="168">Oct</text><text x="118" y="168">Nov</text><text x="157" y="168">Dec</text><text x="196" y="168">Jan</text><text x="235" y="168">Feb</text><text x="275" y="168">Mar</text><text x="314" y="168">Apr</text><text x="353" y="168">May</text><text x="392" y="168">Jun</text><text x="431" y="168">Jul</text><text x="470" y="168">Aug</text></g>
+              <text x="480" y="80.0" text-anchor="end" fill="#FBBF24" font-family="JetBrains Mono, monospace" font-size="10">0.62%</text>
+            </svg>
+          </div>
+          <div class="lbl" style="padding: 8px 16px 4px">Recent churns</div>
+              <div style="display: flex; align-items: center; gap: 10px; height: 38px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+                <span style="width: 6px; height: 6px; border-radius: 2px; background: #D97706; flex-shrink: 0"></span>
+                <span style="flex-grow: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Faith Comprehensive</span>
+                <span class="mono" style="color: #94A3B8; flex-shrink: 0">₦862,000</span>
+                <span style="width: 168px; flex-shrink: 0; font-size: 11px; color: #64748B; text-align: right">Merged with another school</span>
+                <span class="mono" style="flex-shrink: 0; font-size: 11px; color: #64748B">18/08/2026</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px; height: 38px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+                <span style="width: 6px; height: 6px; border-radius: 2px; background: #3B82F6; flex-shrink: 0"></span>
+                <span style="flex-grow: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Riverside Academy</span>
+                <span class="mono" style="color: #94A3B8; flex-shrink: 0">₦214,000</span>
+                <span style="width: 168px; flex-shrink: 0; font-size: 11px; color: #64748B; text-align: right">Non-payment after 3 reminders</span>
+                <span class="mono" style="flex-shrink: 0; font-size: 11px; color: #64748B">09/08/2026</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px; height: 38px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+                <span style="width: 6px; height: 6px; border-radius: 2px; background: #E11D48; flex-shrink: 0"></span>
+                <span style="flex-grow: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Command Sec. Sch. Kaduna</span>
+                <span class="mono" style="color: #94A3B8; flex-shrink: 0">₦2,940,000</span>
+                <span style="width: 168px; flex-shrink: 0; font-size: 11px; color: #64748B; text-align: right">Budget cut — contract lapsed</span>
+                <span class="mono" style="flex-shrink: 0; font-size: 11px; color: #64748B">02/08/2026</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px; height: 38px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+                <span style="width: 6px; height: 6px; border-radius: 2px; background: #3B82F6; flex-shrink: 0"></span>
+                <span style="flex-grow: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Hilltop Nursery & Primary</span>
+                <span class="mono" style="color: #94A3B8; flex-shrink: 0">₦186,000</span>
+                <span style="width: 168px; flex-shrink: 0; font-size: 11px; color: #64748B; text-align: right">Closed permanently</span>
+                <span class="mono" style="flex-shrink: 0; font-size: 11px; color: #64748B">11/07/2026</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px; height: 38px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+                <span style="width: 6px; height: 6px; border-radius: 2px; background: #D97706; flex-shrink: 0"></span>
+                <span style="flex-grow: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Winners Model School</span>
+                <span class="mono" style="color: #94A3B8; flex-shrink: 0">₦1,124,000</span>
+                <span style="width: 168px; flex-shrink: 0; font-size: 11px; color: #64748B; text-align: right">Switched to a competitor</span>
+                <span class="mono" style="flex-shrink: 0; font-size: 11px; color: #64748B">25/06/2026</span>
+              </div>
+        </div>
+      </div>
+
+      <!-- ROW 4 — transactions -->
+      <div class="panel">
+        <div class="p-h">
+          <div style="display: flex; align-items: center; gap: 4px">
+            <span class="tab tab-active" style="height: 28px">All transactions</span>
+            <span class="tab" style="height: 28px">Failed payments<span class="mono" style="margin-left: 6px; display: inline-flex; align-items: center; height: 16px; padding: 0 5px; border-radius: 4px; background: rgba(239,68,68,.16); color: #F87171; font-size: 10px; font-weight: 600">3</span></span>
+          </div>
+          <span style="font-size: 11px; color: #64748B; flex-shrink: 0">Last 20 payments · ₦6,525,000 settled</span>
+        </div>
+        <div style="display: grid; grid-template-columns: .9fr 2.2fr 1.1fr 1fr 1.1fr .8fr; align-items: center; gap: 12px; height: 32px; padding: 0 16px; background: #16233A; border-bottom: 1px solid #1E3A5F">
+          <span class="lbl">Date</span><span class="lbl">School</span><span class="lbl">Plan</span>
+          <span class="lbl" style="text-align: right">Amount</span><span class="lbl">Gateway</span><span class="lbl">Status</span>
+        </div>
+            <div style="display: grid; grid-template-columns: .9fr 2.2fr 1.1fr 1fr 1.1fr .8fr; align-items: center; gap: 12px; height: 34px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+              <span class="mono" style="color: #94A3B8">26/08/2026</span>
+              <span style="min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Corona Secondary School</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: #94A3B8"><span style="width: 6px; height: 6px; border-radius: 2px; background: #0D9488"></span>Enterprise</span>
+              <span class="mono" style="text-align: right">₦850,500</span>
+              <span style="color: #94A3B8">Paystack</span>
+              <span><span style="display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 4px; font-size: 11px; font-weight: 500; background: rgba(34,197,94,.12); color: #4ADE80">Paid</span></span>
+            </div>
+            <div style="display: grid; grid-template-columns: .9fr 2.2fr 1.1fr 1fr 1.1fr .8fr; align-items: center; gap: 12px; height: 34px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+              <span class="mono" style="color: #94A3B8">26/08/2026</span>
+              <span style="min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Kano Central Model Academy</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: #94A3B8"><span style="width: 6px; height: 6px; border-radius: 2px; background: #D97706"></span>Growth</span>
+              <span class="mono" style="text-align: right">₦361,500</span>
+              <span style="color: #94A3B8">Paystack</span>
+              <span><span style="display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 4px; font-size: 11px; font-weight: 500; background: rgba(34,197,94,.12); color: #4ADE80">Paid</span></span>
+            </div>
+            <div style="display: grid; grid-template-columns: .9fr 2.2fr 1.1fr 1fr 1.1fr .8fr; align-items: center; gap: 12px; height: 34px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+              <span class="mono" style="color: #94A3B8">25/08/2026</span>
+              <span style="min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Loyola Jesuit College</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: #94A3B8"><span style="width: 6px; height: 6px; border-radius: 2px; background: #0D9488"></span>Enterprise</span>
+              <span class="mono" style="text-align: right">₦513,000</span>
+              <span style="color: #94A3B8">Flutterwave</span>
+              <span><span style="display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 4px; font-size: 11px; font-weight: 500; background: rgba(34,197,94,.12); color: #4ADE80">Paid</span></span>
+            </div>
+            <div style="display: grid; grid-template-columns: .9fr 2.2fr 1.1fr 1fr 1.1fr .8fr; align-items: center; gap: 12px; height: 34px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+              <span class="mono" style="color: #94A3B8">25/08/2026</span>
+              <span style="min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Sunrise Model College</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: #94A3B8"><span style="width: 6px; height: 6px; border-radius: 2px; background: #D97706"></span>Growth</span>
+              <span class="mono" style="text-align: right">₦180,750</span>
+              <span style="color: #94A3B8">Paystack</span>
+              <span><span style="display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 4px; font-size: 11px; font-weight: 500; background: rgba(239,68,68,.12); color: #F87171">Failed</span></span>
+            </div>
+            <div style="display: grid; grid-template-columns: .9fr 2.2fr 1.1fr 1fr 1.1fr .8fr; align-items: center; gap: 12px; height: 34px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+              <span class="mono" style="color: #94A3B8">25/08/2026</span>
+              <span style="min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Trinity International</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: #94A3B8"><span style="width: 6px; height: 6px; border-radius: 2px; background: #8B5CF6"></span>Professional</span>
+              <span class="mono" style="text-align: right">₦382,800</span>
+              <span style="color: #94A3B8">Paystack</span>
+              <span><span style="display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 4px; font-size: 11px; font-weight: 500; background: rgba(34,197,94,.12); color: #4ADE80">Paid</span></span>
+            </div>
+            <div style="display: grid; grid-template-columns: .9fr 2.2fr 1.1fr 1fr 1.1fr .8fr; align-items: center; gap: 12px; height: 34px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+              <span class="mono" style="color: #94A3B8">24/08/2026</span>
+              <span style="min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Federal Government College</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: #94A3B8"><span style="width: 6px; height: 6px; border-radius: 2px; background: #E11D48"></span>Government</span>
+              <span class="mono" style="text-align: right">₦561,600</span>
+              <span style="color: #94A3B8">Bank transfer</span>
+              <span><span style="display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 4px; font-size: 11px; font-weight: 500; background: rgba(34,197,94,.12); color: #4ADE80">Paid</span></span>
+            </div>
+            <div style="display: grid; grid-template-columns: .9fr 2.2fr 1.1fr 1fr 1.1fr .8fr; align-items: center; gap: 12px; height: 34px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+              <span class="mono" style="color: #94A3B8">24/08/2026</span>
+              <span style="min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Grange School Ikeja</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: #94A3B8"><span style="width: 6px; height: 6px; border-radius: 2px; background: #0D9488"></span>Enterprise</span>
+              <span class="mono" style="text-align: right">₦459,000</span>
+              <span style="color: #94A3B8">Paystack</span>
+              <span><span style="display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 4px; font-size: 11px; font-weight: 500; background: rgba(34,197,94,.12); color: #4ADE80">Paid</span></span>
+            </div>
+            <div style="display: grid; grid-template-columns: .9fr 2.2fr 1.1fr 1fr 1.1fr .8fr; align-items: center; gap: 12px; height: 34px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+              <span class="mono" style="color: #94A3B8">23/08/2026</span>
+              <span style="min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Deeper Life High School</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: #94A3B8"><span style="width: 6px; height: 6px; border-radius: 2px; background: #D97706"></span>Growth</span>
+              <span class="mono" style="text-align: right">₦158,700</span>
+              <span style="color: #94A3B8">Paystack</span>
+              <span><span style="display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 4px; font-size: 11px; font-weight: 500; background: rgba(34,197,94,.12); color: #4ADE80">Paid</span></span>
+            </div>
+            <div style="display: grid; grid-template-columns: .9fr 2.2fr 1.1fr 1fr 1.1fr .8fr; align-items: center; gap: 12px; height: 34px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+              <span class="mono" style="color: #94A3B8">23/08/2026</span>
+              <span style="min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Baptist High School</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: #94A3B8"><span style="width: 6px; height: 6px; border-radius: 2px; background: #3B82F6"></span>Starter</span>
+              <span class="mono" style="text-align: right">₦54,000</span>
+              <span style="color: #94A3B8">Paystack</span>
+              <span><span style="display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 4px; font-size: 11px; font-weight: 500; background: rgba(245,158,11,.12); color: #FBBF24">Refunded</span></span>
+            </div>
+            <div style="display: grid; grid-template-columns: .9fr 2.2fr 1.1fr 1fr 1.1fr .8fr; align-items: center; gap: 12px; height: 34px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+              <span class="mono" style="color: #94A3B8">22/08/2026</span>
+              <span style="min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Pacesetters College</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: #94A3B8"><span style="width: 6px; height: 6px; border-radius: 2px; background: #8B5CF6"></span>Professional</span>
+              <span class="mono" style="text-align: right">₦693,000</span>
+              <span style="color: #94A3B8">Flutterwave</span>
+              <span><span style="display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 4px; font-size: 11px; font-weight: 500; background: rgba(34,197,94,.12); color: #4ADE80">Paid</span></span>
+            </div>
+            <div style="display: grid; grid-template-columns: .9fr 2.2fr 1.1fr 1fr 1.1fr .8fr; align-items: center; gap: 12px; height: 34px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+              <span class="mono" style="color: #94A3B8">22/08/2026</span>
+              <span style="min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Immaculate Heart College</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: #94A3B8"><span style="width: 6px; height: 6px; border-radius: 2px; background: #D97706"></span>Growth</span>
+              <span class="mono" style="text-align: right">₦178,500</span>
+              <span style="color: #94A3B8">Paystack</span>
+              <span><span style="display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 4px; font-size: 11px; font-weight: 500; background: rgba(34,197,94,.12); color: #4ADE80">Paid</span></span>
+            </div>
+            <div style="display: grid; grid-template-columns: .9fr 2.2fr 1.1fr 1fr 1.1fr .8fr; align-items: center; gap: 12px; height: 34px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+              <span class="mono" style="color: #94A3B8">21/08/2026</span>
+              <span style="min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Sardauna Memorial College</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: #94A3B8"><span style="width: 6px; height: 6px; border-radius: 2px; background: #E11D48"></span>Government</span>
+              <span class="mono" style="text-align: right">₦496,800</span>
+              <span style="color: #94A3B8">Bank transfer</span>
+              <span><span style="display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 4px; font-size: 11px; font-weight: 500; background: rgba(34,197,94,.12); color: #4ADE80">Paid</span></span>
+            </div>
+            <div style="display: grid; grid-template-columns: .9fr 2.2fr 1.1fr 1fr 1.1fr .8fr; align-items: center; gap: 12px; height: 34px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+              <span class="mono" style="color: #94A3B8">21/08/2026</span>
+              <span style="min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Air Force Comprehensive</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: #94A3B8"><span style="width: 6px; height: 6px; border-radius: 2px; background: #D97706"></span>Growth</span>
+              <span class="mono" style="text-align: right">₦196,500</span>
+              <span style="color: #94A3B8">Paystack</span>
+              <span><span style="display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 4px; font-size: 11px; font-weight: 500; background: rgba(239,68,68,.12); color: #F87171">Failed</span></span>
+            </div>
+            <div style="display: grid; grid-template-columns: .9fr 2.2fr 1.1fr 1fr 1.1fr .8fr; align-items: center; gap: 12px; height: 34px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+              <span class="mono" style="color: #94A3B8">20/08/2026</span>
+              <span style="min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">St. Saviour's School</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: #94A3B8"><span style="width: 6px; height: 6px; border-radius: 2px; background: #0D9488"></span>Enterprise</span>
+              <span class="mono" style="text-align: right">₦288,000</span>
+              <span style="color: #94A3B8">Paystack</span>
+              <span><span style="display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 4px; font-size: 11px; font-weight: 500; background: rgba(34,197,94,.12); color: #4ADE80">Paid</span></span>
+            </div>
+            <div style="display: grid; grid-template-columns: .9fr 2.2fr 1.1fr 1fr 1.1fr .8fr; align-items: center; gap: 12px; height: 34px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+              <span class="mono" style="color: #94A3B8">20/08/2026</span>
+              <span style="min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Chrisland School Ikeja</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: #94A3B8"><span style="width: 6px; height: 6px; border-radius: 2px; background: #8B5CF6"></span>Professional</span>
+              <span class="mono" style="text-align: right">₦492,000</span>
+              <span style="color: #94A3B8">Paystack</span>
+              <span><span style="display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 4px; font-size: 11px; font-weight: 500; background: rgba(34,197,94,.12); color: #4ADE80">Paid</span></span>
+            </div>
+            <div style="display: grid; grid-template-columns: .9fr 2.2fr 1.1fr 1fr 1.1fr .8fr; align-items: center; gap: 12px; height: 34px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+              <span class="mono" style="color: #94A3B8">19/08/2026</span>
+              <span style="min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Unity Comprehensive School</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: #94A3B8"><span style="width: 6px; height: 6px; border-radius: 2px; background: #8B5CF6"></span>Professional</span>
+              <span class="mono" style="text-align: right">₦469,800</span>
+              <span style="color: #94A3B8">Flutterwave</span>
+              <span><span style="display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 4px; font-size: 11px; font-weight: 500; background: rgba(34,197,94,.12); color: #4ADE80">Paid</span></span>
+            </div>
+            <div style="display: grid; grid-template-columns: .9fr 2.2fr 1.1fr 1fr 1.1fr .8fr; align-items: center; gap: 12px; height: 34px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+              <span class="mono" style="color: #94A3B8">19/08/2026</span>
+              <span style="min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Accra Ridge School</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: #94A3B8"><span style="width: 6px; height: 6px; border-radius: 2px; background: #3B82F6"></span>Starter</span>
+              <span class="mono" style="text-align: right">₦38,400</span>
+              <span style="color: #94A3B8">Paystack</span>
+              <span><span style="display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 4px; font-size: 11px; font-weight: 500; background: rgba(34,197,94,.12); color: #4ADE80">Paid</span></span>
+            </div>
+            <div style="display: grid; grid-template-columns: .9fr 2.2fr 1.1fr 1fr 1.1fr .8fr; align-items: center; gap: 12px; height: 34px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+              <span class="mono" style="color: #94A3B8">18/08/2026</span>
+              <span style="min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Nurul Islam Academy</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: #94A3B8"><span style="width: 6px; height: 6px; border-radius: 2px; background: #3B82F6"></span>Starter</span>
+              <span class="mono" style="text-align: right">₦28,800</span>
+              <span style="color: #94A3B8">Bank transfer</span>
+              <span><span style="display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 4px; font-size: 11px; font-weight: 500; background: rgba(34,197,94,.12); color: #4ADE80">Paid</span></span>
+            </div>
+            <div style="display: grid; grid-template-columns: .9fr 2.2fr 1.1fr 1fr 1.1fr .8fr; align-items: center; gap: 12px; height: 34px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+              <span class="mono" style="color: #94A3B8">18/08/2026</span>
+              <span style="min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Greenfield International School</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: #94A3B8"><span style="width: 6px; height: 6px; border-radius: 2px; background: #8B5CF6"></span>Professional</span>
+              <span class="mono" style="text-align: right">₦552,600</span>
+              <span style="color: #94A3B8">Paystack</span>
+              <span><span style="display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 4px; font-size: 11px; font-weight: 500; background: rgba(34,197,94,.12); color: #4ADE80">Paid</span></span>
+            </div>
+            <div style="display: grid; grid-template-columns: .9fr 2.2fr 1.1fr 1fr 1.1fr .8fr; align-items: center; gap: 12px; height: 34px; padding: 0 16px; border-bottom: 1px solid #1E3A5F">
+              <span class="mono" style="color: #94A3B8">17/08/2026</span>
+              <span style="min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Alhikmah Model Academy</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; color: #94A3B8"><span style="width: 6px; height: 6px; border-radius: 2px; background: #3B82F6"></span>Starter</span>
+              <span class="mono" style="text-align: right">₦41,250</span>
+              <span style="color: #94A3B8">Paystack</span>
+              <span><span style="display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 4px; font-size: 11px; font-weight: 500; background: rgba(239,68,68,.12); color: #F87171">Failed</span></span>
+            </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 11px 16px; background: #16233A">
+          <span style="font-size: 11px; color: #64748B">
+            <span class="mono" style="color: #F87171">3 failed</span> — all three retry automatically after 24h; two have already been re-attempted.
+          </span>
+          <span class="btn" style="height: 26px; font-size: 11px">Retry all failed</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

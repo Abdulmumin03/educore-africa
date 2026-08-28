@@ -1,0 +1,177 @@
+name: Deploy Super Admin Console
+
+# The internal console deploys on its own cadence and to its own hosts. It
+# shares a database with the school app but nothing else — a release of one
+# must never require a release of the other.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/superadmin/**"
+      - "packages/database/**"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/deploy-superadmin.yml"
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        type: choice
+        options: [staging, production]
+        default: staging
+
+concurrency:
+  group: deploy-superadmin-${{ github.ref }}
+  cancel-in-progress: false # never abort an in-flight deploy
+
+jobs:
+  verify:
+    name: Lint + type-check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Prisma Client is a build artefact, not a checked-in file — nothing
+      # type-checks until it exists.
+      - run: pnpm --filter @educore/database exec prisma generate
+
+      - run: pnpm --filter superadmin lint
+      - run: pnpm --filter superadmin check-types
+
+      # Unit tests only. The smoke suites need a seeded database and a running
+      # server, so they run against the deployed environment, not here.
+      - run: pnpm --filter superadmin test
+
+  build-and-push:
+    name: Build & push image
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write # ghcr.io push
+
+    outputs:
+      image: ${{ steps.meta.outputs.tags }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Image metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}/superadmin
+          tags: |
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build & push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/superadmin/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=superadmin
+          cache-to: type=gha,mode=max,scope=superadmin
+          build-args: |
+            APP_VERSION=${{ github.sha }}
+
+  migrate:
+    name: Apply database migrations
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment || 'production' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      # `migrate deploy`, never `migrate dev`: dev wants to author migrations
+      # and will try to reset a drifted database, which is not a thing CI may
+      # ever do to production.
+      - name: prisma migrate deploy
+        env:
+          DATABASE_URL: ${{ secrets.SUPERADMIN_DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.SUPERADMIN_DIRECT_URL }}
+        run: pnpm --filter @educore/database exec prisma migrate deploy
+
+  release:
+    name: Deploy
+    needs: [build-and-push, migrate]
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment || 'production' }}
+    steps:
+      # Replace the body of this step with whatever the hosting target needs.
+      # The image is already in GHCR; this only has to point the host at it.
+      #   Railway: railway up --service superadmin --image "$IMAGE"
+      #   Fly.io:  flyctl deploy --app educore-superadmin --image "$IMAGE"
+      #   Render:  curl -X POST "$RENDER_DEPLOY_HOOK"
+      - name: Deploy (placeholder)
+        env:
+          IMAGE: ${{ needs.build-and-push.outputs.image }}
+        run: |
+          echo "Would deploy image: $IMAGE"
+          echo "Wire the hosting platform's CLI or deploy hook here."
+
+  smoke:
+    name: Smoke test
+    needs: release
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment || 'production' }}
+    steps:
+      # /api/health is public by design — no session, no IP allowlist — which
+      # is exactly why it is what CI can check from a GitHub runner. Anything
+      # deeper would need a credential this job has no business holding.
+      - name: GET /api/health
+        env:
+          BASE_URL: ${{ vars.SUPERADMIN_BASE_URL }}
+        run: |
+          if [ -z "$BASE_URL" ]; then
+            echo "::error::SUPERADMIN_BASE_URL is not set for this environment."
+            exit 1
+          fi
+
+          for attempt in 1 2 3 4 5 6; do
+            body=$(curl -fsS --max-time 10 "$BASE_URL/api/health") && break
+            echo "attempt $attempt failed; the new container may still be starting"
+            sleep 10
+          done
+
+          if [ -z "${body:-}" ]; then
+            echo "::error::/api/health never answered."
+            exit 1
+          fi
+
+          echo "$body"
+          echo "$body" | grep -q '"status":"ok"' || {
+            echo "::error::Health endpoint answered but reported a degraded service."
+            exit 1
+          }
+          echo "$body" | grep -q "\"version\":\"${GITHUB_SHA}\"" || {
+            echo "::warning::The live version does not match this commit — the host may still be rolling out."
+          }

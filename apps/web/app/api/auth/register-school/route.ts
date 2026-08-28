@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import bcrypt from "bcryptjs"
+import { redeemPromo, validatePromo } from "@educore/database"
 import { prisma } from "@/lib/db"
 import { registerSchoolSchema } from "@/lib/auth-schemas"
 import { CLASSES_BY_TIER, armNames, slugify, termDatesFor } from "@/lib/academic-structure"
@@ -42,6 +43,36 @@ export async function POST(req: Request) {
     slug = `${baseSlug}-${suffix}`
   }
 
+  // Catalogue pricing for the chosen plan. A plan with no catalogue row cannot
+  // be sold, and silently signing the school up for free would be worse than
+  // refusing.
+  const planConfig = await prisma.planConfig.findUnique({ where: { plan: plan.plan } })
+  if (!planConfig) {
+    return NextResponse.json(
+      { error: "That plan is not available right now. Pick another or contact support." },
+      { status: 409 },
+    )
+  }
+  const listPrice = Number(planConfig.termly)
+
+  // Promo codes are checked BEFORE anything is written, using the same shared
+  // validator the console previews with. A code that fails stops the signup
+  // with a readable reason rather than creating the school at full price and
+  // leaving the applicant to argue about it later.
+  let promo: Awaited<ReturnType<typeof validatePromo>> | null = null
+  const submittedCode = plan.promoCode?.trim()
+  if (submittedCode) {
+    promo = await validatePromo(prisma, {
+      code: submittedCode,
+      plan: plan.plan,
+      amount: listPrice,
+    })
+    if (!promo.ok) {
+      return NextResponse.json({ error: promo.message, field: "promoCode" }, { status: 422 })
+    }
+  }
+  const chargeable = promo?.ok ? promo.finalAmount : listPrice
+
   const passwordHash = await bcrypt.hash(admin.password, 12)
   const { year: yearDates, terms } = termDatesFor(academic.sessionName)
 
@@ -57,6 +88,23 @@ export async function POST(req: Request) {
         email: school.email,
         website: school.website || null,
         logoUrl: school.logoUrl || null,
+      },
+    })
+
+    // Every school gets a subscription row at signup. Before SA-08 the plan
+    // was recorded only in an audit payload, which left the commercial layer
+    // blind to schools that had just registered.
+    await tx.schoolSubscription.create({
+      data: {
+        schoolId: createdSchool.id,
+        plan: plan.plan,
+        status: "TRIAL",
+        cycle: "TERMLY",
+        amount: chargeable,
+        seats: planConfig.maxStudents,
+        startedAt: new Date(),
+        trialEndsAt: new Date(Date.now() + 30 * 86_400_000),
+        ...(promo?.ok ? { promoCode: promo.code } : {}),
       },
     })
 
@@ -139,12 +187,38 @@ export async function POST(req: Request) {
         action: "SCHOOL_REGISTERED",
         entityType: "School",
         entityId: createdSchool.id,
-        payload: { plan: plan.plan, sections: academic.sections, armsPerClass: academic.armsPerClass },
+        payload: {
+          plan: plan.plan,
+          sections: academic.sections,
+          armsPerClass: academic.armsPerClass,
+          listPrice,
+          chargeable,
+          promoCode: promo?.ok ? promo.code : null,
+        },
       },
     })
 
     return { schoolId: createdSchool.id, slug: createdSchool.slug, adminUserId: adminUser.id }
   })
+
+  // Redeemed after the transaction: the unique index on (code, school) is what
+  // actually prevents a double redemption, and a clash here must not roll back
+  // a school that was created correctly. If it fails, the school keeps the
+  // discounted amount already on its subscription and the ledger gap is
+  // visible in the console rather than hidden.
+  if (promo?.ok) {
+    const redeemed = await redeemPromo(prisma, {
+      promoCodeId: promo.promoCodeId,
+      schoolId: result.schoolId,
+      plan: plan.plan,
+      amountOff: promo.amountOff,
+    })
+    if (!redeemed.ok) {
+      console.error(
+        `[register-school] promo ${promo.code} applied to ${result.schoolId} but the redemption row failed`,
+      )
+    }
+  }
 
   // Best-effort welcome email — failures don't break the registration.
   const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/auth/login?school=${result.slug}`
@@ -163,5 +237,12 @@ export async function POST(req: Request) {
     schoolId: result.schoolId,
     slug: result.slug,
     redirectUrl: `/auth/login?school=${result.slug}`,
+    pricing: {
+      plan: plan.plan,
+      listPrice,
+      amountOff: promo?.ok ? promo.amountOff : 0,
+      chargeable,
+      promoCode: promo?.ok ? promo.code : null,
+    },
   })
 }

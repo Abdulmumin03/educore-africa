@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Console palette — slate/neutral. Intentionally sober and distinct from the
+   school app's warm "African luxe" theme so it is obvious at a glance which
+   application you are looking at. */
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --radius: 0.5rem;
+    --chart-1: 221 83% 53%;
+    --chart-2: 160 84% 39%;
+    --chart-3: 43 96% 56%;
+    --chart-4: 271 81% 56%;
+    --chart-5: 0 84% 60%;
+  }
+
+  .dark {
+    /* SA-02 palette. These are the same hexes as the sa-* Tailwind tokens,
+       expressed as HSL so the shadcn primitives (Button, Card, Dialog,
+       Table…) inherit the console theme without being rewritten.
+         background #0A1628 · card #1E293B · popover #334155
+         primary    #3B82F6 · border #1E3A5F · ring #3B6090 */
+    --background: 216 60% 10%;
+    --foreground: 210 40% 98%;
+    --card: 217 33% 17%;
+    --card-foreground: 210 40% 98%;
+    --popover: 215 25% 27%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 216 60% 10%;
+    --secondary: 217 27% 22%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 27% 22%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 27% 22%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214 52% 25%;
+    --input: 214 52% 25%;
+    --ring: 214 42% 40%;
+    --chart-1: 217 91% 60%;
+    --chart-2: 33 94% 44%;
+    --chart-3: 258 90% 66%;
+    --chart-4: 175 84% 32%;
+    --chart-5: 347 77% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer base {
+  /* Every number in the console is tabular so columns line up row to row. */
+  .tabular {
+    font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Dark scrollbars — the default light ones are jarring on #0A1628. */
+  * {
+    scrollbar-color: #293548 transparent;
+    scrollbar-width: thin;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #293548;
+    border: 2px solid transparent;
+    background-clip: content-box;
+    border-radius: 6px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3B6090;
+    background-clip: content-box;
+  }
+}

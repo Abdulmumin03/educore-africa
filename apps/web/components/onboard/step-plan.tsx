@@ -1,8 +1,9 @@
 "use client"
 
+import * as React from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Check, Sparkles } from "lucide-react"
+import { Check, Sparkles, TicketPercent } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ScrollReveal } from "@/components/shared/scroll-reveal"
 import { cn } from "@/lib/utils"
@@ -85,10 +86,55 @@ export function StepPlan({ defaults, onBack, onSubmit }: Props) {
     watch,
   } = useForm<StepPlanInput>({
     resolver: zodResolver(stepPlanSchema),
-    defaultValues: defaults ?? { plan: "STARTER" },
+    defaultValues: defaults ?? { plan: "STARTER", promoCode: "" },
   })
 
   const selected = watch("plan")
+  const promoCode = watch("promoCode")
+
+  // Checked against the same validator the server runs at registration, so a
+  // code that reads "valid" here cannot be refused a moment later.
+  const [checking, setChecking] = React.useState(false)
+  const [promoResult, setPromoResult] = React.useState<
+    { ok: boolean; message: string } | null
+  >(null)
+
+  React.useEffect(() => {
+    setPromoResult(null)
+  }, [selected])
+
+  async function checkPromo() {
+    const code = (promoCode ?? "").trim()
+    if (!code) return
+    setChecking(true)
+    setPromoResult(null)
+    try {
+      const response = await fetch("/api/promo/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, plan: selected }),
+      })
+      const body = (await response.json()) as {
+        ok?: boolean
+        message?: string
+        amountOff?: number
+        finalAmount?: number
+        listPrice?: number
+      }
+      setPromoResult(
+        body.ok
+          ? {
+              ok: true,
+              message: `₦${(body.amountOff ?? 0).toLocaleString("en-NG")} off — you would pay ₦${(body.finalAmount ?? 0).toLocaleString("en-NG")} per term instead of ₦${(body.listPrice ?? 0).toLocaleString("en-NG")}.`,
+            }
+          : { ok: false, message: body.message ?? "That code cannot be used." },
+      )
+    } catch {
+      setPromoResult({ ok: false, message: "Could not check that code just now." })
+    } finally {
+      setChecking(false)
+    }
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-7" noValidate>
@@ -198,6 +244,56 @@ export function StepPlan({ defaults, onBack, onSubmit }: Props) {
         )}
       />
       {errors.plan && <p className="text-sm text-destructive">{errors.plan.message}</p>}
+
+      <ScrollReveal delay={380}>
+        <div className="rounded-2xl border border-navy/10 bg-cream-soft/60 p-5">
+          <label
+            htmlFor="promoCode"
+            className="flex items-center gap-2 text-sm font-semibold text-navy"
+          >
+            <TicketPercent className="h-4 w-4 text-amber-700" aria-hidden="true" />
+            Have a promo code?
+          </label>
+          <p className="mt-1 text-xs text-navy/55">
+            Optional. We will check it now so there are no surprises at the end.
+          </p>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <Controller
+              control={control}
+              name="promoCode"
+              render={({ field }) => (
+                <input
+                  id="promoCode"
+                  {...field}
+                  value={field.value ?? ""}
+                  onChange={(event) => field.onChange(event.target.value.toUpperCase())}
+                  placeholder="TERM1-2026"
+                  className="h-11 w-48 rounded-xl border border-navy/15 bg-white px-3 font-mono text-sm uppercase tracking-wide text-navy placeholder:text-navy/30 focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200"
+                />
+              )}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              disabled={!promoCode || checking}
+              onClick={() => void checkPromo()}
+              className="h-11 border-navy/15 text-navy hover:bg-white"
+            >
+              {checking ? "Checking…" : "Check code"}
+            </Button>
+            {promoResult && (
+              <span
+                className={cn(
+                  "text-sm",
+                  promoResult.ok ? "font-medium text-emerald-700" : "text-destructive",
+                )}
+              >
+                {promoResult.message}
+              </span>
+            )}
+          </div>
+        </div>
+      </ScrollReveal>
 
       <ScrollReveal delay={400}>
         <div className="flex items-center justify-between border-t border-navy/10 pt-5">
