@@ -1,4 +1,4 @@
-# EduCore Africa
+# EduCore Africa - das
 
 Multi-tenant school-management software for African K-12 schools, and the
 internal console the EduCore Africa team runs it from.
